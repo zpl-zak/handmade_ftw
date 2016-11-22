@@ -153,17 +153,19 @@ main(void)
             | ArenaFlag_AllowRealloc
             | ArenaFlag_AllowHeaders;
         PushValue(&TempArena, s32, 1, Expect(8, 1)); // [s32 1]
-        PushValue(&TempArena, s32, 2, Expect(8, 1)); // [s32 1; s32 2]
+        PushValue(&TempArena, s32, 2, Tag(42, Expect(8, 1))); // [s32 1; s32 2]
         PushValue(&TempArena, s32, 3, Expect(8, 1)); // [s32 1; s32 2; s32 3]
-        PushValue(&TempArena, u8,  4, Expect(8, 1)); // [s32 1; s32 2; s32 3; u8 4]
+        PushValue(&TempArena, u8,  4, Tag(42, Expect(8, 1))); // [s32 1; s32 2; s32 3; u8 4]
         PushValue(&TempArena, s32, 5, Expect(8, 1)); // [s32 1; s32 2; s32 3; u8 4; s32 5]
         
         /*
         TempArena Contains values of different sizes.
         GetVaryBlock(..) retrieves element by index no matter how varying array is.
         */
+         tag_scan_result tag = GetVaryBlockTagResult(&TempArena, DefaultTagScan(), 42); // yields 2
+        tag = GetVaryBlockTagResult(&TempArena, tag, 42); // yields 4
         
-        fprintf(stdout, "Number is: %d\n", *GetVaryBlock(&TempArena, u8, 3));
+        fprintf(stdout, "Number is: %d\n", *(tag.Value));
     }
     #endif
     fprintf(stdout, "\n");

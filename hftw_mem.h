@@ -2,7 +2,14 @@
 
 #if !defined(HFTW_MEM_H)
 
-LinkedList(s32)
+typedef struct
+{
+    s32 Size;
+    u32 Tag;
+    u32 Offset;
+} arena_header;
+
+LinkedList(arena_header)
 
 typedef struct
 {
@@ -14,7 +21,7 @@ typedef struct
 
     s32 TempCount;
     
-    Node_s32 *Header, *HeaderEnd;
+    Node_arena_header *Header, *HeaderEnd;
 } Memory_Arena;
 
 typedef enum
@@ -74,6 +81,7 @@ typedef struct
     u32 Flags;
     u32 Alignment;
     u32 Expectation;
+    u32 Tag;
 } arena_push_params;
 
 inline arena_push_params
@@ -83,6 +91,7 @@ DefaultArenaParams(void)
     Params.Flags = ArenaPushFlag_ClearToZero;
     Params.Alignment = 4;
     Params.Expectation = 0;
+    Params.Tag = 0;
     return(Params);
 }
 
@@ -135,6 +144,14 @@ AlignExpect(u32 Alignment, u32 Expectation, b32 Clear)
     return(Params);
 }
 
+inline arena_push_params
+Tag(u32 Tag, arena_push_params Rest)
+{
+    arena_push_params Params = Rest;
+    Params.Tag = Tag;
+    return(Params);
+}
+
 inline memory_index
 GetArenaSizeRemaining(Memory_Arena *Arena, arena_push_params Params)
 {
@@ -153,19 +170,62 @@ GetBlockByRecord(Memory_Arena *Arena, size_t Index)
     Assert(Arena->Header && "Arena headers aren't enabled!");
       u8 *Result = Arena->Base;
     size_t Idx = 0;
-    for(Node_s32 *Record = Arena->Header->Next;
+    for(Node_arena_header *Record = Arena->Header->Next;
         Record;
         Record = Record->Next)
 {
     if(Idx++ == Index)
         break;
-    Result += Record->Value;
+    Result += Record->Value.Size;
 }
 return(Result);
 }
 
+typedef struct
+{
+    u8 *Value;
+    Node_arena_header *Node;
+} tag_scan_result;
+
+inline tag_scan_result
+DefaultTagScan(void)
+{
+    tag_scan_result Result = {0};
+    return(Result);
+}
+
+inline tag_scan_result
+GetBlockByTagAndRecord(Memory_Arena *Arena, tag_scan_result scan, u32 Tag)
+{
+    if(!scan.Node)
+        scan.Node = Arena->Header;
+    Assert(scan.Node && "Arena headers aren't enabled!");
+    tag_scan_result NewResult = {0};
+    u8 *Result = Arena->Base + scan.Node->Value.Offset;
+    for(Node_arena_header *Record = scan.Node;
+        Record;
+        Record = Record->Next)
+    {
+        if(Record->Value.Tag == Tag)
+        {
+            NewResult.Value = Result;
+            NewResult.Node = Record->Next;
+            break;
+        }
+        Result += Record->Value.Size;
+    }
+    return(NewResult);
+}
+
 #define GetVaryBlock(arena, type, idx) \
 (type *)(GetBlockByRecord(arena,(size_t)idx))
+
+#define GetVaryBlockTagValue(arena, scan, type, tag) \
+(type *)(GetBlockByTagAndRecord(arena, scan, tag).Value)
+
+#define GetVaryBlockTagResult(arena, scan, tag) \
+ GetBlockByTagAndRecord(arena, scan, tag)
+
 
 #define PushStruct(Arena, type, ...) (type *)PushSize_(Arena, sizeof(type), ## __VA_ARGS__)
 #define PushArray(Arena, Count, type, ...) (type *)PushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
@@ -236,15 +296,20 @@ PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
     
     if(Params.Flags & ArenaFlag_AllowHeaders)
     {
+        arena_header header = {0};
+        header.Tag = Params.Tag;
+        header.Size = (s32)SizeInit;
+        header.Offset = (u32)Arena->Used - (u32)Size;
         if(!Arena->Header)
         {
-            Arena->Header = NewNode_s32(0);
-            Arena->HeaderEnd = NewNode_s32((s32)SizeInit);
+            arena_header dummy = {0};
+            Arena->Header = NewNode_arena_header(dummy);
+            Arena->HeaderEnd = NewNode_arena_header(header);
             Arena->Header->Next = Arena->HeaderEnd;
         }
         else
         {
-            Arena->HeaderEnd = AddNode_s32(Arena->HeaderEnd, (s32)SizeInit);
+            Arena->HeaderEnd = AddNode_arena_header(Arena->HeaderEnd, header);
         }
     }
     
