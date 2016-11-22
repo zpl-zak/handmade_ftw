@@ -9,10 +9,12 @@
 #include "tests/monster.h"
 
 /* TEST SWITCHES */
-#define MONSTER_DYNAMIC_PROPERTY 1
-#define RANDOM_DATA 1
-#define PLATFORM_ALLOC 1
-#define STRING_TEST 1
+#define MONSTER_DYNAMIC_PROPERTY 0
+#define RANDOM_DATA 0
+#define PLATFORM_ALLOC 0
+#define STRING_TEST 0
+#define MEMORY_REALLOC 0
+#define MEMORY_HEADERS 1
 
 int
 main(void)
@@ -121,6 +123,49 @@ main(void)
     
     
 #endif
+#if MEMORY_REALLOC
+    {
+        Memory_Arena TempArena;
+        BuildArena(&TempArena, sizeof(s32)*4);
+        TempArena.Flags = TempArena.Flags 
+            | ArenaFlag_AllowRealloc;
+        
+        for(u8 Idx=0;
+            Idx<16;
+            ++Idx)
+        {
+            PushValue(&TempArena, s32, Idx, Expect(CSize(s32, 4), 1));
+              
+            fprintf(stdout, "Number %d added.\n", *GetBlock(&TempArena, s32, Idx));
+            
+            if(TempArena.WasExpanded)
+            {
+                fprintf(stdout, "Expansion happened!\n\n");
+            }
+        }
+    }
+    #endif
+    #if MEMORY_HEADERS
+    {
+        Memory_Arena TempArena;
+        BuildArena(&TempArena, sizeof(s32)*4);
+        TempArena.Flags = TempArena.Flags 
+            | ArenaFlag_AllowRealloc
+            | ArenaFlag_AllowHeaders;
+        PushValue(&TempArena, s32, 1, Expect(8, 1)); // [s32 1]
+        PushValue(&TempArena, s32, 2, Expect(8, 1)); // [s32 1; s32 2]
+        PushValue(&TempArena, s32, 3, Expect(8, 1)); // [s32 1; s32 2; s32 3]
+        PushValue(&TempArena, u8,  4, Expect(8, 1)); // [s32 1; s32 2; s32 3; u8 4]
+        PushValue(&TempArena, s32, 5, Expect(8, 1)); // [s32 1; s32 2; s32 3; u8 4; s32 5]
+        
+        /*
+        TempArena Contains values of different sizes.
+        GetVaryBlock(..) retrieves element by index no matter how varying array is.
+        */
+        
+        fprintf(stdout, "Number is: %d\n", *GetVaryBlock(&TempArena, u8, 3));
+    }
+    #endif
     fprintf(stdout, "\n");
     return(0);
 }

@@ -1,0 +1,8 @@
+.vs
+*.exe
+*.exp
+*.ilk
+*.lib
+*.dll
+*.ctm
+*.pdb

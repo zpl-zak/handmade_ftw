@@ -2,14 +2,26 @@
 
 #if !defined(HFTW_MEM_H)
 
+LinkedList(s32)
+
 typedef struct
 {
     memory_index Size;
     uint8 *Base;
     memory_index Used;
+    u8 Flags;
+    b32 WasExpanded;
 
-    int32 TempCount;
+    s32 TempCount;
+    
+    Node_s32 *Header, *HeaderEnd;
 } Memory_Arena;
+
+typedef enum
+{
+    ArenaFlag_AllowRealloc = 0x1,
+    ArenaFlag_AllowHeaders = 0x01,
+} arena_flags;
 
 typedef struct
 {
@@ -23,7 +35,11 @@ InitializeArena(Memory_Arena *Arena, memory_index Size, void *Base)
     Arena->Size = Size;
     Arena->Base = (uint8 *)Base;
     Arena->Used = 0;
+    Arena->WasExpanded = 0;
     Arena->TempCount = 0;
+    Arena->Flags = 0;
+    Arena->Header = 0;
+        Arena->HeaderEnd = 0;
 }
 
 inline void
@@ -50,21 +66,23 @@ GetAlignmentOffset(Memory_Arena *Arena, memory_index Alignment)
 
 typedef enum
 {
-    ArenaFlag_ClearToZero = 0x1,
+    ArenaPushFlag_ClearToZero = 0x1,
 } arena_push_flag;
 
 typedef struct
 {
     u32 Flags;
     u32 Alignment;
+    u32 Expectation;
 } arena_push_params;
 
 inline arena_push_params
 DefaultArenaParams(void)
 {
     arena_push_params Params;
-    Params.Flags = ArenaFlag_ClearToZero;
+    Params.Flags = ArenaPushFlag_ClearToZero;
     Params.Alignment = 4;
+    Params.Expectation = 0;
     return(Params);
 }
 
@@ -72,7 +90,7 @@ inline arena_push_params
 AlignNoClear(u32 Alignment)
 {
     arena_push_params Params = DefaultArenaParams();
-    Params.Flags &= ~ArenaFlag_ClearToZero;
+    Params.Flags &= ~ArenaPushFlag_ClearToZero;
     Params.Alignment = Alignment;
     return(Params);
 }
@@ -83,11 +101,11 @@ Align(u32 Alignment, b32 Clear)
     arena_push_params Params = DefaultArenaParams();
     if(Clear)
     {
-        Params.Flags |= ArenaFlag_ClearToZero;
+        Params.Flags |= ArenaPushFlag_ClearToZero;
     }
     else
     {
-        Params.Flags &= ~ArenaFlag_ClearToZero;
+        Params.Flags &= ~ArenaPushFlag_ClearToZero;
     }
     Params.Alignment = Alignment;
     return(Params);
@@ -97,7 +115,23 @@ inline arena_push_params
 NoClear(void)
 {
     arena_push_params Params = DefaultArenaParams();
-    Params.Flags &= ~ArenaFlag_ClearToZero;
+    Params.Flags &= ~ArenaPushFlag_ClearToZero;
+    return(Params);
+}
+
+inline arena_push_params
+Expect(u32 Expectation, b32 Clear)
+{
+    arena_push_params Params = Align(4, Clear);
+    Params.Expectation = Expectation;
+    return(Params);
+}
+
+inline arena_push_params
+AlignExpect(u32 Alignment, u32 Expectation, b32 Clear)
+{
+    arena_push_params Params = Align(Alignment, Clear);
+    Params.Expectation = Expectation;
     return(Params);
 }
 
@@ -109,12 +143,37 @@ GetArenaSizeRemaining(Memory_Arena *Arena, arena_push_params Params)
     return(Result);
 }
 
-// TODO(casey): Optional "clear" parameter!!!!
+
+#define GetBlock(arena, type, idx) \
+(type *)&(arena->Base)[sizeof(type)*idx]
+
+inline void *
+GetBlockByRecord(Memory_Arena *Arena, size_t Index)
+{
+    Assert(Arena->Header && "Arena headers aren't enabled!");
+      u8 *Result = Arena->Base;
+    size_t Idx = 0;
+    for(Node_s32 *Record = Arena->Header->Next;
+        Record;
+        Record = Record->Next)
+{
+    if(Idx++ == Index)
+        break;
+    Result += Record->Value;
+}
+return(Result);
+}
+
+#define GetVaryBlock(arena, type, idx) \
+(type *)(GetBlockByRecord(arena,(size_t)idx))
+
 #define PushStruct(Arena, type, ...) (type *)PushSize_(Arena, sizeof(type), ## __VA_ARGS__)
 #define PushArray(Arena, Count, type, ...) (type *)PushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
 #define PushSize(Arena, Size, ...) PushSize_(Arena, Size, ## __VA_ARGS__)
 #define PushCopy(Arena, Size, Source, ...) Copy(Size, Source, PushSize_(Arena, Size, ## __VA_ARGS__))
 #define PushType PushStruct
+#define PushValue(Arena, type, Value, ...) *((type *) PushType(Arena, type, ## __VA_ARGS__)) = Value
+
 inline memory_index
 GetEffectiveSizeFor(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
 {
@@ -134,12 +193,35 @@ ArenaHasRoomFor(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Pa
     return(Result);
 }
 
+inline void
+ArenaExpand(Memory_Arena *Arena, memory_index Size)
+{
+    if(!((Arena->Used + Size) <= Arena->Size))
+    {
+        if(Arena->Flags & ArenaFlag_AllowRealloc)
+        {
+            Arena->Base = PlatformMemRealloc(Arena->Base, Arena->Size + Size);
+            Arena->Size += Size;
+            Arena->WasExpanded = 1;
+            Assert((Arena->Used + Size) <= Arena->Size);
+        }
+        else
+        {
+            Assert(!"Not enough memory in Memory_Arena!");
+        }
+    }
+    else
+    {
+        Arena->WasExpanded = 0;
+    }
+}
+
 inline void *
 PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
 {
     memory_index Size = GetEffectiveSizeFor(Arena, SizeInit, Params);
     
-    Assert((Arena->Used + Size) <= Arena->Size);
+    ArenaExpand(Arena, Size + Params.Expectation);
 
     memory_index AlignmentOffset = GetAlignmentOffset(Arena, Params.Alignment);
     void *Result = Arena->Base + Arena->Used + AlignmentOffset;
@@ -147,9 +229,23 @@ PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
 
     Assert(Size >= SizeInit);
 
-    if(Params.Flags & ArenaFlag_ClearToZero)
+    if(Params.Flags & ArenaPushFlag_ClearToZero)
     {
         ZeroSize(SizeInit, Result);
+    }
+    
+    if(Params.Flags & ArenaFlag_AllowHeaders)
+    {
+        if(!Arena->Header)
+        {
+            Arena->Header = NewNode_s32(0);
+            Arena->HeaderEnd = NewNode_s32((s32)SizeInit);
+            Arena->Header->Next = Arena->HeaderEnd;
+        }
+        else
+        {
+            Arena->HeaderEnd = AddNode_s32(Arena->HeaderEnd, (s32)SizeInit);
+        }
     }
     
     return(Result);

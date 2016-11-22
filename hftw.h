@@ -24,6 +24,8 @@
 #define ZeroStruct(Instance) ZeroSize(sizeof(Instance), &(Instance))
 #define ZeroArray(Count, Pointer) ZeroSize(Count*sizeof((Pointer)[0]), Pointer)
 
+#define CSize(type, Count) sizeof(type)*Count
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -260,6 +262,8 @@ inline u32 GetThreadID(void)
 #endif
 
 #include "hftw_platform.h"
+#include "hftw_node.h"
+
 #include "hftw_mem.h"
 
 #define HANDMADE_MATH_IMPLEMENTATION
