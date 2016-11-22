@@ -150,8 +150,8 @@ main(void)
         Memory_Arena TempArena;
         BuildArena(&TempArena, sizeof(s32)*4);
         TempArena.Flags = TempArena.Flags 
-            | ArenaFlag_AllowRealloc
-            | ArenaFlag_AllowHeaders;
+            | ArenaFlag_AllowRealloc;
+        
         PushValue(&TempArena, s32, 1, Expect(8, 1)); // [s32 1]
         PushValue(&TempArena, s32, 2, Tag(42, Expect(8, 1))); // [s32 1; s32 2]
         PushValue(&TempArena, s32, 3, Expect(8, 1)); // [s32 1; s32 2; s32 3]

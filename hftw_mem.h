@@ -27,7 +27,7 @@ typedef struct
 typedef enum
 {
     ArenaFlag_AllowRealloc = 0x1,
-    ArenaFlag_AllowHeaders = 0x01,
+    ArenaFlag_DisallowHeaders = 0x01,
 } arena_flags;
 
 typedef struct
@@ -294,7 +294,7 @@ PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
         ZeroSize(SizeInit, Result);
     }
     
-    if(Params.Flags & ArenaFlag_AllowHeaders)
+    if(~(Params.Flags & ArenaFlag_DisallowHeaders))
     {
         arena_header header = {0};
         header.Tag = Params.Tag;
