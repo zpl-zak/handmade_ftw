@@ -230,8 +230,8 @@ ArenaGetBlockByTagAndRecord(arena, scan, tag)
 #define ArenaPushStruct(Arena, type, ...) (type *)ArenaPushSize_(Arena, sizeof(type), ## __VA_ARGS__)
 #define ArenaPushArray(Arena, Count, type, ...) (type *)ArenaPushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
 #define ArenaPushSize(Arena, Size, ...) ArenaPushSize_(Arena, Size, ## __VA_ARGS__)
-#define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, PushSize_(Arena, Size, ## __VA_ARGS__))
-#define ArenaPushType PushStruct
+#define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, ArenaPushSize_(Arena, Size, ## __VA_ARGS__))
+#define ArenaPushType ArenaPushStruct
 #define ArenaPushValue(Arena, type, Value, ...) *((type *) ArenaPushType(Arena, type, ## __VA_ARGS__)) = Value
 
 inline memory_index
@@ -317,10 +317,10 @@ ArenaPushSize_(memory_arena *Arena, memory_index SizeInit, arena_push_params Par
 }
 
 inline char *
-ArenaPushString(memory_arena *Arena, char *Source)
+ArenaPushString(memory_arena *Arena, const char *Source)
 {
     u32 Size = 1;
-    for(char *At = Source;
+    for(const char *At = Source;
         *At;
         ++At)
     {
@@ -339,7 +339,7 @@ ArenaPushString(memory_arena *Arena, char *Source)
 }
 
 inline char *
-ArenaPushAndNullTerminate(memory_arena *Arena, u32 Length, char *Source)
+ArenaPushAndNullTerminate(memory_arena *Arena, u32 Length, const char *Source)
 {
     char *Dest = (char *)ArenaPushSize_(Arena, Length + 1, ArenaNoClear());
     for(u32 CharIndex = 0;
@@ -398,7 +398,7 @@ ArenaSub(memory_arena *Result, memory_arena *Arena, memory_index Size, arena_pus
 }
 
 inline void *
-Copy(memory_index Size, void *SourceInit, void *DestInit)
+Copy(memory_index Size, const void *SourceInit, void *DestInit)
 {
     u8 *Source = (u8 *)SourceInit;
     u8 *Dest = (u8 *)DestInit;

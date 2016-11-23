@@ -25,7 +25,7 @@
 #define ZeroArray(Count, Pointer) ZeroSize(Count*sizeof((Pointer)[0]), Pointer)
 
 #define CSize(type, Count) sizeof(type)*Count
-
+#define Count(array) sizeof(array)/sizeof(array[0])
 
 #ifdef __cplusplus
 extern "C" {

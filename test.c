@@ -19,6 +19,7 @@
 int
 main(void)
 {
+    
     fprintf(stdout, "\n");
     return(0);
 }

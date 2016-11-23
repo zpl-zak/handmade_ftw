@@ -28,7 +28,7 @@ extern "C"
 
 #define MathMIN(a, b) (a) > (b) ? (b) : (a)
 #define MathMAX(a, b) (a) < (b) ? (b) : (a)
-#define HMN_ABS(a) (a) < 0 ? -(a) : (a)
+#define MathABS(a) (a) < 0 ? -(a) : (a)
 #define MathMOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
 #define MathSQUARE(x) ((x) * (x))
 
@@ -36,64 +36,64 @@ typedef union vec2
 {
     struct
     {
-        float X, Y;
+        real32 X, Y;
     };
 
     struct
     {
-        float U, V;
+        real32 U, V;
     };
 
     struct
     {
-        float Left, Right;
+        real32 Left, Right;
     };
 
-    float Elements[2];
+    real32 Elements[2];
 } vec2;
 
 typedef union vec3
 {
     struct
     {
-        float X, Y, Z;
+        real32 X, Y, Z;
     };
 
     struct
     {
-        float U, V, W;
+        real32 U, V, W;
     };
 
     struct
     {
-        float R, G, B;
+        real32 R, G, B;
     };
 
     struct
     {
         vec2 XY;
-        float Ignored0_;
+        real32 Ignored0_;
     };
 
     struct
     {
-        float Ignored1_;
+        real32 Ignored1_;
         vec2 YZ;
     };
 
     struct
     {
         vec2 UV;
-        float Ignored2_;
+        real32 Ignored2_;
     };
 
     struct
     {
-        float Ignored3_;
+        real32 Ignored3_;
         vec2 VW;
     };
 
-    float Elements[3];
+    real32 Elements[3];
 } vec3;
 
 typedef union vec4
@@ -105,11 +105,11 @@ typedef union vec4
             vec3 XYZ;
             struct
             {
-                float X, Y, Z;
+                real32 X, Y, Z;
             };
         };
 
-        float W;
+        real32 W;
     };
     struct
     {
@@ -118,40 +118,40 @@ typedef union vec4
             vec3 RGB;
             struct
             {
-                float R, G, B;
+                real32 R, G, B;
             };
         };
 
-        float A;
+        real32 A;
     };
 
     struct
     {
         vec2 XY;
-        float Ignored0_;
-        float Ignored1_;
+        real32 Ignored0_;
+        real32 Ignored1_;
     };
 
     struct
     {
-        float Ignored2_;
+        real32 Ignored2_;
         vec2 YZ;
-        float Ignored3_;
+        real32 Ignored3_;
     };
 
     struct
     {
-        float Ignored4_;
-        float Ignored5_;
+        real32 Ignored4_;
+        real32 Ignored5_;
         vec2 ZW;
     };
 
-    float Elements[4];
+    real32 Elements[4];
 } vec4;
 
 typedef union mat4
 {
-    float Elements[4][4];
+    real32 Elements[4][4];
 } mat4;
 
 typedef vec2 v2;
@@ -159,24 +159,24 @@ typedef vec3 v3;
 typedef vec4 v4;
 typedef mat4 m4;    
 
-HFTWDEF float MathToRadians(float Degrees);
-HFTWDEF float MathInner(vec3 A, vec3 B);
-HFTWDEF float MathSquareRoot(float Float);
-HFTWDEF float MathLengthSquareRoot(vec3 A);
-HFTWDEF float MathFastInverseSquareRoot(float Number);
-HFTWDEF float MathLength(vec3 A);    
-HFTWDEF float MathPower(float Base, int Exponent);
-HFTWDEF float MathClamp(float Min, float Value, float Max);
+HFTWDEF real32 MathToRadians(real32 Degrees);
+HFTWDEF real32 MathInner(vec3 A, vec3 B);
+HFTWDEF real32 MathSquareRoot(real32 Float);
+HFTWDEF real32 MathLengthSquareRoot(vec3 A);
+HFTWDEF real32 MathFastInverseSquareRoot(real32 Number);
+HFTWDEF real32 MathLength(vec3 A);    
+HFTWDEF real32 MathPower(real32 Base, int Exponent);
+HFTWDEF real32 MathClamp(real32 Min, real32 Value, real32 Max);
 
 HFTWDEF vec3 MathNormalize(vec3 A);
 HFTWDEF vec3 MathCross(vec3 VecOne, vec3 VecTwo);
-HFTWDEF float MathDot(vec3 VecOne, vec3 VecTwo);
+HFTWDEF real32 MathDot(vec3 VecOne, vec3 VecTwo);
 
 HFTWDEF vec2 MathVec2i(int X, int Y);
-HFTWDEF vec2 MathVec2(float X, float Y);
-HFTWDEF vec3 MathVec3(float X, float Y, float Z);
+HFTWDEF vec2 MathVec2(real32 X, real32 Y);
+HFTWDEF vec3 MathVec3(real32 X, real32 Y, real32 Z);
 HFTWDEF vec3 MathVec3i(int X, int Y, int Z);
-HFTWDEF vec4 MathVec4(float X, float Y, float Z, float W);
+HFTWDEF vec4 MathVec4(real32 X, real32 Y, real32 Z, real32 W);
 HFTWDEF vec4 MathVec4i(int X, int Y, int Z, int W);
 
 HFTWDEF vec2 MathAddVec2(vec2 Left, vec2 Right);
@@ -196,14 +196,14 @@ HFTWDEF vec3 MathDivideVec3(vec3 Left, vec3 Right);
 HFTWDEF vec4 MathDivideVec4(vec4 Left, vec4 Right);
 
 HFTWDEF mat4 MathMat4(void);
-HFTWDEF mat4 MathMat4d(float Diagonal);
+HFTWDEF mat4 MathMat4d(real32 Diagonal);
 HFTWDEF mat4 MathMultiplyMat4(mat4 Left, mat4 Right);
 HFTWDEF vec4 MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector);
 
-HFTWDEF mat4 MathOrthographic(float Left, float Right, float Bottom, float Top, float Near, float Far);
-HFTWDEF mat4 MathPerspective(float FOV, float AspectRatio, float Near, float Far);
+HFTWDEF mat4 MathOrthographic(real32 Left, real32 Right, real32 Bottom, real32 Top, real32 Near, real32 Far);
+HFTWDEF mat4 MathPerspective(real32 FOV, real32 AspectRatio, real32 Near, real32 Far);
 HFTWDEF mat4 MathTranslate(vec3 Translation);
-HFTWDEF mat4 MathRotate(float Angle, vec3 Axis);
+HFTWDEF mat4 MathRotate(real32 Angle, vec3 Axis);
 HFTWDEF mat4 MathScale(vec3 Scale);
 
 HFTWDEF mat4 MathLookAt(vec3 Eye, vec3 Center, vec3 Up);
@@ -245,8 +245,8 @@ HFTWDEF vec3 operator*(vec3 Left, vec3 Right);
 HFTWDEF vec4 operator*(vec4 Left, vec4 Right);
 HFTWDEF mat4 operator*(mat4 Left, mat4 Right);
 
-HFTWDEF vec3 operator*(vec3 Left, float Right);
-HFTWDEF vec2 operator*(vec2 Left, float Right);
+HFTWDEF vec3 operator*(vec3 Left, real32 Right);
+HFTWDEF vec2 operator*(vec2 Left, real32 Right);
 
 HFTWDEF vec4 operator*(mat4 Matrix, vec4 Vector);
 
@@ -260,68 +260,68 @@ HFTWDEF vec4 operator/(vec4 Left, vec4 Right);
 
 #ifdef HANDMADE_MATH_IMPLEMENTATION
 
-HINLINE float
-MathToRadians(float Degrees)
+HINLINE real32
+MathToRadians(real32 Degrees)
 {
-    float Result = Degrees * (MathPI32 / 180.0f);
+    real32 Result = Degrees * (MathPI32 / 180.0f);
 
     return (Result);
 }
 
-HINLINE float
+HINLINE real32
 MathInner(vec3 A, vec3 B)
 {
-    float Result = A.X * B.X + A.Y * B.Y + A.Z * B.Z;
+    real32 Result = A.X * B.X + A.Y * B.Y + A.Z * B.Z;
 
     return (Result);
 }
 
-HINLINE float
-MathSquareRoot(float Float)
+HINLINE real32
+MathSquareRoot(real32 Float)
 {    
-    float Result = sqrtf(Float);
+    real32 Result = sqrtf(Float);
 
     return(Result);
 }
 
-HINLINE float
+HINLINE real32
 MathLengthSquareRoot(vec3 A)
 {
-    float Result = MathInner(A, A);
+    real32 Result = MathInner(A, A);
 
     return (Result);
 }
 
 // Refer to https://en.wikipedia.org/wiki/Fast_inverse_square_root
-HINLINE float
-MathFastInverseSquareRoot(float Number)
+HINLINE real32
+MathFastInverseSquareRoot(real32 Number)
 {
     long i;
-    float x2, y;
-    const float threehalfs = 1.5f;
+    real32 x2, y;
+    const real32 threehalfs = 1.5f;
 
     x2 = Number * 0.5f;
     y  = Number;
-    i  = * ( long * ) &y;          // evil floating point bit level hacking
+    i  = * ( long * ) &y;          // evil real32ing point bit level hacking
     i  = 0x5f3759df - ( i >> 1 );  // what the fuck? 
-    y  = * ( float * ) &i;
+    y  = * ( real32 * ) &i;
     
     y  = y * ( threehalfs - ( x2 * y * y ) );
 
     return ( y );
 }
 
-HINLINE float
+HINLINE real32
 MathLength(vec3 A)
 {
-    float Result = MathSquareRoot(MathLengthSquareRoot(A));
+    real32 Result = MathSquareRoot(MathLengthSquareRoot(A));
     return (Result);
 }
 
-HINLINE float
-MathPower(float Base, int Exponent)
+HINLINE real32
+MathPower(real32 Base, int Exponent)
 {
-    float Result = 1;
+    real32 Result = 1;
     if(Exponent > 0)
     {
         int i;
@@ -341,18 +341,18 @@ MathPower(float Base, int Exponent)
     return (Result);
 }
 
-HINLINE float
-MathLerp(float A, float Time, float B)
+HINLINE real32
+MathLerp(real32 A, real32 Time, real32 B)
 {
-    float Result = (1.0f - Time) * A + Time * B;
+    real32 Result = (1.0f - Time) * A + Time * B;
 
     return (Result);
 }
 
-HINLINE float
-MathClamp(float Min, float Value, float Max)
+HINLINE real32
+MathClamp(real32 Min, real32 Value, real32 Max)
 {
-    float Result = Value;
+    real32 Result = Value;
 
     if(Result < Min)
     {
@@ -390,10 +390,10 @@ MathCross(vec3 VecOne, vec3 VecTwo)
     return (Result);
 }
 
-HINLINE float
+HINLINE real32
 MathDot(vec3 VecOne, vec3 VecTwo)
 {
-    float Result = 0;
+    real32 Result = 0;
 
     Result = (VecOne.X * VecTwo.X) + (VecOne.Y * VecTwo.Y) + (VecOne.Z * VecTwo.Z);
 
@@ -401,7 +401,7 @@ MathDot(vec3 VecOne, vec3 VecTwo)
 }
 
 HINLINE vec2
-MathVec2(float X, float Y)
+MathVec2(real32 X, real32 Y)
 {
     vec2 Result;
 
@@ -416,14 +416,14 @@ MathVec2i(int X, int Y)
 {
     vec2 Result;
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
+    Result.X = (real32)X;
+    Result.Y = (real32)Y;
 
     return (Result);
 }
 
 HINLINE vec3
-MathVec3(float X, float Y, float Z)
+MathVec3(real32 X, real32 Y, real32 Z)
 {
     vec3 Result;
 
@@ -439,15 +439,15 @@ MathVec3i(int X, int Y, int Z)
 {
     vec3 Result;
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
-    Result.Z = (float)Z;
+    Result.X = (real32)X;
+    Result.Y = (real32)Y;
+    Result.Z = (real32)Z;
 
     return (Result);
 }
 
 HINLINE vec4
-MathVec4(float X, float Y, float Z, float W)
+MathVec4(real32 X, real32 Y, real32 Z, real32 W)
 {
     vec4 Result;
 
@@ -464,10 +464,10 @@ MathVec4i(int X, int Y, int Z, int W)
 {
     vec4 Result;
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
-    Result.Z = (float)Z;
-    Result.W = (float)W;
+    Result.X = (real32)X;
+    Result.Y = (real32)Y;
+    Result.Z = (real32)Z;
+    Result.W = (real32)W;
 
     return (Result);
 }
@@ -625,7 +625,7 @@ MathMat4()
 }
 
 mat4
-MathMat4d(float Diagonal)
+MathMat4d(real32 Diagonal)
 {
     mat4 Result;
 
@@ -658,7 +658,7 @@ MathMultiplyMat4(mat4 Left, mat4 Right)
         int Columns;
         for(Columns = 0; Columns < 4; ++Columns)
         {
-            float Sum = 0;
+            real32 Sum = 0;
             int CurrentMatrice;
             for(CurrentMatrice = 0; CurrentMatrice < 4; ++CurrentMatrice)
             {
@@ -680,7 +680,7 @@ MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector)
     int Rows, Columns;
     for(Rows = 0; Rows < 4; ++Rows)
     {
-        float Sum = 0;
+        real32 Sum = 0;
         for(Columns = 0; Columns < 4; ++Columns)
         {
             Sum += Matrix.Elements[Rows][Columns] * Vector.Elements[Columns];
@@ -693,7 +693,7 @@ MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector)
 }
 
 mat4
-MathOrthographic(float Left, float Right, float Bottom, float Top, float Near, float Far)
+MathOrthographic(real32 Left, real32 Right, real32 Bottom, real32 Top, real32 Near, real32 Far)
 {
     mat4 Result = MathMat4d(1.0f);
 
@@ -709,11 +709,11 @@ MathOrthographic(float Left, float Right, float Bottom, float Top, float Near, f
 }
 
 mat4
-MathPerspective(float FOV, float AspectRatio, float Near, float Far)
+MathPerspective(real32 FOV, real32 AspectRatio, real32 Near, real32 Far)
 {
     mat4 Result = MathMat4d(1.0f);
 
-    float TanThetaOver2 = tanf(FOV * (MathPI32 / 360.0f));
+    real32 TanThetaOver2 = tanf(FOV * (MathPI32 / 360.0f));
     
     Result.Elements[0][0] = 1.0f / TanThetaOver2;
     Result.Elements[1][1] = AspectRatio / TanThetaOver2;
@@ -738,15 +738,15 @@ MathTranslate(vec3 Translation)
 }
 
 mat4
-MathRotate(float Angle, vec3 Axis)
+MathRotate(real32 Angle, vec3 Axis)
 {
     mat4 Result = MathMat4d(1.0f);
     
     Axis = MathNormalize(Axis);
     
-    float SinTheta = sinf(MathToRadians(Angle));
-    float CosTheta = cosf(MathToRadians(Angle));
-    float CosValue = 1.0f - CosTheta;
+    real32 SinTheta = sinf(MathToRadians(Angle));
+    real32 CosTheta = cosf(MathToRadians(Angle));
+    real32 CosValue = 1.0f - CosTheta;
     
     Result.Elements[0][0] = (Axis.X * Axis.X * CosValue) + CosTheta;
     Result.Elements[0][1] = (Axis.X * Axis.Y * CosValue) + (Axis.Z * SinTheta);
@@ -983,7 +983,7 @@ operator*(vec3 Left, vec3 Right)
 }
 
 HINLINE vec3
-operator*(vec3 Left, float Right)
+operator*(vec3 Left, real32 Right)
 {
     vec3 Result;
 
@@ -995,7 +995,7 @@ operator*(vec3 Left, float Right)
 }
 
 HINLINE vec2
-operator*(vec2 Left, float Right)
+operator*(vec2 Left, real32 Right)
 {
     vec2 Result;
 
