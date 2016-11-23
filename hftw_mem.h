@@ -22,7 +22,7 @@ typedef struct
     s32 TempCount;
     
     Node_arena_header *Header, *HeaderEnd;
-} Memory_Arena;
+} memory_arena;
 
 typedef enum
 {
@@ -32,44 +32,9 @@ typedef enum
 
 typedef struct
 {
-    Memory_Arena *Arena;
+    memory_arena *Arena;
     memory_index Used;
-} Temp_Memory;
-
-inline void
-InitializeArena(Memory_Arena *Arena, memory_index Size, void *Base)
-{
-    Arena->Size = Size;
-    Arena->Base = (uint8 *)Base;
-    Arena->Used = 0;
-    Arena->WasExpanded = 0;
-    Arena->TempCount = 0;
-    Arena->Flags = 0;
-    Arena->Header = 0;
-        Arena->HeaderEnd = 0;
-}
-
-inline void
-BuildArena(Memory_Arena *Arena, memory_index Size)
-{
-    void *Base = PlatformMemAlloc(Size);
-    InitializeArena(Arena, Size, Base);
-}
-
-inline memory_index
-GetAlignmentOffset(Memory_Arena *Arena, memory_index Alignment)
-{
-    memory_index AlignmentOffset = 0;
-    
-    memory_index ResultPointer = (memory_index)Arena->Base + Arena->Used;
-    memory_index AlignmentMask = Alignment - 1;
-    if(ResultPointer & AlignmentMask)
-    {
-        AlignmentOffset = Alignment - (ResultPointer & AlignmentMask);
-    }
-
-    return(AlignmentOffset);
-}
+} temp_memory;
 
 typedef enum
 {
@@ -84,8 +49,56 @@ typedef struct
     u32 Tag;
 } arena_push_params;
 
+typedef struct
+{
+    u8 *Value;
+    Node_arena_header *Node;
+} tag_scan_result;
+
+inline tag_scan_result
+DefaultTagScan(void)
+{
+    tag_scan_result Result = {0};
+    return(Result);
+}
+
+inline void
+ArenaInitialize(memory_arena *Arena, memory_index Size, void *Base)
+{
+    Arena->Size = Size;
+    Arena->Base = (uint8 *)Base;
+    Arena->Used = 0;
+    Arena->WasExpanded = 0;
+    Arena->TempCount = 0;
+    Arena->Flags = 0;
+    Arena->Header = 0;
+        Arena->HeaderEnd = 0;
+}
+
+inline void
+ArenaBuild(memory_arena *Arena, memory_index Size)
+{
+    void *Base = PlatformMemAlloc(Size);
+    ArenaInitialize(Arena, Size, Base);
+}
+
+inline memory_index
+ArenaGetAlignmentOffset(memory_arena *Arena, memory_index Alignment)
+{
+    memory_index AlignmentOffset = 0;
+    
+    memory_index ResultPointer = (memory_index)Arena->Base + Arena->Used;
+    memory_index AlignmentMask = Alignment - 1;
+    if(ResultPointer & AlignmentMask)
+    {
+        AlignmentOffset = Alignment - (ResultPointer & AlignmentMask);
+    }
+
+    return(AlignmentOffset);
+}
+
 inline arena_push_params
-DefaultArenaParams(void)
+ArenaDefaultParams(void)
 {
     arena_push_params Params;
     Params.Flags = ArenaPushFlag_ClearToZero;
@@ -96,18 +109,18 @@ DefaultArenaParams(void)
 }
 
 inline arena_push_params
-AlignNoClear(u32 Alignment)
+ArenaAlignNoClear(u32 Alignment)
 {
-    arena_push_params Params = DefaultArenaParams();
+    arena_push_params Params = ArenaDefaultParams();
     Params.Flags &= ~ArenaPushFlag_ClearToZero;
     Params.Alignment = Alignment;
     return(Params);
 }
 
 inline arena_push_params
-Align(u32 Alignment, b32 Clear)
+ArenaAlign(u32 Alignment, b32 Clear)
 {
-    arena_push_params Params = DefaultArenaParams();
+    arena_push_params Params = ArenaDefaultParams();
     if(Clear)
     {
         Params.Flags |= ArenaPushFlag_ClearToZero;
@@ -121,31 +134,31 @@ Align(u32 Alignment, b32 Clear)
 }
 
 inline arena_push_params
-NoClear(void)
+ArenaNoClear(void)
 {
-    arena_push_params Params = DefaultArenaParams();
+    arena_push_params Params = ArenaDefaultParams();
     Params.Flags &= ~ArenaPushFlag_ClearToZero;
     return(Params);
 }
 
 inline arena_push_params
-Expect(u32 Expectation, b32 Clear)
+ArenaExpect(u32 Expectation, b32 Clear)
 {
-    arena_push_params Params = Align(4, Clear);
+    arena_push_params Params = ArenaAlign(4, Clear);
     Params.Expectation = Expectation;
     return(Params);
 }
 
 inline arena_push_params
-AlignExpect(u32 Alignment, u32 Expectation, b32 Clear)
+ArenaAlignExpect(u32 Alignment, u32 Expectation, b32 Clear)
 {
-    arena_push_params Params = Align(Alignment, Clear);
+    arena_push_params Params = ArenaAlign(Alignment, Clear);
     Params.Expectation = Expectation;
     return(Params);
 }
 
 inline arena_push_params
-Tag(u32 Tag, arena_push_params Rest)
+ArenaTag(u32 Tag, arena_push_params Rest)
 {
     arena_push_params Params = Rest;
     Params.Tag = Tag;
@@ -153,19 +166,19 @@ Tag(u32 Tag, arena_push_params Rest)
 }
 
 inline memory_index
-GetArenaSizeRemaining(Memory_Arena *Arena, arena_push_params Params)
+ArenaGetSizeRemaining(memory_arena *Arena, arena_push_params Params)
 {
-    memory_index Result = Arena->Size - (Arena->Used + GetAlignmentOffset(Arena, Params.Alignment));
+    memory_index Result = Arena->Size - (Arena->Used + ArenaGetAlignmentOffset(Arena, Params.Alignment));
 
     return(Result);
 }
 
 
-#define GetBlock(arena, type, idx) \
+#define ArenaGetBlock(arena, type, idx) \
 (type *)&(arena->Base)[sizeof(type)*idx]
 
 inline void *
-GetBlockByRecord(Memory_Arena *Arena, size_t Index)
+ArenaGetBlockByRecord(memory_arena *Arena, size_t Index)
 {
     Assert(Arena->Header && "Arena headers aren't enabled!");
       u8 *Result = Arena->Base;
@@ -181,21 +194,8 @@ GetBlockByRecord(Memory_Arena *Arena, size_t Index)
 return(Result);
 }
 
-typedef struct
-{
-    u8 *Value;
-    Node_arena_header *Node;
-} tag_scan_result;
-
 inline tag_scan_result
-DefaultTagScan(void)
-{
-    tag_scan_result Result = {0};
-    return(Result);
-}
-
-inline tag_scan_result
-GetBlockByTagAndRecord(Memory_Arena *Arena, tag_scan_result scan, u32 Tag)
+ArenaGetBlockByTagAndRecord(memory_arena *Arena, tag_scan_result scan, u32 Tag)
 {
     if(!scan.Node)
         scan.Node = Arena->Header;
@@ -217,44 +217,44 @@ GetBlockByTagAndRecord(Memory_Arena *Arena, tag_scan_result scan, u32 Tag)
     return(NewResult);
 }
 
-#define GetVaryBlock(arena, type, idx) \
-(type *)(GetBlockByRecord(arena,(size_t)idx))
+#define ArenaGetVaryBlock(arena, type, idx) \
+(type *)(ArenaGetBlockByRecord(arena,(size_t)idx))
 
-#define GetVaryBlockTagValue(arena, scan, type, tag) \
-(type *)(GetBlockByTagAndRecord(arena, scan, tag).Value)
+#define ArenaGetVaryBlockTagValue(arena, scan, type, tag) \
+(type *)(ArenaGetBlockByTagAndRecord(arena, scan, tag).Value)
 
-#define GetVaryBlockTagResult(arena, scan, tag) \
- GetBlockByTagAndRecord(arena, scan, tag)
+#define ArenaGetVaryBlockTagResult(arena, scan, tag) \
+ArenaGetBlockByTagAndRecord(arena, scan, tag)
 
 
-#define PushStruct(Arena, type, ...) (type *)PushSize_(Arena, sizeof(type), ## __VA_ARGS__)
-#define PushArray(Arena, Count, type, ...) (type *)PushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
-#define PushSize(Arena, Size, ...) PushSize_(Arena, Size, ## __VA_ARGS__)
-#define PushCopy(Arena, Size, Source, ...) Copy(Size, Source, PushSize_(Arena, Size, ## __VA_ARGS__))
-#define PushType PushStruct
-#define PushValue(Arena, type, Value, ...) *((type *) PushType(Arena, type, ## __VA_ARGS__)) = Value
+#define ArenaPushStruct(Arena, type, ...) (type *)ArenaPushSize_(Arena, sizeof(type), ## __VA_ARGS__)
+#define ArenaPushArray(Arena, Count, type, ...) (type *)ArenaPushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
+#define ArenaPushSize(Arena, Size, ...) ArenaPushSize_(Arena, Size, ## __VA_ARGS__)
+#define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, PushSize_(Arena, Size, ## __VA_ARGS__))
+#define ArenaPushType PushStruct
+#define ArenaPushValue(Arena, type, Value, ...) *((type *) ArenaPushType(Arena, type, ## __VA_ARGS__)) = Value
 
 inline memory_index
-GetEffectiveSizeFor(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
+ArenaGetEffectiveSizeFor(memory_arena *Arena, memory_index SizeInit, arena_push_params Params)
 {
     memory_index Size = SizeInit;
         
-    memory_index AlignmentOffset = GetAlignmentOffset(Arena, Params.Alignment);
+    memory_index AlignmentOffset = ArenaGetAlignmentOffset(Arena, Params.Alignment);
     Size += AlignmentOffset;
 
     return(Size);
 }
 
 inline b32
-ArenaHasRoomFor(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
+ArenaHasRoomFor(memory_arena *Arena, memory_index SizeInit, arena_push_params Params)
 {
-    memory_index Size = GetEffectiveSizeFor(Arena, SizeInit, Params);
+    memory_index Size = ArenaGetEffectiveSizeFor(Arena, SizeInit, Params);
     b32 Result = ((Arena->Used + Size) <= Arena->Size);
     return(Result);
 }
 
 inline void
-ArenaExpand(Memory_Arena *Arena, memory_index Size)
+ArenaExpand(memory_arena *Arena, memory_index Size)
 {
     if(!((Arena->Used + Size) <= Arena->Size))
     {
@@ -267,7 +267,7 @@ ArenaExpand(Memory_Arena *Arena, memory_index Size)
         }
         else
         {
-            Assert(!"Not enough memory in Memory_Arena!");
+            Assert(!"Not enough memory in memory_arena!");
         }
     }
     else
@@ -277,13 +277,13 @@ ArenaExpand(Memory_Arena *Arena, memory_index Size)
 }
 
 inline void *
-PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
+ArenaPushSize_(memory_arena *Arena, memory_index SizeInit, arena_push_params Params)
 {
-    memory_index Size = GetEffectiveSizeFor(Arena, SizeInit, Params);
+    memory_index Size = ArenaGetEffectiveSizeFor(Arena, SizeInit, Params);
     
     ArenaExpand(Arena, Size + Params.Expectation);
 
-    memory_index AlignmentOffset = GetAlignmentOffset(Arena, Params.Alignment);
+    memory_index AlignmentOffset = ArenaGetAlignmentOffset(Arena, Params.Alignment);
     void *Result = Arena->Base + Arena->Used + AlignmentOffset;
     Arena->Used += Size;
 
@@ -316,10 +316,8 @@ PushSize_(Memory_Arena *Arena, memory_index SizeInit, arena_push_params Params)
     return(Result);
 }
 
-// NOTE(casey): This is generally not for production use, this is probably
-// only really something we need during testing, but who knows
 inline char *
-PushString(Memory_Arena *Arena, char *Source)
+ArenaPushString(memory_arena *Arena, char *Source)
 {
     u32 Size = 1;
     for(char *At = Source;
@@ -329,7 +327,7 @@ PushString(Memory_Arena *Arena, char *Source)
         ++Size;
     }
     
-    char *Dest = (char *)PushSize_(Arena, Size, NoClear());
+    char *Dest = (char *)ArenaPushSize_(Arena, Size, ArenaNoClear());
     for(u32 CharIndex = 0;
         CharIndex < Size;
         ++CharIndex)
@@ -341,9 +339,9 @@ PushString(Memory_Arena *Arena, char *Source)
 }
 
 inline char *
-PushAndNullTerminate(Memory_Arena *Arena, u32 Length, char *Source)
+ArenaPushAndNullTerminate(memory_arena *Arena, u32 Length, char *Source)
 {
-    char *Dest = (char *)PushSize_(Arena, Length + 1, NoClear());
+    char *Dest = (char *)ArenaPushSize_(Arena, Length + 1, ArenaNoClear());
     for(u32 CharIndex = 0;
         CharIndex < Length;
         ++CharIndex)
@@ -355,10 +353,10 @@ PushAndNullTerminate(Memory_Arena *Arena, u32 Length, char *Source)
     return(Dest);
 }
 
-inline Temp_Memory
-BeginTemporaryMemory(Memory_Arena *Arena)
+inline temp_memory
+ArenaBeginTemporaryMemory(memory_arena *Arena)
 {
-    Temp_Memory Result;
+    temp_memory Result;
 
     Result.Arena = Arena;
     Result.Used = Arena->Used;
@@ -369,9 +367,9 @@ BeginTemporaryMemory(Memory_Arena *Arena)
 }
 
 inline void
-EndTemporaryMemory(Temp_Memory TempMem)
+ArenaEndTemporaryMemory(temp_memory TempMem)
 {
-    Memory_Arena *Arena = TempMem.Arena;
+    memory_arena *Arena = TempMem.Arena;
     Assert(Arena->Used >= TempMem.Used);
     Arena->Used = TempMem.Used;
     Assert(Arena->TempCount > 0);
@@ -379,22 +377,22 @@ EndTemporaryMemory(Temp_Memory TempMem)
 }
 
 inline void
-Clear(Memory_Arena *Arena)
+ArenaClear(memory_arena *Arena)
 {
-    InitializeArena(Arena, Arena->Size, Arena->Base);
+    ArenaInitialize(Arena, Arena->Size, Arena->Base);
 }
 
 inline void
-CheckArena(Memory_Arena *Arena)
+ArenaCheck(memory_arena *Arena)
 {
     Assert(Arena->TempCount == 0);
 }
 
 inline void
-SubArena(Memory_Arena *Result, Memory_Arena *Arena, memory_index Size, arena_push_params Params)
+ArenaSub(memory_arena *Result, memory_arena *Arena, memory_index Size, arena_push_params Params)
 {
     Result->Size = Size;
-    Result->Base = (uint8 *)PushSize_(Arena, Size, Params);
+    Result->Base = (uint8 *)ArenaPushSize_(Arena, Size, Params);
     Result->Used = 0;
     Result->TempCount = 0;
 }
@@ -410,7 +408,7 @@ Copy(memory_index Size, void *SourceInit, void *DestInit)
 }
 
 inline void
-CleanUnusedArenaRoom(Memory_Arena * Arena)
+ArenaCleanUnusedRoom(memory_arena * Arena)
 {
     u8 * Base = Arena->Base + Arena->Used - 1;
     
@@ -421,7 +419,7 @@ CleanUnusedArenaRoom(Memory_Arena * Arena)
 }
 
 inline void
-FreeArena(Memory_Arena * Arena)
+ArenaFree(memory_arena * Arena)
 {
     Assert(Arena->TempCount == 0);
     

@@ -23,16 +23,16 @@ extern "C"
 #define HINLINE inline
 #endif
 
-#define HFTW_PI32 3.14159265359f
-#define HFTW_PI 3.14159265358979323846f
+#define MathPI32 3.14159265359f
+#define MathPI 3.14159265358979323846f
 
-#define HFTW_MIN(a, b) (a) > (b) ? (b) : (a)
-#define HFTW_MAX(a, b) (a) < (b) ? (b) : (a)
+#define MathMIN(a, b) (a) > (b) ? (b) : (a)
+#define MathMAX(a, b) (a) < (b) ? (b) : (a)
 #define HMN_ABS(a) (a) < 0 ? -(a) : (a)
-#define HFTW_MOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
-#define HFTW_SQUARE(x) ((x) * (x))
+#define MathMOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
+#define MathSQUARE(x) ((x) * (x))
 
-typedef union hmm_vec2
+typedef union vec2
 {
     struct
     {
@@ -50,9 +50,9 @@ typedef union hmm_vec2
     };
 
     float Elements[2];
-} hmm_vec2;
+} vec2;
 
-typedef union hmm_vec3
+typedef union vec3
 {
     struct
     {
@@ -71,38 +71,38 @@ typedef union hmm_vec3
 
     struct
     {
-        hmm_vec2 XY;
+        vec2 XY;
         float Ignored0_;
     };
 
     struct
     {
         float Ignored1_;
-        hmm_vec2 YZ;
+        vec2 YZ;
     };
 
     struct
     {
-        hmm_vec2 UV;
+        vec2 UV;
         float Ignored2_;
     };
 
     struct
     {
         float Ignored3_;
-        hmm_vec2 VW;
+        vec2 VW;
     };
 
     float Elements[3];
-} hmm_vec3;
+} vec3;
 
-typedef union hmm_vec4
+typedef union vec4
 {
     struct
     {
         union
         {
-            hmm_vec3 XYZ;
+            vec3 XYZ;
             struct
             {
                 float X, Y, Z;
@@ -115,7 +115,7 @@ typedef union hmm_vec4
     {
         union
         {
-            hmm_vec3 RGB;
+            vec3 RGB;
             struct
             {
                 float R, G, B;
@@ -127,7 +127,7 @@ typedef union hmm_vec4
 
     struct
     {
-        hmm_vec2 XY;
+        vec2 XY;
         float Ignored0_;
         float Ignored1_;
     };
@@ -135,7 +135,7 @@ typedef union hmm_vec4
     struct
     {
         float Ignored2_;
-        hmm_vec2 YZ;
+        vec2 YZ;
         float Ignored3_;
     };
 
@@ -143,70 +143,70 @@ typedef union hmm_vec4
     {
         float Ignored4_;
         float Ignored5_;
-        hmm_vec2 ZW;
+        vec2 ZW;
     };
 
     float Elements[4];
-} hmm_vec4;
+} vec4;
 
-typedef union hmm_mat4
+typedef union mat4
 {
     float Elements[4][4];
-} hmm_mat4;
+} mat4;
 
-typedef hmm_vec2 hmm_v2;
-typedef hmm_vec3 hmm_v3;
-typedef hmm_vec4 hmm_v4;
-typedef hmm_mat4 hmm_m4;    
+typedef vec2 v2;
+typedef vec3 v3;
+typedef vec4 v4;
+typedef mat4 m4;    
 
-HFTWDEF float HFTW_ToRadians(float Degrees);
-HFTWDEF float HFTW_Inner(hmm_vec3 A, hmm_vec3 B);
-HFTWDEF float HFTW_SquareRoot(float Float);
-HFTWDEF float HFTW_LengthSquareRoot(hmm_vec3 A);
-HFTWDEF float HFTW_FastInverseSquareRoot(float Number);
-HFTWDEF float HFTW_Length(hmm_vec3 A);    
-HFTWDEF float HFTW_Power(float Base, int Exponent);
-HFTWDEF float HFTW_Clamp(float Min, float Value, float Max);
+HFTWDEF float MathToRadians(float Degrees);
+HFTWDEF float MathInner(vec3 A, vec3 B);
+HFTWDEF float MathSquareRoot(float Float);
+HFTWDEF float MathLengthSquareRoot(vec3 A);
+HFTWDEF float MathFastInverseSquareRoot(float Number);
+HFTWDEF float MathLength(vec3 A);    
+HFTWDEF float MathPower(float Base, int Exponent);
+HFTWDEF float MathClamp(float Min, float Value, float Max);
 
-HFTWDEF hmm_vec3 HFTW_Normalize(hmm_vec3 A);
-HFTWDEF hmm_vec3 HFTW_Cross(hmm_vec3 VecOne, hmm_vec3 VecTwo);
-HFTWDEF float HFTW_Dot(hmm_vec3 VecOne, hmm_vec3 VecTwo);
+HFTWDEF vec3 MathNormalize(vec3 A);
+HFTWDEF vec3 MathCross(vec3 VecOne, vec3 VecTwo);
+HFTWDEF float MathDot(vec3 VecOne, vec3 VecTwo);
 
-HFTWDEF hmm_vec2 HFTW_Vec2i(int X, int Y);
-HFTWDEF hmm_vec2 HFTW_Vec2(float X, float Y);
-HFTWDEF hmm_vec3 HFTW_Vec3(float X, float Y, float Z);
-HFTWDEF hmm_vec3 HFTW_Vec3i(int X, int Y, int Z);
-HFTWDEF hmm_vec4 HFTW_Vec4(float X, float Y, float Z, float W);
-HFTWDEF hmm_vec4 HFTW_Vec4i(int X, int Y, int Z, int W);
+HFTWDEF vec2 MathVec2i(int X, int Y);
+HFTWDEF vec2 MathVec2(float X, float Y);
+HFTWDEF vec3 MathVec3(float X, float Y, float Z);
+HFTWDEF vec3 MathVec3i(int X, int Y, int Z);
+HFTWDEF vec4 MathVec4(float X, float Y, float Z, float W);
+HFTWDEF vec4 MathVec4i(int X, int Y, int Z, int W);
 
-HFTWDEF hmm_vec2 HFTW_AddVec2(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 HFTW_AddVec3(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 HFTW_AddVec4(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 MathAddVec2(vec2 Left, vec2 Right);
+HFTWDEF vec3 MathAddVec3(vec3 Left, vec3 Right);
+HFTWDEF vec4 MathAddVec4(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_vec2 HFTW_SubtractVec2(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 HFTW_SubtractVec3(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 HFTW_SubtractVec4(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 MathSubtractVec2(vec2 Left, vec2 Right);
+HFTWDEF vec3 MathSubtractVec3(vec3 Left, vec3 Right);
+HFTWDEF vec4 MathSubtractVec4(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_vec2 HFTW_MultiplyVec2(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 HFTW_MultiplyVec3(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 HFTW_MultiplyVec4(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 MathMultiplyVec2(vec2 Left, vec2 Right);
+HFTWDEF vec3 MathMultiplyVec3(vec3 Left, vec3 Right);
+HFTWDEF vec4 MathMultiplyVec4(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_vec2 HFTW_DivideVec2(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 HFTW_DivideVec3(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 HFTW_DivideVec4(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 MathDivideVec2(vec2 Left, vec2 Right);
+HFTWDEF vec3 MathDivideVec3(vec3 Left, vec3 Right);
+HFTWDEF vec4 MathDivideVec4(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_mat4 HFTW_Mat4(void);
-HFTWDEF hmm_mat4 HFTW_Mat4d(float Diagonal);
-HFTWDEF hmm_mat4 HFTW_MultiplyMat4(hmm_mat4 Left, hmm_mat4 Right);
-HFTWDEF hmm_vec4 HFTW_MultiplyMat4ByVec4(hmm_mat4 Matrix, hmm_vec4 Vector);
+HFTWDEF mat4 MathMat4(void);
+HFTWDEF mat4 MathMat4d(float Diagonal);
+HFTWDEF mat4 MathMultiplyMat4(mat4 Left, mat4 Right);
+HFTWDEF vec4 MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector);
 
-HFTWDEF hmm_mat4 HFTW_Orthographic(float Left, float Right, float Bottom, float Top, float Near, float Far);
-HFTWDEF hmm_mat4 HFTW_Perspective(float FOV, float AspectRatio, float Near, float Far);
-HFTWDEF hmm_mat4 HFTW_Translate(hmm_vec3 Translation);
-HFTWDEF hmm_mat4 HFTW_Rotate(float Angle, hmm_vec3 Axis);
-HFTWDEF hmm_mat4 HFTW_Scale(hmm_vec3 Scale);
+HFTWDEF mat4 MathOrthographic(float Left, float Right, float Bottom, float Top, float Near, float Far);
+HFTWDEF mat4 MathPerspective(float FOV, float AspectRatio, float Near, float Far);
+HFTWDEF mat4 MathTranslate(vec3 Translation);
+HFTWDEF mat4 MathRotate(float Angle, vec3 Axis);
+HFTWDEF mat4 MathScale(vec3 Scale);
 
-HFTWDEF hmm_mat4 HFTW_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up);
+HFTWDEF mat4 MathLookAt(vec3 Eye, vec3 Center, vec3 Up);
 
 #ifdef __cplusplus
 }
@@ -214,45 +214,45 @@ HFTWDEF hmm_mat4 HFTW_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up);
 
 #ifdef HANDMADE_MATH_CPP_MODE
 
-HFTWDEF hmm_vec2 HFTW_Add(int X, int Y);
-HFTWDEF hmm_vec3 HFTW_Add(int X, int Y, int Z);
-HFTWDEF hmm_vec4 HFTW_Add(int X, int Y, int Z, int W);
+HFTWDEF vec2 MathAdd(int X, int Y);
+HFTWDEF vec3 MathAdd(int X, int Y, int Z);
+HFTWDEF vec4 MathAdd(int X, int Y, int Z, int W);
 
-HFTWDEF hmm_vec2 HFTW_Subtract(int X, int Y);
-HFTWDEF hmm_vec3 HFTW_Subtract(int X, int Y, int Z);
-HFTWDEF hmm_vec4 HFTW_Subtract(int X, int Y, int Z, int W);
+HFTWDEF vec2 MathSubtract(int X, int Y);
+HFTWDEF vec3 MathSubtract(int X, int Y, int Z);
+HFTWDEF vec4 MathSubtract(int X, int Y, int Z, int W);
 
-HFTWDEF hmm_vec2 HFTW_Multiply(int X, int Y);
-HFTWDEF hmm_vec3 HFTW_Multiply(int X, int Y, int Z);
-HFTWDEF hmm_vec4 HFTW_Multiply(int X, int Y, int Z, int W);
-HFTWDEF hmm_mat4 HFTW_Multiply(hmm_mat4 Left, hmm_mat4 Right);
-HFTWDEF hmm_vec4 HFTW_Multiply(hmm_mat4 Matrix, hmm_vec4 Vector);
+HFTWDEF vec2 MathMultiply(int X, int Y);
+HFTWDEF vec3 MathMultiply(int X, int Y, int Z);
+HFTWDEF vec4 MathMultiply(int X, int Y, int Z, int W);
+HFTWDEF mat4 MathMultiply(mat4 Left, mat4 Right);
+HFTWDEF vec4 MathMultiply(mat4 Matrix, vec4 Vector);
 
-HFTWDEF hmm_vec2 HFTW_Divide(int X, int Y);
-HFTWDEF hmm_vec3 HFTW_Divide(int X, int Y, int Z);
-HFTWDEF hmm_vec4 HFTW_Divide(int X, int Y, int Z, int W);
+HFTWDEF vec2 MathDivide(int X, int Y);
+HFTWDEF vec3 MathDivide(int X, int Y, int Z);
+HFTWDEF vec4 MathDivide(int X, int Y, int Z, int W);
 
-HFTWDEF hmm_vec2 operator+(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 operator+(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 operator+(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 operator+(vec2 Left, vec2 Right);
+HFTWDEF vec3 operator+(vec3 Left, vec3 Right);
+HFTWDEF vec4 operator+(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_vec2 operator-(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 operator-(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 operator-(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 operator-(vec2 Left, vec2 Right);
+HFTWDEF vec3 operator-(vec3 Left, vec3 Right);
+HFTWDEF vec4 operator-(vec4 Left, vec4 Right);
 
-HFTWDEF hmm_vec2 operator*(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 operator*(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 operator*(hmm_vec4 Left, hmm_vec4 Right);
-HFTWDEF hmm_mat4 operator*(hmm_mat4 Left, hmm_mat4 Right);
+HFTWDEF vec2 operator*(vec2 Left, vec2 Right);
+HFTWDEF vec3 operator*(vec3 Left, vec3 Right);
+HFTWDEF vec4 operator*(vec4 Left, vec4 Right);
+HFTWDEF mat4 operator*(mat4 Left, mat4 Right);
 
-HFTWDEF hmm_vec3 operator*(hmm_vec3 Left, float Right);
-HFTWDEF hmm_vec2 operator*(hmm_vec2 Left, float Right);
+HFTWDEF vec3 operator*(vec3 Left, float Right);
+HFTWDEF vec2 operator*(vec2 Left, float Right);
 
-HFTWDEF hmm_vec4 operator*(hmm_mat4 Matrix, hmm_vec4 Vector);
+HFTWDEF vec4 operator*(mat4 Matrix, vec4 Vector);
 
-HFTWDEF hmm_vec2 operator/(hmm_vec2 Left, hmm_vec2 Right);
-HFTWDEF hmm_vec3 operator/(hmm_vec3 Left, hmm_vec3 Right);
-HFTWDEF hmm_vec4 operator/(hmm_vec4 Left, hmm_vec4 Right);
+HFTWDEF vec2 operator/(vec2 Left, vec2 Right);
+HFTWDEF vec3 operator/(vec3 Left, vec3 Right);
+HFTWDEF vec4 operator/(vec4 Left, vec4 Right);
 
 #endif /* HANDMADE_MATH_CPP */
 
@@ -261,15 +261,15 @@ HFTWDEF hmm_vec4 operator/(hmm_vec4 Left, hmm_vec4 Right);
 #ifdef HANDMADE_MATH_IMPLEMENTATION
 
 HINLINE float
-HFTW_ToRadians(float Degrees)
+MathToRadians(float Degrees)
 {
-    float Result = Degrees * (HFTW_PI32 / 180.0f);
+    float Result = Degrees * (MathPI32 / 180.0f);
 
     return (Result);
 }
 
 HINLINE float
-HFTW_Inner(hmm_vec3 A, hmm_vec3 B)
+MathInner(vec3 A, vec3 B)
 {
     float Result = A.X * B.X + A.Y * B.Y + A.Z * B.Z;
 
@@ -277,7 +277,7 @@ HFTW_Inner(hmm_vec3 A, hmm_vec3 B)
 }
 
 HINLINE float
-HFTW_SquareRoot(float Float)
+MathSquareRoot(float Float)
 {    
     float Result = sqrtf(Float);
 
@@ -285,16 +285,16 @@ HFTW_SquareRoot(float Float)
 }
 
 HINLINE float
-HFTW_LengthSquareRoot(hmm_vec3 A)
+MathLengthSquareRoot(vec3 A)
 {
-    float Result = HFTW_Inner(A, A);
+    float Result = MathInner(A, A);
 
     return (Result);
 }
 
 // Refer to https://en.wikipedia.org/wiki/Fast_inverse_square_root
 HINLINE float
-HFTW_FastInverseSquareRoot(float Number)
+MathFastInverseSquareRoot(float Number)
 {
     long i;
     float x2, y;
@@ -312,14 +312,14 @@ HFTW_FastInverseSquareRoot(float Number)
 }
 
 HINLINE float
-HFTW_Length(hmm_vec3 A)
+MathLength(vec3 A)
 {
-    float Result = HFTW_SquareRoot(HFTW_LengthSquareRoot(A));
+    float Result = MathSquareRoot(MathLengthSquareRoot(A));
     return (Result);
 }
 
 HINLINE float
-HFTW_Power(float Base, int Exponent)
+MathPower(float Base, int Exponent)
 {
     float Result = 1;
     if(Exponent > 0)
@@ -342,7 +342,7 @@ HFTW_Power(float Base, int Exponent)
 }
 
 HINLINE float
-HFTW_Lerp(float A, float Time, float B)
+MathLerp(float A, float Time, float B)
 {
     float Result = (1.0f - Time) * A + Time * B;
 
@@ -350,7 +350,7 @@ HFTW_Lerp(float A, float Time, float B)
 }
 
 HINLINE float
-HFTW_Clamp(float Min, float Value, float Max)
+MathClamp(float Min, float Value, float Max)
 {
     float Result = Value;
 
@@ -366,22 +366,22 @@ HFTW_Clamp(float Min, float Value, float Max)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_Normalize(hmm_vec3 A)
+HINLINE vec3
+MathNormalize(vec3 A)
 {
-    hmm_vec3 Result = {0};
+    vec3 Result = {0};
 
-    Result.X = A.X * (1.0f / HFTW_Length(A));
-    Result.Y = A.Y * (1.0f / HFTW_Length(A));
-    Result.Z = A.Z * (1.0f / HFTW_Length(A));
+    Result.X = A.X * (1.0f / MathLength(A));
+    Result.Y = A.Y * (1.0f / MathLength(A));
+    Result.Z = A.Z * (1.0f / MathLength(A));
     
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_Cross(hmm_vec3 VecOne, hmm_vec3 VecTwo)
+HINLINE vec3
+MathCross(vec3 VecOne, vec3 VecTwo)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = (VecOne.Y * VecTwo.Z) - (VecOne.Z * VecTwo.Y);
     Result.Y = (VecOne.Z * VecTwo.X) - (VecOne.X * VecTwo.Z);
@@ -391,7 +391,7 @@ HFTW_Cross(hmm_vec3 VecOne, hmm_vec3 VecTwo)
 }
 
 HINLINE float
-HFTW_Dot(hmm_vec3 VecOne, hmm_vec3 VecTwo)
+MathDot(vec3 VecOne, vec3 VecTwo)
 {
     float Result = 0;
 
@@ -400,10 +400,10 @@ HFTW_Dot(hmm_vec3 VecOne, hmm_vec3 VecTwo)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_Vec2(float X, float Y)
+HINLINE vec2
+MathVec2(float X, float Y)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = X;
     Result.Y = Y;
@@ -411,10 +411,10 @@ HFTW_Vec2(float X, float Y)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_Vec2i(int X, int Y)
+HINLINE vec2
+MathVec2i(int X, int Y)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = (float)X;
     Result.Y = (float)Y;
@@ -422,10 +422,10 @@ HFTW_Vec2i(int X, int Y)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_Vec3(float X, float Y, float Z)
+HINLINE vec3
+MathVec3(float X, float Y, float Z)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = X;
     Result.Y = Y;
@@ -434,10 +434,10 @@ HFTW_Vec3(float X, float Y, float Z)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_Vec3i(int X, int Y, int Z)
+HINLINE vec3
+MathVec3i(int X, int Y, int Z)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = (float)X;
     Result.Y = (float)Y;
@@ -446,10 +446,10 @@ HFTW_Vec3i(int X, int Y, int Z)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_Vec4(float X, float Y, float Z, float W)
+HINLINE vec4
+MathVec4(float X, float Y, float Z, float W)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = X;
     Result.Y = Y;
@@ -459,10 +459,10 @@ HFTW_Vec4(float X, float Y, float Z, float W)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_Vec4i(int X, int Y, int Z, int W)
+HINLINE vec4
+MathVec4i(int X, int Y, int Z, int W)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = (float)X;
     Result.Y = (float)Y;
@@ -472,10 +472,10 @@ HFTW_Vec4i(int X, int Y, int Z, int W)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_AddVec2(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+MathAddVec2(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = Left.X + Right.X;
     Result.Y = Left.Y + Right.Y;
@@ -483,10 +483,10 @@ HFTW_AddVec2(hmm_vec2 Left, hmm_vec2 Right)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_AddVec3(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+MathAddVec3(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = Left.X + Right.X;
     Result.Y = Left.Y + Right.Y;
@@ -495,10 +495,10 @@ HFTW_AddVec3(hmm_vec3 Left, hmm_vec3 Right)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_AddVec4(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+MathAddVec4(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = Left.X + Right.X;
     Result.Y = Left.Y + Right.Y;
@@ -508,10 +508,10 @@ HFTW_AddVec4(hmm_vec4 Left, hmm_vec4 Right)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_SubtractVec2(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+MathSubtractVec2(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = Left.X - Right.X;
     Result.Y = Left.Y - Right.Y;
@@ -519,10 +519,10 @@ HFTW_SubtractVec2(hmm_vec2 Left, hmm_vec2 Right)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_SubtractVec3(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+MathSubtractVec3(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = Left.X - Right.X;
     Result.Y = Left.Y - Right.Y;
@@ -531,10 +531,10 @@ HFTW_SubtractVec3(hmm_vec3 Left, hmm_vec3 Right)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_SubtractVec4(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+MathSubtractVec4(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = Left.X - Right.X;
     Result.Y = Left.Y - Right.Y;
@@ -544,10 +544,10 @@ HFTW_SubtractVec4(hmm_vec4 Left, hmm_vec4 Right)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_MultiplyVec2(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+MathMultiplyVec2(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = Left.X * Right.X;
     Result.Y = Left.Y * Right.Y;
@@ -555,10 +555,10 @@ HFTW_MultiplyVec2(hmm_vec2 Left, hmm_vec2 Right)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_MultiplyVec3(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+MathMultiplyVec3(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = Left.Z * Right.X;
     Result.Y = Left.Y * Right.Y;
@@ -567,10 +567,10 @@ HFTW_MultiplyVec3(hmm_vec3 Left, hmm_vec3 Right)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_MultiplyVec4(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+MathMultiplyVec4(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = Left.X * Right.X;
     Result.Y = Left.Y * Right.Y;
@@ -580,10 +580,10 @@ HFTW_MultiplyVec4(hmm_vec4 Left, hmm_vec4 Right)
     return (Result);
 }
 
-HINLINE hmm_vec2
-HFTW_DivideVec2(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+MathDivideVec2(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = Left.X / Right.X;
     Result.Y = Left.Y / Right.Y;
@@ -591,10 +591,10 @@ HFTW_DivideVec2(hmm_vec2 Left, hmm_vec2 Right)
     return (Result);
 }
 
-HINLINE hmm_vec3
-HFTW_DivideVec3(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+MathDivideVec3(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = Left.X / Right.X;
     Result.Y = Left.Y / Right.Y;
@@ -603,10 +603,10 @@ HFTW_DivideVec3(hmm_vec3 Left, hmm_vec3 Right)
     return (Result);
 }
 
-HINLINE hmm_vec4
-HFTW_DivideVec4(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+MathDivideVec4(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result;
+    vec4 Result;
 
     Result.X = Left.X / Right.X;
     Result.Y = Left.Y / Right.Y;
@@ -616,18 +616,18 @@ HFTW_DivideVec4(hmm_vec4 Left, hmm_vec4 Right)
     return (Result);
 }
 
-HINLINE hmm_mat4
-HFTW_Mat4()
+HINLINE mat4
+MathMat4()
 {
-    hmm_mat4 Result = {0};
+    mat4 Result = {0};
 
     return (Result);
 }
 
-hmm_mat4
-HFTW_Mat4d(float Diagonal)
+mat4
+MathMat4d(float Diagonal)
 {
-    hmm_mat4 Result;
+    mat4 Result;
 
     int Rows;
     for(Rows = 0; Rows < 4; ++Rows)
@@ -647,10 +647,10 @@ HFTW_Mat4d(float Diagonal)
     return (Result);
 }
 
-hmm_mat4
-HFTW_MultiplyMat4(hmm_mat4 Left, hmm_mat4 Right)
+mat4
+MathMultiplyMat4(mat4 Left, mat4 Right)
 {
-    hmm_mat4 Result = HFTW_Mat4();
+    mat4 Result = MathMat4();
 
     int Rows;
     for(Rows = 0; Rows < 4; ++Rows)
@@ -672,10 +672,10 @@ HFTW_MultiplyMat4(hmm_mat4 Left, hmm_mat4 Right)
     return (Result);
 }
 
-hmm_vec4
-HFTW_MultiplyMat4ByVec4(hmm_mat4 Matrix, hmm_vec4 Vector)
+vec4
+MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector)
 {
-    hmm_vec4 Result = HFTW_Vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    vec4 Result = MathVec4(0.0f, 0.0f, 0.0f, 0.0f);
     
     int Rows, Columns;
     for(Rows = 0; Rows < 4; ++Rows)
@@ -692,10 +692,10 @@ HFTW_MultiplyMat4ByVec4(hmm_mat4 Matrix, hmm_vec4 Vector)
     return (Result);
 }
 
-hmm_mat4
-HFTW_Orthographic(float Left, float Right, float Bottom, float Top, float Near, float Far)
+mat4
+MathOrthographic(float Left, float Right, float Bottom, float Top, float Near, float Far)
 {
-    hmm_mat4 Result = HFTW_Mat4d(1.0f);
+    mat4 Result = MathMat4d(1.0f);
 
     Result.Elements[0][0] = 2.0f / (Right - Left);
     Result.Elements[1][1] = 2.0f / (Top - Bottom);
@@ -708,12 +708,12 @@ HFTW_Orthographic(float Left, float Right, float Bottom, float Top, float Near, 
     return (Result);
 }
 
-hmm_mat4
-HFTW_Perspective(float FOV, float AspectRatio, float Near, float Far)
+mat4
+MathPerspective(float FOV, float AspectRatio, float Near, float Far)
 {
-    hmm_mat4 Result = HFTW_Mat4d(1.0f);
+    mat4 Result = MathMat4d(1.0f);
 
-    float TanThetaOver2 = tanf(FOV * (HFTW_PI32 / 360.0f));
+    float TanThetaOver2 = tanf(FOV * (MathPI32 / 360.0f));
     
     Result.Elements[0][0] = 1.0f / TanThetaOver2;
     Result.Elements[1][1] = AspectRatio / TanThetaOver2;
@@ -725,10 +725,10 @@ HFTW_Perspective(float FOV, float AspectRatio, float Near, float Far)
     return (Result);
 }
 
-hmm_mat4
-HFTW_Translate(hmm_vec3 Translation)
+mat4
+MathTranslate(vec3 Translation)
 {
-    hmm_mat4 Result = HFTW_Mat4d(1.0f);
+    mat4 Result = MathMat4d(1.0f);
 
     Result.Elements[0][3] = Translation.X;
     Result.Elements[1][3] = Translation.Y;
@@ -737,15 +737,15 @@ HFTW_Translate(hmm_vec3 Translation)
     return (Result);
 }
 
-hmm_mat4
-HFTW_Rotate(float Angle, hmm_vec3 Axis)
+mat4
+MathRotate(float Angle, vec3 Axis)
 {
-    hmm_mat4 Result = HFTW_Mat4d(1.0f);
+    mat4 Result = MathMat4d(1.0f);
     
-    Axis = HFTW_Normalize(Axis);
+    Axis = MathNormalize(Axis);
     
-    float SinTheta = sinf(HFTW_ToRadians(Angle));
-    float CosTheta = cosf(HFTW_ToRadians(Angle));
+    float SinTheta = sinf(MathToRadians(Angle));
+    float CosTheta = cosf(MathToRadians(Angle));
     float CosValue = 1.0f - CosTheta;
     
     Result.Elements[0][0] = (Axis.X * Axis.X * CosValue) + CosTheta;
@@ -763,14 +763,14 @@ HFTW_Rotate(float Angle, hmm_vec3 Axis)
     return (Result);
 }
 
-hmm_mat4
-HFTW_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up)
+mat4
+MathLookAt(vec3 Eye, vec3 Center, vec3 Up)
 {
-    hmm_mat4 Result = {0};
+    mat4 Result = {0};
 
-    hmm_vec3 F = HFTW_Normalize(HFTW_SubtractVec3(Center, Eye));
-    hmm_vec3 S = HFTW_Normalize(HFTW_Cross(F, Up));
-    hmm_vec3 U = HFTW_Cross(S, F);
+    vec3 F = MathNormalize(MathSubtractVec3(Center, Eye));
+    vec3 S = MathNormalize(MathCross(F, Up));
+    vec3 U = MathCross(S, F);
 
     Result.Elements[0][0] = S.X;
     Result.Elements[0][1] = U.X;
@@ -784,18 +784,18 @@ HFTW_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up)
     Result.Elements[2][1] = U.Z;
     Result.Elements[2][2] = -F.Z;
 
-    Result.Elements[3][0] = -HFTW_Dot(S, Eye);
-    Result.Elements[3][1] = -HFTW_Dot(U, Eye);
-    Result.Elements[3][2] = HFTW_Dot(F, Eye);
+    Result.Elements[3][0] = -MathDot(S, Eye);
+    Result.Elements[3][1] = -MathDot(U, Eye);
+    Result.Elements[3][2] = MathDot(F, Eye);
     Result.Elements[3][3] = 1.0f;
 
     return (Result);
 }
 
-hmm_mat4
-HFTW_Scale(hmm_vec3 Scale)
+mat4
+MathScale(vec3 Scale)
 {
-    hmm_mat4 Result = HFTW_Mat4d(1.0f);
+    mat4 Result = MathMat4d(1.0f);
 
     Result.Elements[0][0] = Scale.X;
     Result.Elements[1][1] = Scale.Y;
@@ -806,186 +806,186 @@ HFTW_Scale(hmm_vec3 Scale)
 
 #ifdef HANDMADE_MATH_CPP_MODE
 
-HINLINE hmm_vec2
-Add(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+Add(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = HFTW_AddVec2(Left, Right);
+    vec2 Result = MathAddVec2(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-Add(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+Add(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = HFTW_AddVec3(Left, Right);
+    vec3 Result = MathAddVec3(Left, Right);
 
     return (Result);
 }
 
-HFTWDEF HINLINE hmm_vec4
-Add(hmm_vec4 Left, hmm_vec4 Right)
+HFTWDEF HINLINE vec4
+Add(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = HFTW_AddVec4(Left, Right);
+    vec4 Result = MathAddVec4(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec2
-Subtract(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+Subtract(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = HFTW_SubtractVec2(Left, Right);
+    vec2 Result = MathSubtractVec2(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-Subtract(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+Subtract(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = HFTW_SubtractVec3(Left, Right);
+    vec3 Result = MathSubtractVec3(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-Subtract(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+Subtract(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = HFTW_SubtractVec4(Left, Right);
+    vec4 Result = MathSubtractVec4(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec2
-Multiply(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+Multiply(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = HFTW_MultiplyVec2(Left, Right);
+    vec2 Result = MathMultiplyVec2(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-Multiply(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+Multiply(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = HFTW_MultiplyVec3(Left, Right);
+    vec3 Result = MathMultiplyVec3(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-Multiply(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+Multiply(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = HFTW_MultiplyVec4(Left, Right);
+    vec4 Result = MathMultiplyVec4(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_mat4
-Multiply(hmm_mat4 Left, hmm_mat4 Right)
+HINLINE mat4
+Multiply(mat4 Left, mat4 Right)
 {
-    hmm_mat4 Result = HFTW_MultiplyMat4(Left, Right);
+    mat4 Result = MathMultiplyMat4(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-Multiply(hmm_mat4 Matrix, hmm_vec4 Vector)
+HINLINE vec4
+Multiply(mat4 Matrix, vec4 Vector)
 {
-    hmm_vec4 Result = HFTW_MultiplyMat4ByVec4(Matrix, Vector);
+    vec4 Result = MathMultiplyMat4ByVec4(Matrix, Vector);
     
     return (Result);
 }
 
-HINLINE hmm_vec2
-Divide(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+Divide(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = HFTW_DivideVec2(Left, Right);
+    vec2 Result = MathDivideVec2(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-Divide(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+Divide(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = HFTW_DivideVec3(Left, Right);
+    vec3 Result = MathDivideVec3(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-Divide(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+Divide(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = HFTW_DivideVec4(Left, Right);
+    vec4 Result = MathDivideVec4(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec2
-operator+(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+operator+(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = Add(Left, Right);
+    vec2 Result = Add(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-operator+(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+operator+(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = Add(Left, Right);
+    vec3 Result = Add(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-operator+(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+operator+(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = Add(Left, Right);
+    vec4 Result = Add(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec2
-operator-(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+operator-(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = Subtract(Left, Right);
+    vec2 Result = Subtract(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-operator-(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+operator-(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = Subtract(Left, Right);
+    vec3 Result = Subtract(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-operator-(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+operator-(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = Subtract(Left, Right);
+    vec4 Result = Subtract(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec2
-operator*(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+operator*(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = Multiply(Left, Right);
+    vec2 Result = Multiply(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-operator*(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+operator*(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = Multiply(Left, Right);
+    vec3 Result = Multiply(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-operator*(hmm_vec3 Left, float Right)
+HINLINE vec3
+operator*(vec3 Left, float Right)
 {
-    hmm_vec3 Result;
+    vec3 Result;
 
     Result.X = Right * Left.X;
     Result.Y = Right * Left.Y;
@@ -994,10 +994,10 @@ operator*(hmm_vec3 Left, float Right)
     return (Result);
 }
 
-HINLINE hmm_vec2
-operator*(hmm_vec2 Left, float Right)
+HINLINE vec2
+operator*(vec2 Left, float Right)
 {
-    hmm_vec2 Result;
+    vec2 Result;
 
     Result.X = Right * Left.X;
     Result.Y = Right * Left.Y;
@@ -1005,50 +1005,50 @@ operator*(hmm_vec2 Left, float Right)
     return (Result);
 }
 
-HINLINE hmm_vec4
-operator*(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+operator*(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = Multiply(Left, Right);
+    vec4 Result = Multiply(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_mat4
-operator*(hmm_mat4 Left, hmm_mat4 Right)
+HINLINE mat4
+operator*(mat4 Left, mat4 Right)
 {
-    hmm_mat4 Result = Multiply(Left, Right);
+    mat4 Result = Multiply(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-operator*(hmm_mat4 Matrix, hmm_vec4 Vector)
+HINLINE vec4
+operator*(mat4 Matrix, vec4 Vector)
 {
-    hmm_vec4 Result = Multiply(Matrix, Vector);
+    vec4 Result = Multiply(Matrix, Vector);
     
     return (Result);
 }
 
-HINLINE hmm_vec2
-operator/(hmm_vec2 Left, hmm_vec2 Right)
+HINLINE vec2
+operator/(vec2 Left, vec2 Right)
 {
-    hmm_vec2 Result = Divide(Left, Right);
+    vec2 Result = Divide(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec3
-operator/(hmm_vec3 Left, hmm_vec3 Right)
+HINLINE vec3
+operator/(vec3 Left, vec3 Right)
 {
-    hmm_vec3 Result = Divide(Left, Right);
+    vec3 Result = Divide(Left, Right);
 
     return (Result);
 }
 
-HINLINE hmm_vec4
-operator/(hmm_vec4 Left, hmm_vec4 Right)
+HINLINE vec4
+operator/(vec4 Left, vec4 Right)
 {
-    hmm_vec4 Result = Divide(Left, Right);
+    vec4 Result = Divide(Left, Right);
 
     return (Result);
 }

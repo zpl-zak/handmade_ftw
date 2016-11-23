@@ -4,14 +4,14 @@
 
 typedef struct
 {
-    Memory_Arena Arena;
+    memory_arena Arena;
     u32 Length;
     s32 StringHash;
     b32 IsModified;
 } String;
 
 inline s32
-CalcStringHash(char *Source, u32 Length)
+StringCalcHash(char *Source, u32 Length)
 {
     s32 Hash = 0;
     char *Ptr = Source;
@@ -25,7 +25,7 @@ CalcStringHash(char *Source, u32 Length)
 }
 
 inline u32
-GetStringLengthFromArray(char *Src)
+StringGetLengthFromArray(char *Src)
 {
     u32 Length = 0;
     while(*(Src++))
@@ -36,22 +36,23 @@ GetStringLengthFromArray(char *Src)
 }
 
 inline String
-MakeString(char *Source, u32 Length)
+StringCreate(char *Source, u32 Length)
 {
     String Str = {0};
-    Memory_Arena StringArena = {0};
-    BuildArena(&StringArena, Length+2);
-    PushAndNullTerminate(&StringArena, Length+1, (char *)Source);
+    memory_arena StringArena = {0};
+    ArenaBuild(&StringArena, Length+2);
+    StringArena.Flags = ArenaFlag_AllowRealloc;
+    ArenaPushAndNullTerminate(&StringArena, Length+1, (char *)Source);
     Str.Arena = StringArena;
     Str.Length = Length;
-    Str.StringHash = CalcStringHash(Source, Str.Length);
+    Str.StringHash = StringCalcHash(Source, Str.Length);
     
     return(Str);
 }
 
 // NOTE(zaklaus): Read-Only
 inline const char *
-GetRawString(String *Str)
+StringGetRaw(String *Str)
 {
     Assert(!Str->IsModified);
     const char *Source = (char *)Str->Arena.Base;
@@ -59,21 +60,21 @@ GetRawString(String *Str)
 }
 
 inline b32
-CompareStrings(String *Str1, String *Str2)
+StringCompare(String *Str1, String *Str2)
 {
     b32 Result = Str1->StringHash == Str2->StringHash;
     return(Result);
 }
 
 inline b32
-CompareStringsRaw(String *Str1, String *Str2)
+StringCompareRaw(String *Str1, String *Str2)
 {
     b32 Result = StringsAreEqual((char *)Str1->Arena.Base, (char *)Str2->Arena.Base);
     return(Result);
 }
 
 inline char *
-BeginStringEdit(String *Str)
+StringBeginEdit(String *Str)
 {
     Assert(!Str->IsModified);
     char * Result = (char *)Str->Arena.Base;
@@ -82,17 +83,17 @@ BeginStringEdit(String *Str)
 }
 
 inline void
-EndStringEdit(String *Str)
+StringEndEdit(String *Str)
 {
     Assert(Str->IsModified);
     char *Source = (char *)Str->Arena.Base;
-    Str->Length = GetStringLengthFromArray(Source);
-    Str->StringHash = CalcStringHash(Source, Str->Length);
+    Str->Length = StringGetLengthFromArray(Source);
+    Str->StringHash = StringCalcHash(Source, Str->Length);
     Str->IsModified = 0;
 }
 
 inline u32
-GetStringLength(String *Str)
+StringGetLength(String *Str)
 {
     Assert(!Str->IsModified);
     u32 Length = Str->Length;
@@ -100,7 +101,7 @@ GetStringLength(String *Str)
 }
 
 inline u32
-GetAllocatedStringLength(String *Str)
+StringGetAllocatedLength(String *Str)
 {
     Assert(!Str->IsModified);
     u32 Length = (u32)Str->Arena.Size;
@@ -108,13 +109,19 @@ GetAllocatedStringLength(String *Str)
 }
 
 inline void
-CheckString(String *Str)
+StringCheck(String *Str)
 {
     Assert(!Str->IsModified);
     char *Source = (char *)Str->Arena.Base;
     u32 Length = Str->Length;
-    s32 CompareHash = CalcStringHash(Source, Length);
+    s32 CompareHash = StringCalcHash(Source, Length);
     Assert(CompareHash == Str->StringHash);
+}
+
+inline void
+StringAppend(String *StrA, String *StrB)
+{
+    
 }
 
 #define literal(Literal) Literal, sizeof(Literal)/sizeof(u8)-1

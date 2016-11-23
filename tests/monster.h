@@ -17,7 +17,7 @@ typedef struct
     u8 EnemyType;
     u8 Damage;
     u8 Flags;
-    Memory_Arena Properties;
+    memory_arena Properties;
 } Monster;
 
 #define M_BRUTE_SIZE sizeof(Monster_Brute)
@@ -45,8 +45,8 @@ MakeBrute(void)
     
     Result.EnemyType = Brute;
     
-    BuildArena(&Result.Properties, M_BRUTE_SIZE);
-    Monster_Brute * Properties = PushStruct(&Result.Properties, Monster_Brute, DefaultArenaParams());
+    ArenaBuild(&Result.Properties, M_BRUTE_SIZE);
+    Monster_Brute * Properties = ArenaPushStruct(&Result.Properties, Monster_Brute, ArenaDefaultParams());
     Properties->TimeLeftForKicking = 20;
     Properties->MadnessDamage = 64;
     
@@ -70,6 +70,6 @@ MakeHeavy(void)
 static void
 DisposeMonster(Monster * Enemy)
 {
-    FreeArena(&Enemy->Properties);
+    ArenaFree(&Enemy->Properties);
     InitializeMonster(Enemy, 0, 0, 0, 0);
 }
