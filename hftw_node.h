@@ -3,12 +3,12 @@
 #if !defined(HFTW_NODE_H)
 
 #define LinkedList(type) \
-typedef struct Node_##type_ { type Value; struct Node_##type_ *Next; } Node_##type; \
+typedef struct _Node_##type { type Value; struct _Node_##type *Next; } Node_##type ; \
 \
 inline Node_##type *\
-NewNode_##type(type Value){ \
+NewNode_##type (type Value){ \
     Node_##type *Item; \
-    Item = (Node_##type *)PlatformMemAlloc(sizeof(Node_##type)); \
+    Item = (Node_##type *)PlatformMemAlloc(sizeof(Node_##type )); \
     Assert(Item); \
     Item->Value = Value; \
     Item->Next = 0; \
@@ -17,7 +17,7 @@ NewNode_##type(type Value){ \
 \
 inline Node_##type *\
 AddNode_##type(Node_##type *List, type Value){ \
-    Node_##type *NewNode = NewNode_##type(Value); \
+    Node_##type *NewNode = NewNode_##type (Value); \
     List->Next = NewNode; \
     return(NewNode); \
 } \

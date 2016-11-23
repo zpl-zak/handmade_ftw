@@ -6,6 +6,14 @@
 #define introspect(IGNORED)
 #define counted_pointer(IGNORED)
 
+// NOTE(zaklaus): These are used for documentating the code.
+#define doc(...)
+#define doc_string(...)
+#define doc_end
+#define doc_example(...)
+#define doc_tags(...)
+
+
 /*
   NOTE(casey):
 

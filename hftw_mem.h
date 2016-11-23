@@ -62,6 +62,9 @@ DefaultTagScan(void)
     return(Result);
 }
 
+doc(ArenaInitialize)
+doc_string(Initializes Memory Arena with default values.)
+doc_example(ArenaInitialize(Arena, 128, MemBlock);)
 inline void
 ArenaInitialize(memory_arena *Arena, memory_index Size, void *Base)
 {
@@ -75,6 +78,9 @@ ArenaInitialize(memory_arena *Arena, memory_index Size, void *Base)
         Arena->HeaderEnd = 0;
 }
 
+doc(ArenaBuild)
+doc_string(Uses internal allocator to build new arena.)
+doc_example(ArenaBuild(Arena, 128);)
 inline void
 ArenaBuild(memory_arena *Arena, memory_index Size)
 {
@@ -82,6 +88,9 @@ ArenaBuild(memory_arena *Arena, memory_index Size)
     ArenaInitialize(Arena, Size, Base);
 }
 
+doc(ArenaGetAlignmentOffset)
+doc_string(Calculates the offset required by specified alignment.)
+doc_example(ArenaGetAlignmentOffset(Arena, 8);)
 inline memory_index
 ArenaGetAlignmentOffset(memory_arena *Arena, memory_index Alignment)
 {
@@ -97,6 +106,8 @@ ArenaGetAlignmentOffset(memory_arena *Arena, memory_index Alignment)
     return(AlignmentOffset);
 }
 
+doc(ArenaDefaultParams)
+doc_string(Returns default push state params.)
 inline arena_push_params
 ArenaDefaultParams(void)
 {
