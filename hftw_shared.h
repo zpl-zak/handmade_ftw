@@ -2,6 +2,16 @@
 
 #if !defined(HFTW_SHARED_H)
 
+inline void *
+Copy(memory_index Size, const void *SourceInit, void *DestInit)
+{
+    u8 *Source = (u8 *)SourceInit;
+    u8 *Dest = (u8 *)DestInit;
+    while(Size--) {*Dest++ = *Source++;}
+    
+    return(DestInit);
+}
+
 inline b32
 IsEndOfLine(char C)
 {

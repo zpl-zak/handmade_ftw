@@ -14,6 +14,7 @@
 #define doc_example(...)
 #define doc_tags(...)
 #define doc_sig(...) __VA_ARGS__
+#define doc_sep()
 
 /*
   NOTE(casey):
