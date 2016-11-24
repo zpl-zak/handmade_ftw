@@ -8,11 +8,12 @@
 
 // NOTE(zaklaus): These are used for documentating the code.
 #define doc(...)
+#define doc_cat(...)
 #define doc_string(...)
 #define doc_end
 #define doc_example(...)
 #define doc_tags(...)
-
+#define doc_sig(...) __VA_ARGS__
 
 /*
   NOTE(casey):

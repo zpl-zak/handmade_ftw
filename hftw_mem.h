@@ -2,39 +2,58 @@
 
 #if !defined(HFTW_MEM_H)
 
+doc_cat(Memory Arena)
+
+doc(arena_header)
+doc_string(Describes arena elements.)
+doc_sig(
 typedef struct
 {
-    s32 Size;
-    u32 Tag;
-    u32 Offset;
+    s32 Size;    // Size of the element.
+    u32 Tag;     // Element's tag used for identification.
+    u32 Offset;  // Memory offset from the base.
 } arena_header;
+)
 
 LinkedList(arena_header)
 
+doc(memory_arena)
+doc_string(Memory arena holding contigous block of memory and tracking of pushed objects.)
+doc_sig(
 typedef struct
 {
-    memory_index Size;
-    uint8 *Base;
-    memory_index Used;
-    u8 Flags;
-    b32 WasExpanded;
+    memory_index Size;             // Allocated memory size. 
+    uint8 *Base;                   // Memory base pointer. (Points to a contigous block of memory.)
+    memory_index Used;             // Memory already used by elements.
+    u8 Flags;                      // Arena's flags.
+    b32 WasExpanded;               // If reallocation is allowed, this signals us whether memory expansion has happened.
 
-    s32 TempCount;
+    s32 TempCount;                 // Counts how many times is our arena used by temp_memory.
     
-    Node_arena_header *Header, *HeaderEnd;
+    Node_arena_header *Header;    // Linked list of tracked elements.
+    Node_arena_header *HeaderEnd;
 } memory_arena;
+)
 
+doc(arena_flags)
+doc_string(Arena flags.)
+doc_sig(
 typedef enum
 {
-    ArenaFlag_AllowRealloc = 0x1,
-    ArenaFlag_DisallowHeaders = 0x2,
+    ArenaFlag_AllowRealloc = 0x1,    // Allows re-allocation of the memory, if expansion is required.
+    ArenaFlag_DisallowHeaders = 0x2, // Disallows tracking of elements. Useful if elements are of uniform size.
 } arena_flags;
+)
 
+doc(temp_memory)
+doc_string(Used to temporarily store short-living data in arena.)
+doc_sig(
 typedef struct
 {
-    memory_arena *Arena;
-    memory_index Used;
+    memory_arena *Arena;  // Memory Arena to be used.
+    memory_index Used;    // This holds the Arena's original used size.
 } temp_memory;
+)
 
 typedef enum
 {
@@ -65,8 +84,12 @@ DefaultTagScan(void)
 doc(ArenaInitialize)
 doc_string(Initializes Memory Arena with default values.)
 doc_example(ArenaInitialize(Arena, 128, MemBlock);)
+doc_sig(
 inline void
-ArenaInitialize(memory_arena *Arena, memory_index Size, void *Base)
+ArenaInitialize(memory_arena *Arena, // Arena to be initialized.
+                memory_index Size,   // Size of the allocated memory.
+                void *Base)          // Memory block to be used with Arena.
+)
 {
     Arena->Size = Size;
     Arena->Base = (uint8 *)Base;
@@ -75,14 +98,18 @@ ArenaInitialize(memory_arena *Arena, memory_index Size, void *Base)
     Arena->TempCount = 0;
     Arena->Flags = 0;
     Arena->Header = 0;
-        Arena->HeaderEnd = 0;
+    Arena->HeaderEnd = 0;
 }
+
 
 doc(ArenaBuild)
 doc_string(Uses internal allocator to build new arena.)
 doc_example(ArenaBuild(Arena, 128);)
+doc_sig(
 inline void
-ArenaBuild(memory_arena *Arena, memory_index Size)
+ArenaBuild(memory_arena *Arena, // Arena to be built.
+           memory_index Size)   // The size to be pre-allocated.
+)
 {
     void *Base = PlatformMemAlloc(Size);
     ArenaInitialize(Arena, Size, Base);
@@ -91,8 +118,11 @@ ArenaBuild(memory_arena *Arena, memory_index Size)
 doc(ArenaGetAlignmentOffset)
 doc_string(Calculates the offset required by specified alignment.)
 doc_example(ArenaGetAlignmentOffset(Arena, 8);)
+doc_sig(
 inline memory_index
-ArenaGetAlignmentOffset(memory_arena *Arena, memory_index Alignment)
+ArenaGetAlignmentOffset(memory_arena *Arena,     // Target Arena.
+                        memory_index Alignment)  // Desired alignment
+)
 {
     memory_index AlignmentOffset = 0;
     
