@@ -7,14 +7,17 @@
 #define counted_pointer(IGNORED)
 
 // NOTE(zaklaus): These are used for documentating the code.
+#define doc_ignore()
 #define doc(...)
 #define doc_cat(...)
 #define doc_string(...)
 #define doc_end
 #define doc_example(...)
+#define doc_ret(...) 
 #define doc_tags(...)
 #define doc_sig(...) __VA_ARGS__
 #define doc_sep()
+#define doc_hunt()
 
 /*
   NOTE(casey):

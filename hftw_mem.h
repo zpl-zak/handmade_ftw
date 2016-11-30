@@ -595,12 +595,32 @@ doc_example(tag_scan_result ArenaGetVaryBlockTagResult(Arena, Scan, Tag))
 #define ArenaGetVaryBlockTagResult(arena, scan, tag) \
 ArenaGetBlockByTagAndRecord(arena, scan, tag)
 
-
+doc(ArenaPushStruct)
+doc_string(Push struct to the arena.)
+doc_example((Type *) ArenaPushStruct(Arena, Type, ...))
 #define ArenaPushStruct(Arena, type, ...) (type *)ArenaPushSize_(Arena, sizeof(type), ## __VA_ARGS__)
+
+doc(ArenaPushArray)
+doc_string(Push array to the arena.)
+doc_example((Type *) ArenaPushArray(Arena, Count, Type, ...))
 #define ArenaPushArray(Arena, Count, type, ...) (type *)ArenaPushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
+
+doc(ArenaPushSize)
+doc_string(Push size to the arena.)
+doc_example((void *) ArenaPushSize(Arena, Size, ...))
 #define ArenaPushSize(Arena, Size, ...) ArenaPushSize_(Arena, Size, ## __VA_ARGS__)
+
+doc(ArenaPushCopy)
+doc_string(Push and copy size from the source.)
+doc_example((void *) ArenaPushCopy(Arena, Size, Source, ...))
 #define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, ArenaPushSize_(Arena, Size, ## __VA_ARGS__))
+
 #define ArenaPushType ArenaPushStruct
+
+doc(ArenaPushValue)
+doc_string(Push and set value to the arena.)
+doc_example((none) 
+            ArenaPushValue(Arena, Type, Value, ...))
 #define ArenaPushValue(Arena, type, Value, ...) *((type *) ArenaPushType(Arena, type, ## __VA_ARGS__)) = Value
 
 

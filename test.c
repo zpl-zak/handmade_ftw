@@ -17,8 +17,32 @@
 #define MEMORY_HEADERS 0
 
 int
+cmp(const void *a, const void *b)
+{
+    return( - *(int *)a + *(int *)b);
+}
+
+int
 main(void)
 {
+    #if STRING_TEST
+    {
+        string hashTest = StringCreate(literal("hello"));
+        s32 hash = hash_lit("hello");
+        Assert(hashTest.StringHash == hash);
+    }
+    #endif
+    
+    
+    int values[] = { 3, 1, 2, 7, 9, 0, 6 };
+    qsort(values, 7, sizeof(int), cmp);
+    
+    for(mi Idx = 0;
+        Idx < 7;
+        ++Idx)
+    {
+        printf("%d ", values[Idx]);
+    }
     
     fprintf(stdout, "\n");
     return(0);

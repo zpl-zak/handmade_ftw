@@ -7,8 +7,8 @@ SET SRC=%1
 if "%SRC%" == "" SET SRC=test.c
 
 SET OPTS=/W4 /wd4189 /wd4310 /wd4100 /wd4201 /wd4505 /wd4996 /wd4127 /wd4510 /wd4512 /wd4610 /wd4457 /WX
-SET OPTS=%OPTS% /GR- /nologo /FC
-SET DEBUG=/Zi
+SET OPTS=%OPTS% /GR- /nologo /FC /O2
+SET DEBUG=/Zi /DEBUG /Zo
 
 SET CODE_HOME=%~dp0
 
