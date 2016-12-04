@@ -12,7 +12,9 @@ SET DEBUG=/Zi /DEBUG /Zo
 
 SET CODE_HOME=%~dp0
 
+ctime -begin test_case.ctm
 cl /I%CODE_HOME% %OPTS% %DEBUG% %SRC%
+ctime -end test_case.ctm
 
 REM file spammation preventation
 del *.obj
