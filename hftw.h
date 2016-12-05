@@ -284,7 +284,6 @@ inline u32 GetThreadID(void)
 #include "hftw_math.h"
 #include "hftw_intrinsics.h"
 #include "hftw_shared.h"
-
 #include "hftw_string.h"
 
 #define HFTW_H

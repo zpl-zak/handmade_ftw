@@ -15,6 +15,7 @@
 #define STRING_TEST 1
 #define MEMORY_REALLOC 0
 #define MEMORY_HEADERS 0
+#define ECS_TEST 1
 
 int
 cmp(const void *a, const void *b)
@@ -33,16 +34,26 @@ main(void)
     }
     #endif
     
-    
-    int values[] = { 3, 1, 2, 7, 9, 0, 6 };
-    qsort(values, 7, sizeof(int), cmp);
-    
-    for(mi Idx = 0;
-        Idx < 7;
-        ++Idx)
+#if 0
     {
-        printf("%d ", values[Idx]);
+        int values[] = { 3, 1, 2, 7, 9, 0, 6 };
+        qsort(values, 7, sizeof(int), cmp);
+        
+        
+        for(mi Idx = 0;
+            Idx < 7;
+            ++Idx)
+        {
+            printf("%d ", values[Idx]);
+        }
     }
+    #endif
+    
+    #if ECS_TEST
+    {
+        // TODO(zaklaus): T.U.
+    }
+    #endif
     
     fprintf(stdout, "\n");
     return(0);

@@ -88,11 +88,11 @@ typedef struct
 
 doc_sep()
 
-doc(DefaultTagScan)
+doc(ArenaDefaultTagScan)
 doc_string(Default scan setup for new scans.)
 doc_sig(
 inline tag_scan_result
-DefaultTagScan(void)
+ArenaDefaultTagScan(void)
 )
 {
     tag_scan_result Result = {0};
