@@ -72,14 +72,14 @@ main(void)
         ArenaPushValue(&TestArena, some_data, dat, ArenaDefaultParams());
         ArenaPushValue(&TestArena, u8, 3, ArenaTag(42, ArenaDefaultParams()));
         ArenaPushValue(&TestArena, s32, 12, ArenaDefaultParams());
-        ArenaPushValue(&TestArena, s32, 4, ArenaDefaultParams());
+        ArenaPushValue(&TestArena, s32, 22, ArenaDefaultParams());
         
         size_t DataSize = 0;
           u8 * Data = ArenaSerialize(&TestArena, &DataSize);
         Assert(Data);
         printf("Packed size: %d, Arena size: %zd", (int)DataSize, *(mi *)Data);
         
-        memory_arena NextArena;
+        memory_arena NextArena = {0};
         ArenaDeserialize(&NextArena, Data);
         printf("\nOld used size: %zu == New used size: %zu", TestArena.Used, NextArena.Used);
         printf("\n1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)NextArena.Base, *(s32 *)TestArena.Base, (mi)NextArena.Size);

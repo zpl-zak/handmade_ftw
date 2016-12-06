@@ -688,7 +688,7 @@ u8 * Data)            // Source of our serialized data.
         Arena->NodeCount = *(s32 *)Data; Data += sizeof(s32);
         
         for (size_t Idx = 0;
-             Idx < Arena->NodeCount;
+             Idx < Arena->NodeCount + 1;
              Idx++)
         {
             arena_header header = {0};
@@ -708,6 +708,7 @@ u8 * Data)            // Source of our serialized data.
             }
         }
     }
+    Arena->Base = Data;
 }
 
 #define HFTW_MEM_H
