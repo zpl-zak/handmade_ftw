@@ -646,6 +646,8 @@ memory_arena * Arena, // Arena to be serialized.
     *(mi *)Ptr = Arena->Size; Ptr += sizeof(mi);
     *(mi *)Ptr = Arena->Used; Ptr += sizeof(mi);
     *(u8 *)Ptr = Arena->Flags; Ptr += sizeof(u8);
+    Copy(Arena->Used, Arena->Base, Ptr);
+    Ptr += Arena->Used;
     
     // NOTE(zaklaus): Headers
     if(!(Arena->Flags & ArenaFlag_DisallowHeaders))
@@ -662,8 +664,6 @@ memory_arena * Arena, // Arena to be serialized.
             *(s32 *)Ptr = E.Offset; Ptr += sizeof(u32);
         }
     }
-    
-    Copy(Arena->Used, Arena->Base, Ptr);
     
 *Size = AllocSize;
 return(Result);
@@ -682,6 +682,9 @@ u8 * Data)            // Source of our serialized data.
     Arena->Used = *(mi *)Data; Data += sizeof(mi);
     Arena->Flags = *(u8 *)Data; Data += sizeof(u8);
     Arena->NodeCount = Arena->TempCount = 0;
+    Arena->Base = PlatformMemAlloc(Arena->Size);
+    Copy(Arena->Used, Data, Arena->Base);
+    Data += Arena->Used;
     
     if(!(Arena->Flags & ArenaFlag_DisallowHeaders))
     {
@@ -709,8 +712,6 @@ u8 * Data)            // Source of our serialized data.
             }
         }
     }
-    Arena->Base = PlatformMemAlloc(Arena->Size);
-    Copy(Arena->Used, Data, Arena->Base);
 }
 
 #define HFTW_MEM_H
