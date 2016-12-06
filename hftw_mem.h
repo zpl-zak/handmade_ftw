@@ -687,6 +687,7 @@ u8 * Data)            // Source of our serialized data.
     {
         Arena->NodeCount = *(s32 *)Data; Data += sizeof(s32);
         
+// NOTE(zaklaus): Include header as a part of the Linked-List.
         for (size_t Idx = 0;
              Idx < Arena->NodeCount + 1;
              Idx++)
@@ -708,7 +709,8 @@ u8 * Data)            // Source of our serialized data.
             }
         }
     }
-    Arena->Base = Data;
+    Arena->Base = PlatformMemAlloc(Arena->Size);
+    Copy(Arena->Used, Data, Arena->Base);
 }
 
 #define HFTW_MEM_H

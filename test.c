@@ -81,6 +81,10 @@ main(void)
         
         memory_arena NextArena = {0};
         ArenaDeserialize(&NextArena, Data);
+        
+        // NOTE(zaklaus): We need to free the de-serialized memory once we don't need it!
+        PlatformMemFree(Data);
+        
         printf("\nOld used size: %zu == New used size: %zu", TestArena.Used, NextArena.Used);
         printf("\n1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)NextArena.Base, *(s32 *)TestArena.Base, (mi)NextArena.Size);
     }
