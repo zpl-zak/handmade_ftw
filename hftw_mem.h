@@ -637,7 +637,7 @@ memory_arena * Arena, // Arena to be serialized.
 )
 {
     Assert(!Arena->TempCount);
-    size_t AllocSize = Arena->Used + sizeof(memory_arena) + sizeof(arena_header)*Arena->NodeCount;
+    size_t AllocSize = Arena->Used + sizeof(mi)*2 + sizeof(u8) + sizeof(s32) + sizeof(arena_header)*Arena->NodeCount;
     u8 * Result = PlatformMemAlloc(AllocSize);
     u8 * Ptr = Result;
     

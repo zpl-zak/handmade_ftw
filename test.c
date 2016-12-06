@@ -78,9 +78,20 @@ main(void)
           u8 * Data = ArenaSerialize(&TestArena, &DataSize);
         Assert(Data);
         printf("Packed size: %d, Arena size: %zd", (int)DataSize, *(mi *)Data);
+        FILE *File = fopen("memdata.dat", "wb");
+        fwrite(Data, 1, DataSize, File);
+        fclose(File);
+        
+        FILE *File2 = fopen("memdata.dat", "rb");
+        fseek(File2, 0, SEEK_END);
+        int fsize = ftell(File2);
+        rewind(File2);
+        u8 *NewData = PlatformMemAlloc(fsize);
+        fread(NewData, 1, fsize, File2);
+        fclose(File2);
         
         memory_arena NextArena = {0};
-        ArenaDeserialize(&NextArena, Data);
+        ArenaDeserialize(&NextArena, NewData);
         
         // NOTE(zaklaus): We need to free the de-serialized memory once we don't need it!
         PlatformMemFree(Data);
