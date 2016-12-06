@@ -714,5 +714,49 @@ u8 * Data)            // Source of our serialized data.
     }
 }
 
+doc(ArenaDuplicate)
+doc_string(Duplicates our arena.)
+doc_sig(
+inline void
+ArenaDuplicate(
+memory_arena * A, // Arena to be duplicated.
+memory_arena * B) // Arena to duplicate to.
+)
+{
+    Assert(!A->TempCount);
+    B->Size = A->Size;
+    B->Used = A->Used;
+    B->Flags = A->Flags;
+    B->NodeCount = A->NodeCount;
+    B->WasExpanded = A->WasExpanded;
+    B->Base = PlatformMemAlloc(B->Size);
+    Copy(B->Used, A->Base, B->Base);
+    
+    if(!(B->Flags & ArenaFlag_DisallowHeaders))
+    {
+        for (Node_arena_header *E = A->Header;
+             E;
+             E = E->Next)
+        {
+            arena_header header = E->Value;
+            if (!B->Header)
+            {
+                arena_header dummy = {0};
+                B->Header = NewNode_arena_header(dummy);
+                B->HeaderEnd = NewNode_arena_header(header);
+                B->Header->Next = B->HeaderEnd;
+            }
+            else
+            {
+                B->HeaderEnd = AddNode_arena_header(B->HeaderEnd, header);
+            }
+        }
+    }
+    else
+    {
+        B->Header = B->HeaderEnd = 0;
+    }
+}
+
 #define HFTW_MEM_H
 #endif

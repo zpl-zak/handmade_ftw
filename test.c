@@ -98,6 +98,10 @@ main(void)
         
         printf("\nOld used size: %zu == New used size: %zu", TestArena.Used, NextArena.Used);
         printf("\n1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)NextArena.Base, *(s32 *)TestArena.Base, (mi)NextArena.Size);
+        
+        memory_arena ThirdArena;
+        ArenaDuplicate(&NextArena, &ThirdArena);
+        printf("\nDuplicated 1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)ThirdArena.Base, *(s32 *)NextArena.Base, (mi)NextArena.Size);
     }
     #endif
     
