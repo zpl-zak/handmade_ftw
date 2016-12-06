@@ -2,6 +2,13 @@
 
 #if !defined(HFTW_NODE_H)
 
+doc(LinkedList)
+doc_cat(Linked list)
+doc_string(Linked list macro generator.)
+doc_string(Supports arbitrary type.)
+doc_example(LinkedList(StructName))
+doc_ret(Generates Linked-List code for type StructName,
+        ie. Node_StructName, NewNode_StructName, AddNode_StructName)
 #define LinkedList(type) \
 typedef struct _Node_##type { type Value; struct _Node_##type *Next; } Node_##type ; \
 \

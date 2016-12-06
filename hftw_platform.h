@@ -3,6 +3,7 @@
 #if !defined(HFTW_PLATFORM_H)
 
 // NOTE(zaklaus): Lazy solution for MM.
+// TODO(zaklaus): Make it NOT LAZY : Implement OS-specific routines!!!
 #ifdef PLATFORM_ALLOC
 #error Platform-specific MM is not yet implemented
 #else//LIBC_MALLOC

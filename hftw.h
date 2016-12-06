@@ -276,14 +276,13 @@ inline u32 GetThreadID(void)
 
 #include "hftw_platform.h"
 #include "hftw_node.h"
-
+#include "hftw_shared.h"
 #include "hftw_mem.h"
 
 #define HANDMADE_MATH_IMPLEMENTATION
 
 #include "hftw_math.h"
 #include "hftw_intrinsics.h"
-#include "hftw_shared.h"
 #include "hftw_string.h"
 
 #define HFTW_H

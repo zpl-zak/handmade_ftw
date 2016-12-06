@@ -16,12 +16,19 @@
 #define MEMORY_REALLOC 0
 #define MEMORY_HEADERS 0
 #define ECS_TEST 1
+#define DATA_PACKING 1
 
 int
 cmp(const void *a, const void *b)
 {
     return( - *(int *)a + *(int *)b);
 }
+
+typedef struct
+{
+    s32 Cislo;
+    u8 Height;
+} some_data;
 
 int
 main(void)
@@ -52,6 +59,30 @@ main(void)
     #if ECS_TEST
     {
         // TODO(zaklaus): T.U.
+    }
+    #endif
+    
+    #if DATA_PACKING
+    {
+        some_data dat = {.Cislo = 42, .Height = 128};
+        memory_arena TestArena;
+        ArenaBuild(&TestArena, 1024);
+        //TestArena.Flags |= ArenaFlag_DisallowHeaders;
+        ArenaPushValue(&TestArena, s32, 45, ArenaDefaultParams());
+        ArenaPushValue(&TestArena, some_data, dat, ArenaDefaultParams());
+        ArenaPushValue(&TestArena, u8, 3, ArenaTag(42, ArenaDefaultParams()));
+        ArenaPushValue(&TestArena, s32, 12, ArenaDefaultParams());
+        ArenaPushValue(&TestArena, s32, 4, ArenaDefaultParams());
+        
+        size_t DataSize = 0;
+          u8 * Data = ArenaSerialize(&TestArena, &DataSize);
+        Assert(Data);
+        printf("Packed size: %d, Arena size: %zd", (int)DataSize, *(mi *)Data);
+        
+        memory_arena NextArena;
+        ArenaDeserialize(&NextArena, Data);
+        printf("\nOld used size: %zu == New used size: %zu", TestArena.Used, NextArena.Used);
+        printf("\n1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)NextArena.Base, *(s32 *)TestArena.Base, (mi)NextArena.Size);
     }
     #endif
     

@@ -29,8 +29,9 @@ typedef struct
     b32 WasExpanded;               // If reallocation is allowed, this signals us whether memory expansion has happened.
 
     s32 TempCount;                 // Counts how many times is our arena used by temp_memory.
+    s32 NodeCount;                 // Counts how many nodes do we track in our arena header.
     
-    Node_arena_header *Header;    // Linked list of tracked elements.
+    Node_arena_header *Header;     // Linked list of tracked elements.
     Node_arena_header *HeaderEnd;
 } memory_arena;
 )
@@ -88,6 +89,60 @@ typedef struct
 
 doc_sep()
 
+doc(ArenaGetBlock)
+doc_string(Returns block of memory pointed to by index. *NOTE* Works only with arena`s elements of uniform size!)
+doc_example((Type *) ArenaGetBlock(Arena, Type, Index))
+#define ArenaGetBlock(arena, type, idx) \
+(type *)&(arena->Base)[sizeof(type)*idx]
+
+doc(ArenaGetVaryBlock)
+doc_string(Returns element by index.)
+doc_example((Type *) ArenaGetVaryBlock(Arena, Type, Index))
+#define ArenaGetVaryBlock(arena, type, idx) \
+(type *)(ArenaGetBlockByRecord(arena,(size_t)idx))
+
+doc(ArenaGetVaryBlockTagValue)
+doc_string(Returns element`s value by tag.)
+doc_example((Type *) ArenaGetVaryBlockTagValue(Arena, Scan, Type, Tag))
+#define ArenaGetVaryBlockTagValue(arena, scan, type, tag) \
+(type *)(ArenaGetBlockByTagAndRecord(arena, scan, tag).Value)
+
+doc(ArenaGetVaryBlockTagResult)
+doc_string(Returns tag scan result by tag.)
+doc_example(tag_scan_result ArenaGetVaryBlockTagResult(Arena, Scan, Tag))
+#define ArenaGetVaryBlockTagResult(arena, scan, tag) \
+ArenaGetBlockByTagAndRecord(arena, scan, tag)
+
+doc(ArenaPushStruct)
+doc_string(Push struct to the arena.)
+doc_example((Type *) ArenaPushStruct(Arena, Type, ...))
+#define ArenaPushStruct(Arena, type, ...) (type *)ArenaPushSize_(Arena, sizeof(type), ## __VA_ARGS__)
+
+doc(ArenaPushArray)
+doc_string(Push array to the arena.)
+doc_example((Type *) ArenaPushArray(Arena, Count, Type, ...))
+#define ArenaPushArray(Arena, Count, type, ...) (type *)ArenaPushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
+
+doc(ArenaPushSize)
+doc_string(Push size to the arena.)
+doc_example((void *) ArenaPushSize(Arena, Size, ...))
+#define ArenaPushSize(Arena, Size, ...) ArenaPushSize_(Arena, Size, ## __VA_ARGS__)
+
+doc(ArenaPushCopy)
+doc_string(Push and copy size from the source.)
+doc_example((void *) ArenaPushCopy(Arena, Size, Source, ...))
+#define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, ArenaPushSize_(Arena, Size, ## __VA_ARGS__))
+
+#define ArenaPushType ArenaPushStruct
+
+doc(ArenaPushValue)
+doc_string(Push and set value to the arena.)
+doc_example((none) 
+            ArenaPushValue(Arena, Type, Value, ...))
+#define ArenaPushValue(Arena, type, Value, ...) *((type *) ArenaPushType(Arena, type, ## __VA_ARGS__)) = Value
+
+doc_sep()
+
 doc(ArenaDefaultTagScan)
 doc_string(Default scan setup for new scans.)
 doc_sig(
@@ -118,6 +173,7 @@ ArenaInitialize(memory_arena *Arena, // Arena to be initialized.
     Arena->Flags = 0;
     Arena->Header = 0;
     Arena->HeaderEnd = 0;
+    Arena->NodeCount = 0;
 }
 
 
@@ -416,6 +472,7 @@ ArenaPushSize_(memory_arena *Arena,         // Target arena
         {
             Arena->HeaderEnd = AddNode_arena_header(Arena->HeaderEnd, header);
         }
+        ++Arena->NodeCount;
     }
     
     return(Result);
@@ -569,60 +626,89 @@ memory_arena * Arena) // Target arena
     Arena->Used = Arena->Size = 0;
 }
 
-doc_sep()
+doc(ArenaSerialize)
+doc_string(Serializes our arena)
+doc_ret(Returns serialized data.)
+doc_sig(
+inline u8 *
+ArenaSerialize(
+memory_arena * Arena, // Arena to be serialized.
+ size_t * Size)         // Size of the serialized data.
+)
+{
+    Assert(!Arena->TempCount);
+    size_t AllocSize = Arena->Used + sizeof(memory_arena) + sizeof(arena_header)*Arena->NodeCount;
+    u8 * Result = PlatformMemAlloc(AllocSize);
+    u8 * Ptr = Result;
+    
+    // NOTE(zaklaus): size, used, flags, content
+    
+    *(mi *)Ptr = Arena->Size; Ptr += sizeof(mi);
+    *(mi *)Ptr = Arena->Used; Ptr += sizeof(mi);
+    *(u8 *)Ptr = Arena->Flags; Ptr += sizeof(u8);
+    
+    // NOTE(zaklaus): Headers
+    if(!(Arena->Flags & ArenaFlag_DisallowHeaders))
+    {
+        *(s32 *)Ptr = Arena->NodeCount; Ptr += sizeof(s32);
+        
+        for (Node_arena_header *Node = Arena->Header;
+             Node;
+             Node = Node->Next)
+        {
+            arena_header E = Node->Value;
+            *(s32 *)Ptr = E.Size; Ptr += sizeof(s32);
+            *(s32 *)Ptr = E.Tag; Ptr += sizeof(u32);
+            *(s32 *)Ptr = E.Offset; Ptr += sizeof(u32);
+        }
+    }
+    
+    Copy(Arena->Used, Arena->Base, Ptr);
+    
+*Size = AllocSize;
+return(Result);
+}
 
-doc(ArenaGetBlock)
-doc_string(Returns block of memory pointed to by index. *NOTE* Works only with arena`s elements of uniform size!)
-doc_example((Type *) ArenaGetBlock(Arena, Type, Index))
-#define ArenaGetBlock(arena, type, idx) \
-(type *)&(arena->Base)[sizeof(type)*idx]
-
-doc(ArenaGetVaryBlock)
-doc_string(Returns element by index.)
-doc_example((Type *) ArenaGetVaryBlock(Arena, Type, Index))
-#define ArenaGetVaryBlock(arena, type, idx) \
-(type *)(ArenaGetBlockByRecord(arena,(size_t)idx))
-
-doc(ArenaGetVaryBlockTagValue)
-doc_string(Returns element`s value by tag.)
-doc_example((Type *) ArenaGetVaryBlockTagValue(Arena, Scan, Type, Tag))
-#define ArenaGetVaryBlockTagValue(arena, scan, type, tag) \
-(type *)(ArenaGetBlockByTagAndRecord(arena, scan, tag).Value)
-
-doc(ArenaGetVaryBlockTagResult)
-doc_string(Returns tag scan result by tag.)
-doc_example(tag_scan_result ArenaGetVaryBlockTagResult(Arena, Scan, Tag))
-#define ArenaGetVaryBlockTagResult(arena, scan, tag) \
-ArenaGetBlockByTagAndRecord(arena, scan, tag)
-
-doc(ArenaPushStruct)
-doc_string(Push struct to the arena.)
-doc_example((Type *) ArenaPushStruct(Arena, Type, ...))
-#define ArenaPushStruct(Arena, type, ...) (type *)ArenaPushSize_(Arena, sizeof(type), ## __VA_ARGS__)
-
-doc(ArenaPushArray)
-doc_string(Push array to the arena.)
-doc_example((Type *) ArenaPushArray(Arena, Count, Type, ...))
-#define ArenaPushArray(Arena, Count, type, ...) (type *)ArenaPushSize_(Arena, (Count)*sizeof(type), ## __VA_ARGS__)
-
-doc(ArenaPushSize)
-doc_string(Push size to the arena.)
-doc_example((void *) ArenaPushSize(Arena, Size, ...))
-#define ArenaPushSize(Arena, Size, ...) ArenaPushSize_(Arena, Size, ## __VA_ARGS__)
-
-doc(ArenaPushCopy)
-doc_string(Push and copy size from the source.)
-doc_example((void *) ArenaPushCopy(Arena, Size, Source, ...))
-#define ArenaPushCopy(Arena, Size, Source, ...) Copy(Size, Source, ArenaPushSize_(Arena, Size, ## __VA_ARGS__))
-
-#define ArenaPushType ArenaPushStruct
-
-doc(ArenaPushValue)
-doc_string(Push and set value to the arena.)
-doc_example((none) 
-            ArenaPushValue(Arena, Type, Value, ...))
-#define ArenaPushValue(Arena, type, Value, ...) *((type *) ArenaPushType(Arena, type, ## __VA_ARGS__)) = Value
-
+doc(ArenaDeserialize)
+doc_string(Deserializes our packed data to our new arena.)
+doc_sig(
+inline void
+ArenaDeserialize(
+memory_arena * Arena, // Our new arena to be used for unpacking.
+u8 * Data)            // Source of our serialized data.
+)
+{
+    Arena->Size = *(mi *)Data; Data += sizeof(mi);
+    Arena->Used = *(mi *)Data; Data += sizeof(mi);
+    Arena->Flags = *(u8 *)Data; Data += sizeof(u8);
+    Arena->NodeCount = Arena->TempCount = 0;
+    
+    if(!(Arena->Flags & ArenaFlag_DisallowHeaders))
+    {
+        Arena->NodeCount = *(s32 *)Data; Data += sizeof(s32);
+        
+        for (size_t Idx = 0;
+             Idx < Arena->NodeCount;
+             Idx++)
+        {
+            arena_header header = {0};
+            header.Size = *(s32 *)Data; Data += sizeof(s32);
+            header.Tag = *(u32 *)Data; Data += sizeof(u32);
+            header.Offset = *(u32 *)Data; Data += sizeof(u32);
+            if(!Arena->Header)
+            {
+                arena_header dummy = {0};
+                Arena->Header = NewNode_arena_header(dummy);
+                Arena->HeaderEnd = NewNode_arena_header(header);
+                Arena->Header->Next = Arena->HeaderEnd;
+            }
+            else
+            {
+                Arena->HeaderEnd = AddNode_arena_header(Arena->HeaderEnd, header);
+            }
+        }
+    }
+}
 
 #define HFTW_MEM_H
 #endif
