@@ -2,7 +2,6 @@
 
 #if !defined(HFTW_H)
 
-// TODO(casey): Have the meta-parser ignore its own #define
 #define introspect(IGNORED)
 #define counted_pointer(IGNORED)
 
@@ -125,8 +124,7 @@ typedef uintptr_t umm;
 #define Tau32 6.28318530717958647692f
 
 #ifdef HANDMADE_SLOW
-// TODO(casey): Complete assertion macro - don't worry everyone!
-
+    
 #ifdef COMPILER_MSVC
 #define TRAP() *(int *)0 = 0
 #elif COMPILER_LLVM
@@ -149,18 +147,24 @@ typedef uintptr_t umm;
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
-// TODO(casey): swap, min, max ... macros???
+#define Min(a,b) (a < b) ? a : b
+#define Max(a,b) (a > b) ? a : b
+#define Swap(a,b) a = a ^ b; b = a ^ b; a = a ^ b
 
+#define SwapTypeDeclare(type) global_variable type __HFTW_SWAP##type
+#define SwapType(a,b,type, tname) __HFTW_SWAP##type = a; a = b; b = __HFTW_SWAP##type
+    
 #define AlignPow2(Value, Alignment) ((Value + ((Alignment) - 1)) & ~((Alignment) - 1))
 #define Align4(Value) ((Value + 3) & ~3)
 #define Align8(Value) ((Value + 7) & ~7)
 #define Align16(Value) ((Value + 15) & ~15)
+#define Maximum64Value 0xFFFFFFFF
+    #define Maximum32Value 0xFFFF
 
 internal uint32
 SafeTruncateUInt64(uint64 Value)
 {
-    // TODO(casey): Defines for maximum values
-    Assert(Value <= 0xFFFFFFFF);
+    Assert(Value <= Maximum64Value);
     uint32 Result = (uint32)Value;
     return(Result);
 }
@@ -168,8 +172,7 @@ SafeTruncateUInt64(uint64 Value)
 internal u16
 SafeTruncateToU16(uint32 Value)
 {
-    // TODO(casey): Defines for maximum values
-    Assert(Value <= 0xFFFF);
+    Assert(Value <= Maximum32Value);
     u16 Result = (u16)Value;
     return(Result);
 }
@@ -178,7 +181,6 @@ SafeTruncateToU16(uint32 Value)
 internal void
 ZeroSize(memory_index Size, void *Ptr)
 {
-    // TODO(casey): Check this guy for performance
     uint8 *Byte = (uint8 *)Ptr;
     while(Size--)
     {
@@ -217,7 +219,6 @@ internal u32 GetThreadID(void)
 }
 
 #elif COMPILER_LLVM
-// TODO(casey): Does LLVM have real read-specific barriers yet?
 #define CompletePreviousReadsBeforeFutureReads asm volatile("" ::: "memory")
 #define CompletePreviousWritesBeforeFutureWrites asm volatile("" ::: "memory")
 internal uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
@@ -255,7 +256,6 @@ internal u32 GetThreadID(void)
     return(ThreadID);
 }
 #else
-// TODO(casey): Other compilers/platforms??
 #endif
 
 #ifdef __cplusplus

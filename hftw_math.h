@@ -18,7 +18,7 @@ extern "C"
 #endif
 
 #if _MSC_VER && !__INTEL_COMPILER
-#define HINLINE __internal
+#define HINLINE internal
 #else
 #define HINLINE internal
 #endif
