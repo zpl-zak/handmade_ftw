@@ -47,26 +47,14 @@ extern "C" {
 //
 // NOTE(casey): Compilers
 //
-    
-#if !defined(COMPILER_MSVC)
-#define COMPILER_MSVC 0
-#endif
-    
-#if !defined(COMPILER_LLVM)
-#define COMPILER_LLVM 0
-#endif
-    
-#if !COMPILER_MSVC && !COMPILER_LLVM
-#if _MSC_VER
-#undef COMPILER_MSVC
+
+
+#ifdef _MSC_VER
 #define COMPILER_MSVC 1
-#else
-    // TODO(casey): Moar compilerz!!!
-#undef COMPILER_LLVM
+#elif __clang__
 #define COMPILER_LLVM 1
 #endif
-#endif
-    
+
 #if COMPILER_MSVC
 #include <intrin.h>
 #elif COMPILER_LLVM
@@ -168,7 +156,7 @@ typedef uintptr_t umm;
 #define Align8(Value) ((Value + 7) & ~7)
 #define Align16(Value) ((Value + 15) & ~15)
 
-inline uint32
+internal uint32
 SafeTruncateUInt64(uint64 Value)
 {
     // TODO(casey): Defines for maximum values
@@ -177,7 +165,7 @@ SafeTruncateUInt64(uint64 Value)
     return(Result);
 }
 
-inline u16
+internal u16
 SafeTruncateToU16(uint32 Value)
 {
     // TODO(casey): Defines for maximum values
@@ -187,7 +175,7 @@ SafeTruncateToU16(uint32 Value)
 }
 
 
-inline void
+internal void
 ZeroSize(memory_index Size, void *Ptr)
 {
     // TODO(casey): Check this guy for performance
@@ -201,26 +189,26 @@ ZeroSize(memory_index Size, void *Ptr)
 #if COMPILER_MSVC
 #define CompletePreviousReadsBeforeFutureReads _ReadBarrier()
 #define CompletePreviousWritesBeforeFutureWrites _WriteBarrier()
-inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
+internal uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
 {
     uint32 Result = _InterlockedCompareExchange((long volatile *)Value, New, Expected);
 
     return(Result);
 }
-inline u64 AtomicExchangeU64(u64 volatile *Value, u64 New)
+internal u64 AtomicExchangeU64(u64 volatile *Value, u64 New)
 {
     u64 Result = _InterlockedExchange64((__int64 volatile *)Value, New);
 
     return(Result);
 }
-inline u64 AtomicAddU64(u64 volatile *Value, u64 Addend)
+internal u64 AtomicAddU64(u64 volatile *Value, u64 Addend)
 {
     // NOTE(casey): Returns the original value _prior_ to adding
     u64 Result = _InterlockedExchangeAdd64((__int64 volatile *)Value, Addend);
 
     return(Result);
 }    
-inline u32 GetThreadID(void)
+internal u32 GetThreadID(void)
 {
     u8 *ThreadLocalStorage = (u8 *)__readgsqword(0x30);
     u32 ThreadID = *(u32 *)(ThreadLocalStorage + 0x48);
@@ -232,26 +220,26 @@ inline u32 GetThreadID(void)
 // TODO(casey): Does LLVM have real read-specific barriers yet?
 #define CompletePreviousReadsBeforeFutureReads asm volatile("" ::: "memory")
 #define CompletePreviousWritesBeforeFutureWrites asm volatile("" ::: "memory")
-inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
+internal uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
 {
     uint32 Result = __sync_val_compare_and_swap(Value, Expected, New);
 
     return(Result);
 }
-inline u64 AtomicExchangeU64(u64 volatile *Value, u64 New)
+internal u64 AtomicExchangeU64(u64 volatile *Value, u64 New)
 {
     u64 Result = __sync_lock_test_and_set(Value, New);
 
     return(Result);
 }
-inline u64 AtomicAddU64(u64 volatile *Value, u64 Addend)
+internal u64 AtomicAddU64(u64 volatile *Value, u64 Addend)
 {
     // NOTE(casey): Returns the original value _prior_ to adding
     u64 Result = __sync_fetch_and_add(Value, Addend);
 
     return(Result);
 }    
-inline u32 GetThreadID(void)
+internal u32 GetThreadID(void)
 {
     u32 ThreadID;
 #if defined(__APPLE__) && defined(__x86_64__)
@@ -279,6 +267,7 @@ inline u32 GetThreadID(void)
 #include "hftw_shared.h"
 #include "hftw_mem.h"
 
+#define HANDMADEMATH_STATIC
 #define HANDMADE_MATH_IMPLEMENTATION
 
 #include "hftw_math.h"

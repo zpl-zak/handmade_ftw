@@ -12,15 +12,15 @@ extern "C"
 #endif
 
 #ifdef HANDMADEMATH_STATIC
-#define HFTWDEF static
+#define HFTWDEF internal
 #else
 #define HFTWDEF extern
 #endif
 
 #if _MSC_VER && !__INTEL_COMPILER
-#define HINLINE __inline
+#define HINLINE __internal
 #else
-#define HINLINE inline
+#define HINLINE internal
 #endif
 
 #define MathPI32 3.14159265359f

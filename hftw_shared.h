@@ -2,7 +2,7 @@
 
 #if !defined(HFTW_SHARED_H)
 
-inline void *
+internal void *
 Copy(memory_index Size, const void *SourceInit, void *DestInit)
 {
     u8 *Source = (u8 *)SourceInit;
@@ -12,7 +12,7 @@ Copy(memory_index Size, const void *SourceInit, void *DestInit)
     return(DestInit);
 }
 
-inline b32
+internal b32
 IsEndOfLine(char C)
 {
     b32 Result = ((C == '\n') ||
@@ -21,7 +21,7 @@ IsEndOfLine(char C)
     return(Result);
 }
 
-inline b32
+internal b32
 IsWhitespace(char C)
 {
     b32 Result = ((C == ' ') ||
@@ -33,7 +33,7 @@ IsWhitespace(char C)
     return(Result);
 }
 
-inline b32
+internal b32
 StringsAreEqual(char *A, char *B)
 {
     b32 Result = (A == B);
@@ -52,7 +52,7 @@ StringsAreEqual(char *A, char *B)
     return(Result);
 }
 
-inline b32
+internal b32
 StringsAreEqualA(umm ALength, char *A, char *B)
 {
     b32 Result = 0;
@@ -81,7 +81,7 @@ StringsAreEqualA(umm ALength, char *A, char *B)
     return(Result);
 }
 
-inline b32
+internal b32
 StringsAreEqualAB(memory_index ALength, char *A, memory_index BLength, char *B)
 {
     b32 Result = (ALength == BLength);

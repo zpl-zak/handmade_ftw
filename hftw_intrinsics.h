@@ -3,28 +3,28 @@
 #if !defined(HFTW_INTRINSICS_H)
 
 
-inline int32
+internal int32
 SignOf(int32 Value)
 {
     int32 Result = (Value >= 0) ? 1 : -1;
     return(Result);
 }
 
-inline real32
+internal real32
 SignOf_r32(real32 Value)
 {
     real32 Result = (Value >= 0) ? 1.0f : -1.0f;
     return(Result);
 }
 
-inline real32
+internal real32
 AbsoluteValue(real32 Real32)
 {
     real32 Result = (real32)fabs(Real32);
     return(Result);
 }
 
-inline uint32
+internal uint32
 RotateLeft(uint32 Value, int32 Amount)
 {
 #if COMPILER_MSVC
@@ -38,7 +38,7 @@ RotateLeft(uint32 Value, int32 Amount)
     return(Result);
 }
 
-inline uint32
+internal uint32
 RotateRight(uint32 Value, int32 Amount)
 {
 #if COMPILER_MSVC
@@ -52,56 +52,56 @@ RotateRight(uint32 Value, int32 Amount)
     return(Result);
 }
 
-inline int32
+internal int32
 RoundReal32ToInt32(real32 Real32)
 {
     int32 Result = (int32)roundf(Real32);
     return(Result);
 }
 
-inline uint32
+internal uint32
 RoundReal32ToUInt32(real32 Real32)
 {
     uint32 Result = (uint32)roundf(Real32);
     return(Result);
 }
 
-inline int32 
+internal int32 
 FloorReal32ToInt32(real32 Real32)
 {
     int32 Result = (int32)floorf(Real32);
     return(Result);
 }
 
-inline int32 
+internal int32 
 CeilReal32ToInt32(real32 Real32)
 {
     int32 Result = (int32)ceilf(Real32);
     return(Result);
 }
 
-inline int32
+internal int32
 TruncateReal32ToInt32(real32 Real32)
 {
     int32 Result = (int32)Real32;
     return(Result);
 }
 
-inline real32
+internal real32
 Sin(real32 Angle)
 {
     real32 Result = sinf(Angle);
     return(Result);
 }
 
-inline real32
+internal real32
 Cos(real32 Angle)
 {
     real32 Result = cosf(Angle);
     return(Result);
 }
 
-inline real32
+internal real32
 ATan2(real32 Y, real32 X)
 {
     real32 Result = atan2f(Y, X);
@@ -114,7 +114,7 @@ typedef struct
     uint32 Index;
 } bit_scan_result;
 
-inline bit_scan_result
+internal bit_scan_result
 FindLeastSignificantSetBit(uint32 Value)
 {
     bit_scan_result Result = {0};
@@ -129,7 +129,7 @@ FindLeastSignificantSetBit(uint32 Value)
         if(Value & (1 << Test))
         {
             Result.Index = Test;
-            Result.Found = true;
+            Result.Found = 1;
             break;
         }
     }

@@ -4,7 +4,6 @@
 
 #include "hftw.h"
 #include <stdio.h>
-#include <Windows.h>
 
 #include "tests/monster.h"
 

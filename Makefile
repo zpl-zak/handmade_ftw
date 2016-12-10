@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-std=c99 -Wall
+CC=clang
+CFLAGS=-std=gnu99 -Wall -Wextra -Werror -Wno-unused-function -Wno-missing-field-initializers -Wno-missing-braces
 
 all:
-	$(CC) $(CFLAGS) test.cpp -o test.exe
+	$(CC) $(CFLAGS) test.c -o test

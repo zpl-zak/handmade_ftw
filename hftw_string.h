@@ -20,7 +20,7 @@ doc_sep()
 doc(StringCalcHash)
 doc_string(Calculates string hash.)
 doc_sig(
-inline s32
+internal s32
 StringCalcHash(char *Source, // Source of the raw string to be hashed.
                u32 Length)   // Its length.
 )
@@ -39,7 +39,7 @@ StringCalcHash(char *Source, // Source of the raw string to be hashed.
 doc(StringGetLengthFromArray)
 doc_string(Returns length of raw null-terminated string.)
 doc_sig(
-inline u32
+internal u32
 StringGetLengthFromArray(char *Src) // Source of the raw string to get length from.
 )
 {
@@ -55,7 +55,7 @@ doc(StringCreate)
 doc_string(Returns newly-created managed string.)
 doc_example(StringCreate("Hello world!", 11);)
 doc_sig(
-inline string
+internal string
 StringCreate(char *Source, // Source of the raw string.
              u32 Length)   // Its length.
 )
@@ -75,7 +75,7 @@ StringCreate(char *Source, // Source of the raw string.
 doc(StringDestroy)
 doc_string(Destroys string and de-allocates its memory.)
 doc_sig(
-inline void
+internal void
 StringDestroy(string *Str) // Our string.
 )
 {
@@ -86,7 +86,7 @@ StringDestroy(string *Str) // Our string.
 doc(StringGetRaw)
 doc_string(Returns raw string.)
 doc_sig(
-inline const char *
+internal const char *
 StringGetRaw(string *Str) // Our string.
 )
 {
@@ -99,7 +99,7 @@ doc(StringCompare)
 doc_string(Compares two strings by hash.)
 doc_ret(Returns 1 if string hashes are equal.)
 doc_sig(
-inline b32
+internal b32
 StringCompare(string *Str1, // Our 1st string.
               string *Str2) // Our 2nd string.
 )
@@ -111,7 +111,7 @@ StringCompare(string *Str1, // Our 1st string.
 doc(StringCompareSlow)
 doc_string(Compares two string by comparing their characters.)
 doc_sig(
-inline b32
+internal b32
 StringCompareSlow(string *Str1, // Our 1st string.
                   string *Str2) // Our 2nd string.
 )
@@ -123,7 +123,7 @@ StringCompareSlow(string *Str1, // Our 1st string.
 doc(StringBeginEdit)
 doc_string(Tells the string we want to edit it. Therefore entering edit mode.)
 doc_sig(
-inline char *
+internal char *
 StringBeginEdit(string *Str) // Our string.
 )
 {
@@ -136,7 +136,7 @@ StringBeginEdit(string *Str) // Our string.
 doc(StringEndEdit)
 doc_string(Tells the string we`re done with editation, therefore it recalculates string`s hash.)
 doc_sig(
-inline void
+internal void
 StringEndEdit(string *Str) // Our string.
 )
 {
@@ -150,7 +150,7 @@ StringEndEdit(string *Str) // Our string.
 doc(StringGetLength)
 doc_string(Returns the length of our string.)
 doc_sig(
-inline u32
+internal u32
 StringGetLength(
 string *Str) // Our string.
 )
@@ -163,7 +163,7 @@ string *Str) // Our string.
 doc(StringGetAllocatedLength)
 doc_string(Returns the allocated memory for our string.)
 doc_sig(
-inline u32
+internal u32
 StringGetAllocatedLength(
 string *Str) // Our string.
 )
@@ -176,7 +176,7 @@ string *Str) // Our string.
 doc(StringCheck)
 doc_string(Checks whether our hash is correct.)
 doc_sig(
-inline void
+internal void
 StringCheck(
 string *Str) // Our string.
 )
@@ -191,7 +191,7 @@ string *Str) // Our string.
 doc(StringDuplicate)
 doc_string(Duplicates our string.)
 doc_sig(
-inline string
+internal string
 StringDuplicate(
 string *Str) // Our string.
 )
@@ -214,7 +214,7 @@ string *Str) // Our string.
 doc(StringAppend)
 doc_string(Appends our string to our original string.)
 doc_sig(
-inline void
+internal void
 StringAppend(string *StrA, // Our string.
              string *StrB) // Our string.
 )

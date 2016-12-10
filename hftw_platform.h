@@ -12,7 +12,7 @@
 doc(PlatformMemAlloc)
 doc_string(Allocates memory using platform-specific call.)
 doc_sig(
-inline void *
+internal void *
 PlatformMemAlloc(
 size_t Size)  // Requested memory size.
 )
@@ -28,7 +28,7 @@ doc_cat(Platform)
 doc(PlatformMemFree)
 doc_string(Free memory using platform-specific call.)
 doc_sig(
-inline void
+internal void
 PlatformMemFree(
 void *Ptr)   // Pointer to allocated block of memory.
 )
@@ -39,7 +39,7 @@ void *Ptr)   // Pointer to allocated block of memory.
 doc(PlatformMemRealloc)
 doc_string(Reallocates memory by requested size using platform-specific call.)
 doc_sig(
-inline void *
+internal void *
 PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
                    size_t Size) // Requested memory size.
 )

@@ -12,7 +12,7 @@ doc_ret(Generates Linked-List code for type StructName,
 #define LinkedList(type) \
 typedef struct _Node_##type { type Value; struct _Node_##type *Next; } Node_##type ; \
 \
-inline Node_##type *\
+internal Node_##type *\
 NewNode_##type (type Value){ \
     Node_##type *Item; \
     Item = (Node_##type *)PlatformMemAlloc(sizeof(Node_##type )); \
@@ -22,7 +22,7 @@ NewNode_##type (type Value){ \
     return(Item); \
 } \
 \
-inline Node_##type *\
+internal Node_##type *\
 AddNode_##type(Node_##type *List, type Value){ \
     Node_##type *NewNode = NewNode_##type (Value); \
     List->Next = NewNode; \

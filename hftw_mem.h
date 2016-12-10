@@ -146,7 +146,7 @@ doc_sep()
 doc(ArenaDefaultTagScan)
 doc_string(Default scan setup for new scans.)
 doc_sig(
-inline tag_scan_result
+internal tag_scan_result
 ArenaDefaultTagScan(void)
 )
 {
@@ -159,7 +159,7 @@ doc(ArenaInitialize)
 doc_string(Initializes Memory Arena with default values.)
 doc_example(ArenaInitialize(Arena, 128, MemBlock);)
 doc_sig(
-inline void
+internal void
 ArenaInitialize(memory_arena *Arena, // Arena to be initialized.
                 memory_index Size,   // Size of the allocated memory.
                 void *Base)          // Memory block to be used with Arena.
@@ -181,7 +181,7 @@ doc(ArenaBuild)
 doc_string(Uses internal allocator to build new arena.)
 doc_example(ArenaBuild(Arena, 128);)
 doc_sig(
-inline void
+internal void
 ArenaBuild(memory_arena *Arena, // Arena to be built.
            memory_index Size)   // The size to be pre-allocated.
 )
@@ -194,7 +194,7 @@ doc(ArenaGetAlignmentOffset)
 doc_string(Calculates the offset required by specified alignment.)
 doc_example(ArenaGetAlignmentOffset(Arena, 8);)
 doc_sig(
-inline memory_index
+internal memory_index
 ArenaGetAlignmentOffset(memory_arena *Arena,     // Target Arena.
                         memory_index Alignment)  // Desired alignment
 )
@@ -214,7 +214,7 @@ ArenaGetAlignmentOffset(memory_arena *Arena,     // Target Arena.
 doc(ArenaDefaultParams)
 doc_string(Returns default push state params.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaDefaultParams(void)
 )
 {
@@ -229,7 +229,7 @@ ArenaDefaultParams(void)
 doc(ArenaAlignNoClear)
 doc_string(Returns alignment arena push params without clear flag.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaAlignNoClear(
 u32 Alignment)      // Memory alignment we require during allocation.
 )
@@ -243,7 +243,7 @@ u32 Alignment)      // Memory alignment we require during allocation.
 doc(ArenaAlign)
 doc_string(Returns alignment arena push params.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaAlign(u32 Alignment, // Memory alignment we require during allocation.
            b32 Clear)     // Should allocator clear allocated memory?
 )
@@ -264,7 +264,7 @@ ArenaAlign(u32 Alignment, // Memory alignment we require during allocation.
 doc(ArenaNoClear)
 doc_string(Returns arena push params without clear flag.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaNoClear(void)
 )
 {
@@ -276,7 +276,7 @@ ArenaNoClear(void)
 doc(ArenaExpect)
 doc_string(Returns arena push params with expected reserves.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaExpect(u32 Expectation, // Expected memory to be in reserves.
             b32 Clear)       // Should allocator clear allocated memory?
 )
@@ -289,7 +289,7 @@ ArenaExpect(u32 Expectation, // Expected memory to be in reserves.
 doc(ArenaAlignExpect)
 doc_string(Returns arena push params with expected reserves and alignment.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaAlignExpect(u32 Alignment,   // Memory alignment we require during allocation.
                  u32 Expectation, // Expected memory to be in reserves.
                  b32 Clear)       // Should allocator clear allocated memory?
@@ -303,7 +303,7 @@ ArenaAlignExpect(u32 Alignment,   // Memory alignment we require during allocati
 doc(ArenaTag)
 doc_string(Returns arena push params with tag property.)
 doc_sig(
-inline arena_push_params
+internal arena_push_params
 ArenaTag(u32 Tag,                 // Tag used for element lookup.
          arena_push_params Rest)  // Rest of the push params. @see arena_push_params
 )
@@ -316,7 +316,7 @@ ArenaTag(u32 Tag,                 // Tag used for element lookup.
 doc(ArenaGetSizeRemaining)
 doc_string(Returns the remaining unused space size in arena.)
 doc_sig(
-inline memory_index
+internal memory_index
 ArenaGetSizeRemaining(memory_arena *Arena,      // Target arena
                       arena_push_params Params) // Params to be used during the procedure.
 )
@@ -329,7 +329,7 @@ ArenaGetSizeRemaining(memory_arena *Arena,      // Target arena
 doc(ArenaGetBlockByRecord)
 doc_string(Returns block of memory pointed to by index.)
 doc_sig(
-inline void *
+internal void *
 ArenaGetBlockByRecord(memory_arena *Arena, // Target arena
                       size_t Index)        // Element index
 )
@@ -351,7 +351,7 @@ return(Result);
 doc(ArenaGetBlockByTagAndRecord)
 doc_string(Returns tag scan result based on specified tag.)
 doc_sig(
-inline tag_scan_result
+internal tag_scan_result
 ArenaGetBlockByTagAndRecord(memory_arena *Arena,  // Target arena
                             tag_scan_result scan, // Previous scan result. (Or DefaultTagScan if none. @see DefaultTagScan)
                             u32 Tag)              // Tag used for lookup.
@@ -380,7 +380,7 @@ ArenaGetBlockByTagAndRecord(memory_arena *Arena,  // Target arena
 doc(ArenaGetEffectiveSizeFor)
 doc_string(Returns effective size based on push params for specified initial size.)
 doc_sig(
-inline memory_index
+internal memory_index
 ArenaGetEffectiveSizeFor(memory_arena *Arena,      // Target arena
                          memory_index SizeInit,    // Initial size required by callee.
                          arena_push_params Params) // Params to be used during the procedure.
@@ -397,7 +397,7 @@ ArenaGetEffectiveSizeFor(memory_arena *Arena,      // Target arena
 doc(ArenaHasRoomFor)
 doc_string(Returns truth value determining whether we have enough space in our arena depending on initial size requirements and push params.)
 doc_sig(
-inline b32
+internal b32
 ArenaHasRoomFor(memory_arena *Arena,       // Target arena
                 memory_index SizeInit,     // Initial size required by callee.
                 arena_push_params Params)  // Params to be used during the procedure.
@@ -408,7 +408,7 @@ ArenaHasRoomFor(memory_arena *Arena,       // Target arena
     return(Result);
 }
 
-inline void
+internal void
 ArenaExpand(memory_arena *Arena, memory_index Size)
 {
     if(!((Arena->Used + Size) <= Arena->Size))
@@ -434,7 +434,7 @@ ArenaExpand(memory_arena *Arena, memory_index Size)
 doc(ArenaPushSize_)
 doc_string(Asks our arena for plotting a block of memory determined by initial size and params requirements.)
 doc_sig(
-inline void *
+internal void *
 ArenaPushSize_(memory_arena *Arena,         // Target arena
                memory_index SizeInit,       // Initial size required by callee.
                arena_push_params Params)    // Params to be used during the procedure.
@@ -481,7 +481,7 @@ ArenaPushSize_(memory_arena *Arena,         // Target arena
 doc(ArenaPushString)
 doc_string(Pushes null-terminated string to the arena.)
 doc_sig(
-inline char *
+internal char *
 ArenaPushString(memory_arena *Arena, // Target arena
                 const char *Source)  // String source
 )
@@ -508,7 +508,7 @@ ArenaPushString(memory_arena *Arena, // Target arena
 doc(ArenaPushAndNullTerminate)
 doc_string(Pushes string of specified size to the arena and additionally null-terminates it.)
 doc_sig(
-inline char *
+internal char *
 ArenaPushAndNullTerminate(memory_arena *Arena, // Target arena
                           u32 Length,          // String length
                           const char *Source)  // String source
@@ -529,7 +529,7 @@ ArenaPushAndNullTerminate(memory_arena *Arena, // Target arena
 doc(ArenaBeginTemporaryMemory)
 doc_string(Tells our arena we plan to store temporary memory in it.)
 doc_sig(
-inline temp_memory
+internal temp_memory
 ArenaBeginTemporaryMemory(
 memory_arena *Arena) // Target arena
 )
@@ -547,7 +547,7 @@ memory_arena *Arena) // Target arena
 doc(ArenaEndTemporaryMemory)
 doc_string(Tells our arena we`re done serving temporary memory and resets it back to its original state.)
 doc_sig(
-inline void
+internal void
 ArenaEndTemporaryMemory(
 temp_memory TempMem) // Structure holding our arena's pointer and originally used size. @see temp_memory
 )
@@ -562,7 +562,7 @@ temp_memory TempMem) // Structure holding our arena's pointer and originally use
 doc(ArenaClear)
 doc_string(Clears the whole arena.)
 doc_sig(
-inline void
+internal void
 ArenaClear(
 memory_arena *Arena) // Target arena
 )
@@ -573,7 +573,7 @@ memory_arena *Arena) // Target arena
 doc(ArenaCheck)
 doc_string(Checks whether our arena is still holding temporary data.)
 doc_sig(
-inline void
+internal void
 ArenaCheck(memory_arena *Arena)
 )
 {
@@ -583,7 +583,7 @@ ArenaCheck(memory_arena *Arena)
 doc(ArenaSub)
 doc_string(Creates sub-arena inside of our arena, with specified size and push params.)
 doc_sig(
-inline void
+internal void
 ArenaSub(memory_arena *Result,     // Target SubArena
          memory_arena *Arena,      // Target Arena
          memory_index Size,        // Initial size required by callee.
@@ -599,7 +599,7 @@ ArenaSub(memory_arena *Result,     // Target SubArena
 doc(ArenaCleanUnusedRoom)
 doc_string(Clean unused reserved space in our arena.)
 doc_sig(
-inline void
+internal void
 ArenaCleanUnusedRoom(
 memory_arena * Arena) // Target arena
 )
@@ -615,7 +615,7 @@ memory_arena * Arena) // Target arena
 doc(ArenaFree)
 doc_string(Deallocate our arena.)
 doc_sig(
-inline void
+internal void
 ArenaFree(
 memory_arena * Arena) // Target arena
 )
@@ -630,7 +630,7 @@ doc(ArenaSerialize)
 doc_string(Serializes our arena)
 doc_ret(Returns serialized data.)
 doc_sig(
-inline u8 *
+internal u8 *
 ArenaSerialize(
 memory_arena * Arena, // Arena to be serialized.
  size_t * Size)         // Size of the serialized data.
@@ -672,7 +672,7 @@ return(Result);
 doc(ArenaDeserialize)
 doc_string(Deserializes our packed data to our new arena.)
 doc_sig(
-inline void
+internal void
 ArenaDeserialize(
 memory_arena * Arena, // Our new arena to be used for unpacking.
 u8 * Data)            // Source of our serialized data.
@@ -691,7 +691,7 @@ u8 * Data)            // Source of our serialized data.
         Arena->NodeCount = *(s32 *)Data; Data += sizeof(s32);
         
 // NOTE(zaklaus): Include header as a part of the Linked-List.
-        for (size_t Idx = 0;
+        for (s32 Idx = 0;
              Idx < Arena->NodeCount + 1;
              Idx++)
         {
@@ -717,7 +717,7 @@ u8 * Data)            // Source of our serialized data.
 doc(ArenaDuplicate)
 doc_string(Duplicates our arena.)
 doc_sig(
-inline void
+internal void
 ArenaDuplicate(
 memory_arena * A, // Arena to be duplicated.
 memory_arena * B) // Arena to duplicate to.
