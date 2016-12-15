@@ -408,8 +408,13 @@ ArenaHasRoomFor(memory_arena *Arena,       // Target arena
     return(Result);
 }
 
+doc(ArenaExpand)
+doc_string(Expands the arena if the requested size can`t make it into our arena.)
+doc_sig(
 internal void
-ArenaExpand(memory_arena *Arena, memory_index Size)
+ArenaExpand(memory_arena *Arena, // Our arena.
+            memory_index Size)   // The requested size.
+)
 {
     if(!((Arena->Used + Size) <= Arena->Size))
     {

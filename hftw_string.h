@@ -72,6 +72,47 @@ StringCreate(char *Source, // Source of the raw string.
     return(Str);
 }
 
+doc(StringCreateUsingArena)
+doc_string(Push string to the provided arena.)
+doc_sig(
+internal string
+StringCreateUsingArena(char *Source,        // Source of the raw string.
+                       u32 Length,          // Its length.
+                       memory_arena *Arena) // Our arena to be used for storing our string.
+)
+{
+    string Str = {0};
+    memory_arena StringArena = {0};
+    ArenaSub(&StringArena, Arena, Length, ArenaExpect(4, 1));
+    ArenaPushAndNullTerminate(&StringArena, Length, (char *)Source);
+    Str.Arena = StringArena;
+    Str.Length = Length;
+    Str.StringHash = StringCalcHash(Source, Str.Length);
+    
+    return(Str);
+}
+
+doc(StringCreateRaw)
+doc_string(Push string to a raw block of memory.<br/>
+           NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).)
+doc_sig(
+internal string
+StringCreateRaw(char *Source,        // Source of the raw string.
+                       u32 Length,          // Its length.
+                        char *Dest)          // The destination to write to.
+)
+{
+    string Str = {0};
+    memory_arena StringArena = {0};
+    ArenaInitialize(&StringArena, Length, Dest);
+    ArenaPushAndNullTerminate(&StringArena, Length, (char *)Source);
+    Str.Arena = StringArena;
+    Str.Length = Length;
+    Str.StringHash = StringCalcHash(Source, Str.Length);
+    
+    return(Str);
+}
+
 doc(StringDestroy)
 doc_string(Destroys string and de-allocates its memory.)
 doc_sig(

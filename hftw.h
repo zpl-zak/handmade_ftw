@@ -86,6 +86,7 @@ typedef uintptr_t uintptr;
 
 typedef size_t memory_index;
 typedef size_t mi;
+    typedef size_t ms;
 
 typedef float real32;
 typedef double real64;

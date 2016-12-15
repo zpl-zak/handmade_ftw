@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "tests/monster.h"
+#include "tests/ecs_test.h"
 
 /* TEST SWITCHES */
 #define MONSTER_DYNAMIC_PROPERTY 0
@@ -15,7 +16,7 @@
 #define MEMORY_REALLOC 0
 #define MEMORY_HEADERS 0
 #define ECS_TEST 1
-#define DATA_PACKING 1
+#define DATA_PACKING 0
 
 int
 cmp(const void *a, const void *b)
@@ -29,6 +30,8 @@ typedef struct
     u8 Height;
 } some_data;
 
+
+
 int
 main(void)
 {
@@ -40,24 +43,44 @@ main(void)
     }
     #endif
     
-#if 0
-    {
-        int values[] = { 3, 1, 2, 7, 9, 0, 6 };
-        qsort(values, 7, sizeof(int), cmp);
-        
-        
-        for(mi Idx = 0;
-            Idx < 7;
-            ++Idx)
-        {
-            printf("%d ", values[Idx]);
-        }
-    }
-    #endif
     
     #if ECS_TEST
     {
-        // TODO(zaklaus): T.U.
+        #define ENTITY_COUNT 5
+        
+        entity Entities[ENTITY_COUNT] = {0};
+        
+        for(mi Idx = 0;
+            Idx < ENTITY_COUNT;
+            ++Idx)
+        {
+            entity *E = &Entities[Idx];
+            
+            E->ID = Idx;
+            ArenaBuild(&E->Components, 4);
+            E->Components.Flags |= ArenaFlag_AllowRealloc;
+            
+            transform_component T = {0}; vec3 P = {0};
+            P.X = 1.f;
+            T.P = P;
+            AddComponent(E, Comp_Transform, &T, sizeof(T));
+            
+            // NOTE(zaklaus): Make special case for component ID 42
+            if(Idx == 3)
+            {
+                 render_component R = { .RenderID = 42, .IsTransparent = 0, .MeshID = 1337 };
+                AddComponent(E, Comp_Render, &R, sizeof(R));
+            }
+            
+            
+            // NOTE(zaklaus): Rendition
+            {
+                fprintf(stdout, "Entity ID: %zd\n", Idx);
+                SystemTransform(E);
+                SystemRender(E);
+                fprintf(stdout, "END OF ENTITY\n\n");
+            }
+        }
     }
     #endif
     
