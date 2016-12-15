@@ -83,7 +83,7 @@ StringCreateUsingArena(char *Source,        // Source of the raw string.
 {
     string Str = {0};
     memory_arena StringArena = {0};
-    ArenaSub(&StringArena, Arena, Length, ArenaExpect(4, 1));
+    ArenaSub(&StringArena, Arena, Length+1, ArenaExpect(4, 1));
     ArenaPushAndNullTerminate(&StringArena, Length, (char *)Source);
     Str.Arena = StringArena;
     Str.Length = Length;
@@ -104,7 +104,7 @@ StringCreateRaw(char *Source,        // Source of the raw string.
 {
     string Str = {0};
     memory_arena StringArena = {0};
-    ArenaInitialize(&StringArena, Length, Dest);
+    ArenaInitialize(&StringArena, Length+1, Dest);
     ArenaPushAndNullTerminate(&StringArena, Length, (char *)Source);
     Str.Arena = StringArena;
     Str.Length = Length;
@@ -114,7 +114,8 @@ StringCreateRaw(char *Source,        // Source of the raw string.
 }
 
 doc(StringDestroy)
-doc_string(Destroys string and de-allocates its memory.)
+doc_string(Destroys string and de-allocates its memory. <br/>
+           NOTE: Should be used only on strings with independent memory block!)
 doc_sig(
 internal void
 StringDestroy(string *Str) // Our string.
