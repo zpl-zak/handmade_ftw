@@ -106,6 +106,8 @@ typedef uint64 u64;
 
 typedef real32 r32;
 typedef real64 r64;
+    typedef r32 f32;
+    typedef r64 f64;
 
 typedef uintptr_t umm;
 
@@ -273,6 +275,7 @@ internal u32 GetThreadID(void)
 
 #include "hftw_math.h"
 #include "hftw_intrinsics.h"
+#include "hftw_simd.h"
 #include "hftw_string.h"
 
 #define HFTW_H
