@@ -4,21 +4,23 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 <p>
 Currently, Handmade FTW offers the following features:
 <ul>
-<table>
-<tr>
-<th>Filename</th>
-<th>Description</th>
-</tr>
-<tr><td>hftw.h</td><td>Contains essential directives used by other libs.</td></tr>
-<tr><td>hftw_mem.h</td><td>Handles memory allocation and management.</td></tr>
-<tr><td>hftw_node.h</td><td>Linked list macro directives.</td></tr>
-<tr><td>hftw_math.h</td><td>Linear algebra.</td></tr>
-<tr><td>hftw_intrinsics.h</td><td>Intrinsics library.</td></tr>
-<tr><td>hftw_math.h</td><td>String library providing easier and faster way of string manipulation.</td></tr>
-<tr><td>hftw_platform.h</td><td>Platform-specific functions.</td></tr>
-</table>
+	<table>
+		<tr>
+			<th>Filename</th>
+			<th>Description</th>
+		</tr>
+		<tr><td>hftw.h</td><td>Contains essential directives used by other libs.</td></tr>
+		<tr><td>hftw_mem.h</td><td>Handles memory allocation and management.</td></tr>
+		<tr><td>hftw_node.h</td><td>Linked list macro directives.</td></tr>
+		<tr><td>hftw_math.h</td><td>Linear algebra.</td></tr>
+		<tr><td>hftw_intrinsics.h</td><td>Intrinsics library.</td></tr>
+		<tr><td>hftw_math.h</td><td>String library providing easier and faster way of string manipulation.</td></tr>
+		<tr><td>hftw_platform.h</td><td>Platform-specific functions.</td></tr>
+		<tr><td>hftw_simd.h</td><td>SIMD library providing basic arithmetic operations with vectors.</td></tr>
+
+	</table>
 </ul>
-</p>様様様様様様様様様様</div><h1>$ Index</h1><ul><h2>Memory Arena</h2><li> <a href="#arena_header">arena_header</a> &nbsp; <small>Describes arena elements.</small></li><li> <a href="#memory_arena">memory_arena</a> &nbsp; <small>Memory arena holding contigous block of memory and tracking of pushed objects.</small></li><li> <a href="#arena_flags">arena_flags</a> &nbsp; <small>Arena flags.</small></li><li> <a href="#temp_memory">temp_memory</a> &nbsp; <small>Used to temporarily store short-living data in arena.</small></li><li> <a href="#arena_push_flag">arena_push_flag</a> &nbsp; <small>Push flags used by arena allocator.</small></li><li> <a href="#arena_push_params">arena_push_params</a> &nbsp; <small>Params used by allocator for customized allocation procedure.</small></li><li> <a href="#tag_scan_result">tag_scan_result</a> &nbsp; <small>Holds pointer to current element found by specified tag identification.</small></li><br><li> <a href="#ArenaGetBlock">ArenaGetBlock</a> &nbsp; <small>Returns block of memory pointed to by index. *NOTE* Works only with arena`s elements of uniform size!</small></li><li> <a href="#ArenaGetVaryBlock">ArenaGetVaryBlock</a> &nbsp; <small>Returns element by index.</small></li><li> <a href="#ArenaGetVaryBlockTagValue">ArenaGetVaryBlockTagValue</a> &nbsp; <small>Returns element`s value by tag.</small></li><li> <a href="#ArenaGetVaryBlockTagResult">ArenaGetVaryBlockTagResult</a> &nbsp; <small>Returns tag scan result by tag.</small></li><li> <a href="#ArenaPushStruct">ArenaPushStruct</a> &nbsp; <small>Push struct to the arena.</small></li><li> <a href="#ArenaPushArray">ArenaPushArray</a> &nbsp; <small>Push array to the arena.</small></li><li> <a href="#ArenaPushSize">ArenaPushSize</a> &nbsp; <small>Push size to the arena.</small></li><li> <a href="#ArenaPushCopy">ArenaPushCopy</a> &nbsp; <small>Push and copy size from the source.</small></li><li> <a href="#ArenaPushValue">ArenaPushValue</a> &nbsp; <small>Push and set value to the arena.</small></li><br><li> <a href="#ArenaDefaultTagScan">ArenaDefaultTagScan</a> &nbsp; <small>Default scan setup for new scans.</small></li><li> <a href="#ArenaInitialize">ArenaInitialize</a> &nbsp; <small>Initializes Memory Arena with default values.</small></li><li> <a href="#ArenaBuild">ArenaBuild</a> &nbsp; <small>Uses internal allocator to build new arena.</small></li><li> <a href="#ArenaGetAlignmentOffset">ArenaGetAlignmentOffset</a> &nbsp; <small>Calculates the offset required by specified alignment.</small></li><li> <a href="#ArenaDefaultParams">ArenaDefaultParams</a> &nbsp; <small>Returns default push state params.</small></li><li> <a href="#ArenaAlignNoClear">ArenaAlignNoClear</a> &nbsp; <small>Returns alignment arena push params without clear flag.</small></li><li> <a href="#ArenaAlign">ArenaAlign</a> &nbsp; <small>Returns alignment arena push params.</small></li><li> <a href="#ArenaNoClear">ArenaNoClear</a> &nbsp; <small>Returns arena push params without clear flag.</small></li><li> <a href="#ArenaExpect">ArenaExpect</a> &nbsp; <small>Returns arena push params with expected reserves.</small></li><li> <a href="#ArenaAlignExpect">ArenaAlignExpect</a> &nbsp; <small>Returns arena push params with expected reserves and alignment.</small></li><li> <a href="#ArenaTag">ArenaTag</a> &nbsp; <small>Returns arena push params with tag property.</small></li><li> <a href="#ArenaGetSizeRemaining">ArenaGetSizeRemaining</a> &nbsp; <small>Returns the remaining unused space size in arena.</small></li><li> <a href="#ArenaGetBlockByRecord">ArenaGetBlockByRecord</a> &nbsp; <small>Returns block of memory pointed to by index.</small></li><li> <a href="#ArenaGetBlockByTagAndRecord">ArenaGetBlockByTagAndRecord</a> &nbsp; <small>Returns tag scan result based on specified tag.</small></li><li> <a href="#ArenaGetEffectiveSizeFor">ArenaGetEffectiveSizeFor</a> &nbsp; <small>Returns effective size based on push params for specified initial size.</small></li><li> <a href="#ArenaHasRoomFor">ArenaHasRoomFor</a> &nbsp; <small>Returns truth value determining whether we have enough space in our arena depending on initial size requirements and push params.</small></li><li> <a href="#ArenaExpand">ArenaExpand</a> &nbsp; <small>Expands the arena if the requested size can`t make it into our arena.</small></li><li> <a href="#ArenaPushSize_">ArenaPushSize_</a> &nbsp; <small>Asks our arena for plotting a block of memory determined by initial size and params requirements.</small></li><li> <a href="#ArenaPushString">ArenaPushString</a> &nbsp; <small>Pushes null-terminated string to the arena.</small></li><li> <a href="#ArenaPushAndNullTerminate">ArenaPushAndNullTerminate</a> &nbsp; <small>Pushes string of specified size to the arena and additionally null-terminates it.</small></li><li> <a href="#ArenaBeginTemporaryMemory">ArenaBeginTemporaryMemory</a> &nbsp; <small>Tells our arena we plan to store temporary memory in it.</small></li><li> <a href="#ArenaEndTemporaryMemory">ArenaEndTemporaryMemory</a> &nbsp; <small>Tells our arena we`re done serving temporary memory and resets it back to its original state.</small></li><li> <a href="#ArenaClear">ArenaClear</a> &nbsp; <small>Clears the whole arena.</small></li><li> <a href="#ArenaCheck">ArenaCheck</a> &nbsp; <small>Checks whether our arena is still holding temporary data.</small></li><li> <a href="#ArenaSub">ArenaSub</a> &nbsp; <small>Creates sub-arena inside of our arena, with specified size and push params.</small></li><li> <a href="#ArenaCleanUnusedRoom">ArenaCleanUnusedRoom</a> &nbsp; <small>Clean unused reserved space in our arena.</small></li><li> <a href="#ArenaFree">ArenaFree</a> &nbsp; <small>Deallocate our arena.</small></li><li> <a href="#ArenaSerialize">ArenaSerialize</a> &nbsp; <small>Serializes our arena</small></li><li> <a href="#ArenaDeserialize">ArenaDeserialize</a> &nbsp; <small>Deserializes our packed data to our new arena.</small></li><li> <a href="#ArenaDuplicate">ArenaDuplicate</a> &nbsp; <small>Duplicates our arena.</small></li><h2>Linked list</h2><li> <a href="#LinkedList">LinkedList</a> &nbsp; <small>Supports arbitrary type.</small></li><h2>Platform</h2><li> <a href="#PlatformMemAlloc">PlatformMemAlloc</a> &nbsp; <small>Allocates memory using platform-specific call.</small></li><li> <a href="#PlatformMemFree">PlatformMemFree</a> &nbsp; <small>Free memory using platform-specific call.</small></li><li> <a href="#PlatformMemRealloc">PlatformMemRealloc</a> &nbsp; <small>Reallocates memory by requested size using platform-specific call.</small></li><h2>String</h2><li> <a href="#string">string</a> &nbsp; <small>Describes string component.</small></li><br><li> <a href="#StringCalcHash">StringCalcHash</a> &nbsp; <small>Calculates string hash.</small></li><li> <a href="#StringGetLengthFromArray">StringGetLengthFromArray</a> &nbsp; <small>Returns length of raw null-terminated string.</small></li><li> <a href="#StringCreate">StringCreate</a> &nbsp; <small>Returns newly-created managed string.</small></li><li> <a href="#StringCreateUsingArena">StringCreateUsingArena</a> &nbsp; <small>Push string to the provided arena.</small></li><li> <a href="#StringCreateRaw">StringCreateRaw</a> &nbsp; <small>Push string to a raw block of memory.<br/>
+</p>様様様様様様様様様様様</div><h1>$ Index</h1><ul><h2>Memory Arena</h2><li> <a href="#arena_header">arena_header</a> &nbsp; <small>Describes arena elements.</small></li><li> <a href="#memory_arena">memory_arena</a> &nbsp; <small>Memory arena holding contigous block of memory and tracking of pushed objects.</small></li><li> <a href="#arena_flags">arena_flags</a> &nbsp; <small>Arena flags.</small></li><li> <a href="#temp_memory">temp_memory</a> &nbsp; <small>Used to temporarily store short-living data in arena.</small></li><li> <a href="#arena_push_flag">arena_push_flag</a> &nbsp; <small>Push flags used by arena allocator.</small></li><li> <a href="#arena_push_params">arena_push_params</a> &nbsp; <small>Params used by allocator for customized allocation procedure.</small></li><li> <a href="#tag_scan_result">tag_scan_result</a> &nbsp; <small>Holds pointer to current element found by specified tag identification.</small></li><br><li> <a href="#ArenaGetBlock">ArenaGetBlock</a> &nbsp; <small>Returns block of memory pointed to by index. *NOTE* Works only with arena`s elements of uniform size!</small></li><li> <a href="#ArenaGetVaryBlock">ArenaGetVaryBlock</a> &nbsp; <small>Returns element by index.</small></li><li> <a href="#ArenaGetVaryBlockTagValue">ArenaGetVaryBlockTagValue</a> &nbsp; <small>Returns element`s value by tag.</small></li><li> <a href="#ArenaGetVaryBlockTagResult">ArenaGetVaryBlockTagResult</a> &nbsp; <small>Returns tag scan result by tag.</small></li><li> <a href="#ArenaPushStruct">ArenaPushStruct</a> &nbsp; <small>Push struct to the arena.</small></li><li> <a href="#ArenaPushArray">ArenaPushArray</a> &nbsp; <small>Push array to the arena.</small></li><li> <a href="#ArenaPushSize">ArenaPushSize</a> &nbsp; <small>Push size to the arena.</small></li><li> <a href="#ArenaPushCopy">ArenaPushCopy</a> &nbsp; <small>Push and copy size from the source.</small></li><li> <a href="#ArenaPushValue">ArenaPushValue</a> &nbsp; <small>Push and set value to the arena.</small></li><br><li> <a href="#ArenaDefaultTagScan">ArenaDefaultTagScan</a> &nbsp; <small>Default scan setup for new scans.</small></li><li> <a href="#ArenaInitialize">ArenaInitialize</a> &nbsp; <small>Initializes Memory Arena with default values.</small></li><li> <a href="#ArenaBuild">ArenaBuild</a> &nbsp; <small>Uses internal allocator to build new arena.</small></li><li> <a href="#ArenaGetAlignmentOffset">ArenaGetAlignmentOffset</a> &nbsp; <small>Calculates the offset required by specified alignment.</small></li><li> <a href="#ArenaDefaultParams">ArenaDefaultParams</a> &nbsp; <small>Returns default push state params.</small></li><li> <a href="#ArenaAlignNoClear">ArenaAlignNoClear</a> &nbsp; <small>Returns alignment arena push params without clear flag.</small></li><li> <a href="#ArenaAlign">ArenaAlign</a> &nbsp; <small>Returns alignment arena push params.</small></li><li> <a href="#ArenaNoClear">ArenaNoClear</a> &nbsp; <small>Returns arena push params without clear flag.</small></li><li> <a href="#ArenaExpect">ArenaExpect</a> &nbsp; <small>Returns arena push params with expected reserves.</small></li><li> <a href="#ArenaAlignExpect">ArenaAlignExpect</a> &nbsp; <small>Returns arena push params with expected reserves and alignment.</small></li><li> <a href="#ArenaTag">ArenaTag</a> &nbsp; <small>Returns arena push params with tag property.</small></li><li> <a href="#ArenaGetSizeRemaining">ArenaGetSizeRemaining</a> &nbsp; <small>Returns the remaining unused space size in arena.</small></li><li> <a href="#ArenaGetBlockByRecord">ArenaGetBlockByRecord</a> &nbsp; <small>Returns block of memory pointed to by index.</small></li><li> <a href="#ArenaGetBlockByTagAndRecord">ArenaGetBlockByTagAndRecord</a> &nbsp; <small>Returns tag scan result based on specified tag.</small></li><li> <a href="#ArenaGetEffectiveSizeFor">ArenaGetEffectiveSizeFor</a> &nbsp; <small>Returns effective size based on push params for specified initial size.</small></li><li> <a href="#ArenaHasRoomFor">ArenaHasRoomFor</a> &nbsp; <small>Returns truth value determining whether we have enough space in our arena depending on initial size requirements and push params.</small></li><li> <a href="#ArenaExpand">ArenaExpand</a> &nbsp; <small>Expands the arena if the requested size can`t make it into our arena.</small></li><li> <a href="#ArenaPushSize_">ArenaPushSize_</a> &nbsp; <small>Asks our arena for plotting a block of memory determined by initial size and params requirements.</small></li><li> <a href="#ArenaPushString">ArenaPushString</a> &nbsp; <small>Pushes null-terminated string to the arena.</small></li><li> <a href="#ArenaPushAndNullTerminate">ArenaPushAndNullTerminate</a> &nbsp; <small>Pushes string of specified size to the arena and additionally null-terminates it.</small></li><li> <a href="#ArenaBeginTemporaryMemory">ArenaBeginTemporaryMemory</a> &nbsp; <small>Tells our arena we plan to store temporary memory in it.</small></li><li> <a href="#ArenaEndTemporaryMemory">ArenaEndTemporaryMemory</a> &nbsp; <small>Tells our arena we`re done serving temporary memory and resets it back to its original state.</small></li><li> <a href="#ArenaClear">ArenaClear</a> &nbsp; <small>Clears the whole arena.</small></li><li> <a href="#ArenaCheck">ArenaCheck</a> &nbsp; <small>Checks whether our arena is still holding temporary data.</small></li><li> <a href="#ArenaSub">ArenaSub</a> &nbsp; <small>Creates sub-arena inside of our arena, with specified size and push params.</small></li><li> <a href="#ArenaCleanUnusedRoom">ArenaCleanUnusedRoom</a> &nbsp; <small>Clean unused reserved space in our arena.</small></li><li> <a href="#ArenaFree">ArenaFree</a> &nbsp; <small>Deallocate our arena.</small></li><li> <a href="#ArenaSerialize">ArenaSerialize</a> &nbsp; <small>Serializes our arena</small></li><li> <a href="#ArenaDeserialize">ArenaDeserialize</a> &nbsp; <small>Deserializes our packed data to our new arena.</small></li><li> <a href="#ArenaDuplicate">ArenaDuplicate</a> &nbsp; <small>Duplicates our arena.</small></li><h2>Linked list</h2><li> <a href="#LinkedList">LinkedList</a> &nbsp; <small>Supports arbitrary type.</small></li><h2>Platform</h2><li> <a href="#PlatformMemAlloc">PlatformMemAlloc</a> &nbsp; <small>Allocates memory using platform-specific call.</small></li><li> <a href="#PlatformMemFree">PlatformMemFree</a> &nbsp; <small>Free memory using platform-specific call.</small></li><li> <a href="#PlatformMemRealloc">PlatformMemRealloc</a> &nbsp; <small>Reallocates memory by requested size using platform-specific call.</small></li><h2>SIMD</h2><li> <a href="#v3_4x">v3_4x</a> &nbsp; <small>3-dimensional vector component.</small></li><li> <a href="#v4_4x">v4_4x</a> &nbsp; <small>4-dimensional vector component.</small></li><br><li> <a href="#SIMDMultiplyv3_4x">SIMDMultiplyv3_4x</a> &nbsp; <small>Multiply v3_4x with scalar.</small></li><li> <a href="#SIMDAddv3_4x">SIMDAddv3_4x</a> &nbsp; <small>Add scalar to v3_4x.</small></li><li> <a href="#SIMDMultiplyv4_4x">SIMDMultiplyv4_4x</a> &nbsp; <small>Multiply v4_4x with scalar.</small></li><li> <a href="#SIMDAddv4_4x">SIMDAddv4_4x</a> &nbsp; <small>Add scalar to v4_4x.</small></li><li> <a href="#SIMDTov3_4x">SIMDTov3_4x</a> &nbsp; <small>Convert v3 to v3_4x.</small></li><h2>String</h2><li> <a href="#string">string</a> &nbsp; <small>Describes string component.</small></li><br><li> <a href="#StringCalcHash">StringCalcHash</a> &nbsp; <small>Calculates string hash.</small></li><li> <a href="#StringGetLengthFromArray">StringGetLengthFromArray</a> &nbsp; <small>Returns length of raw null-terminated string.</small></li><li> <a href="#StringCreate">StringCreate</a> &nbsp; <small>Returns newly-created managed string.</small></li><li> <a href="#StringCreateUsingArena">StringCreateUsingArena</a> &nbsp; <small>Push string to the provided arena.</small></li><li> <a href="#StringCreateRaw">StringCreateRaw</a> &nbsp; <small>Push string to a raw block of memory.<br/>
            NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).</small></li><li> <a href="#StringDestroy">StringDestroy</a> &nbsp; <small>Destroys string and de-allocates its memory. <br/>
            NOTE: Should be used only on strings with independent memory block!</small></li><li> <a href="#StringGetRaw">StringGetRaw</a> &nbsp; <small>Returns raw string.</small></li><li> <a href="#StringCompare">StringCompare</a> &nbsp; <small>Compares two strings by hash.</small></li><li> <a href="#StringCompareSlow">StringCompareSlow</a> &nbsp; <small>Compares two string by comparing their characters.</small></li><li> <a href="#StringBeginEdit">StringBeginEdit</a> &nbsp; <small>Tells the string we want to edit it. Therefore entering edit mode.</small></li><li> <a href="#StringEndEdit">StringEndEdit</a> &nbsp; <small>Tells the string we`re done with editation, therefore it recalculates string`s hash.</small></li><li> <a href="#StringGetLength">StringGetLength</a> &nbsp; <small>Returns the length of our string.</small></li><li> <a href="#StringGetAllocatedLength">StringGetAllocatedLength</a> &nbsp; <small>Returns the allocated memory for our string.</small></li><li> <a href="#StringCheck">StringCheck</a> &nbsp; <small>Checks whether our hash is correct.</small></li><li> <a href="#StringDuplicate">StringDuplicate</a> &nbsp; <small>Duplicates our string.</small></li><li> <a href="#StringAppend">StringAppend</a> &nbsp; <small>Appends our string to our original string.</small></li></ul><h1>$ Content</h1><ul><h1>$ Memory Arena</h1><div id="arena_header" class="doc"><h2>arena_header</h2><pre>
 typedef struct
@@ -215,7 +217,75 @@ void *Ptr)   // Pointer to allocated block of memory.
 internal void *
 PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
                    size_t Size) // Requested memory size.
-</pre><p>Reallocates memory by requested size using platform-specific call.</p></div><h1>$ String</h1><div id="string" class="doc"><h2>string</h2><pre>
+</pre><p>Reallocates memory by requested size using platform-specific call.</p></div><h1>$ SIMD</h1><div id="v3_4x" class="doc"><h2>v3_4x</h2><pre>
+typedef union v3_4x
+{
+    struct
+    {
+        __m128 X;
+        __m128 R;
+    };
+    
+    struct
+    {
+        __m128 Y;
+        __m128 G;
+    };
+    
+    struct
+    {
+        __m128 Z;
+        __m128 B;
+    };
+} v3_4x;
+</pre><p>3-dimensional vector component.</p></div><div id="v4_4x" class="doc"><h2>v4_4x</h2><pre>
+typedef union v4_4x
+{
+    struct
+    {
+        __m128 X;
+        __m128 R;
+    };
+    
+    struct
+    {
+        __m128 Y;
+        __m128 G;
+    };
+    
+    struct
+    {
+        __m128 Z;
+        __m128 B;
+    };
+    
+    struct
+    {
+        __m128 W;
+        __m128 A;
+    };
+} v4_4x;
+</pre><p>4-dimensional vector component.</p></div><div id="SIMDMultiplyv3_4x" class="doc"><h2>SIMDMultiplyv3_4x</h2><pre>
+internal v3_4x
+SIMDMultiplyv3_4x(f32 As,
+                  v3_4x B)
+</pre><p>Multiply v3_4x with scalar.</p></div><div id="SIMDAddv3_4x" class="doc"><h2>SIMDAddv3_4x</h2><pre>
+ internal v3_4x
+SIMDAddv3_4x(v3_4x A, 
+             v3_4x B)
+</pre><p>Add scalar to v3_4x.</p></div><div id="SIMDMultiplyv4_4x" class="doc"><h2>SIMDMultiplyv4_4x</h2><pre>
+internal v4_4x
+SIMDMultiplyv4_4x(f32 As, 
+                  v4_4x B)
+</pre><p>Multiply v4_4x with scalar.</p></div><div id="SIMDAddv4_4x" class="doc"><h2>SIMDAddv4_4x</h2><pre>
+internal v4_4x
+SIMDAddv4_4x(v4_4x A, 
+             v4_4x B)
+</pre><p>Add scalar to v4_4x.</p></div><div id="SIMDTov3_4x" class="doc"><h2>SIMDTov3_4x</h2><pre>
+internal v3_4x 
+SIMDTov3_4x(
+v3 A)
+</pre><p>Convert v3 to v3_4x.</p></div><h1>$ String</h1><div id="string" class="doc"><h2>string</h2><pre>
 typedef struct
 {
     memory_arena Arena; // Memory arena used by the string.
