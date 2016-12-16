@@ -12,11 +12,12 @@
 #define MONSTER_DYNAMIC_PROPERTY 0
 #define RANDOM_DATA 0
 #define PLATFORM_ALLOC 0
-#define STRING_TEST 1
+#define STRING_TEST 0
 #define MEMORY_REALLOC 0
 #define MEMORY_HEADERS 0
-#define ECS_TEST 1
+#define ECS_TEST 0
 #define DATA_PACKING 0
+#define REUSE_TEST 1
 
 int
 cmp(const void *a, const void *b)
@@ -57,7 +58,7 @@ main(void)
             entity *E = &Entities[Idx];
             
             E->ID = Idx;
-            ArenaBuild(&E->Components, 4);
+            ArenaBuild(&E->Components, 128);
             E->Components.Flags |= ArenaFlag_AllowRealloc;
             
             transform_component T = {0}; vec3 P = {0};
@@ -71,7 +72,6 @@ main(void)
                  render_component R = { .RenderID = 42, .IsTransparent = 0, .MeshID = 1337 };
                 AddComponent(E, Comp_Render, &R, sizeof(R));
             }
-            
             
             // NOTE(zaklaus): Rendition
             {
@@ -124,6 +124,33 @@ main(void)
         memory_arena ThirdArena;
         ArenaDuplicate(&NextArena, &ThirdArena);
         printf("\nDuplicated 1st element: %d, Old 1st element: %d, New arena size: %zd", *(s32 *)ThirdArena.Base, *(s32 *)NextArena.Base, (mi)NextArena.Size);
+    }
+    #endif
+    
+    #if REUSE_TEST
+    {
+        memory_arena Numbers;
+        ArenaBuild(&Numbers,sizeof(s32)*4);
+        
+        ArenaPushValue(&Numbers, s32, 1, ArenaDefaultParams());
+        ArenaPushValue(&Numbers, s32, 2, ArenaDefaultParams());
+        ArenaPushValue(&Numbers, s32, 3, ArenaDefaultParams());
+        ArenaPushValue(&Numbers, s32, 4, ArenaDefaultParams());
+        // NOTE(zaklaus): [1,2,3,4]
+        
+        ArenaFreeBlockID(&Numbers, 1);
+        ArenaPushValue(&Numbers, s32, 6, ArenaDefaultParams());
+        // NOTE(zaklaus): [1,6,3,4]
+        
+        fprintf(stdout, "[%d,%d,%d,%d]\n", *Numbers.Base, *(Numbers.Base+sizeof(s32)), *(Numbers.Base+sizeof(s32)*2), *(Numbers.Base+sizeof(s32)*3));
+        
+        ArenaFreeBlockID(&Numbers, 1);
+        ArenaPushValue(&Numbers, s16, 8, ArenaDefaultParams());
+        ArenaPushValue(&Numbers, s16, 9, ArenaDefaultParams());
+        // NOTE(zaklaus): [1,8,9,3,4]
+        
+        fprintf(stdout, "[%d,%d,%d,%d,%d]\n", *Numbers.Base, *(Numbers.Base+sizeof(s32)), *(Numbers.Base+sizeof(s32) + sizeof(s16)), *(Numbers.Base+sizeof(s32) + sizeof(s16)*2),
+                *(Numbers.Base+sizeof(s32) + sizeof(s16)*2 + sizeof(s32)));
     }
     #endif
     

@@ -33,7 +33,11 @@ typedef struct
 internal void
 AddComponent(entity *E, component_id CompID, void *Component, ms Size)
 {
-    void *C = ArenaPushSize_(&E->Components, Size, ArenaTag(CompID, ArenaExpect(COMPONENT_CHUNK, 0)));
+    void *C = ArenaPushSize_(&E->Components, 
+                             Size, 
+                             ArenaTag(CompID, 
+                                      ArenaExpect(
+        COMPONENT_CHUNK, 0)));
     
     Copy(Size, Component, C);
 }

@@ -12,6 +12,7 @@ typedef struct
     s32 Size;    // Size of the element.
     u32 Tag;     // Element's tag used for identification.
     u32 Offset;  // Memory offset from the base.
+    b32 IsFree;  // Is this node free for use?
 } arena_header;
 )
 
@@ -42,7 +43,8 @@ doc_sig(
 typedef enum
 {
     ArenaFlag_AllowRealloc = 0x1,    // Allows re-allocation of the memory, if expansion is required.
-    ArenaFlag_DisallowHeaders = 0x2, // Disallows tracking of elements. Useful if elements are of uniform size.
+    ArenaFlag_DisallowHeaders = 0x2, // Disallows tracking of elements. Useful if elements are of uniform size. This also disables Arena memory reuse.
+    ArenaFlag_DisallowReuse = 0x3,   // Disallows the ability to reuse freed memory in arena.
 } arena_flags;
 )
 
@@ -436,6 +438,48 @@ ArenaExpand(memory_arena *Arena, // Our arena.
     }
 }
 
+internal void *
+ArenaReuseMem(memory_arena *Arena,
+              memory_index Size,
+              b32 *IsReused,
+              arena_push_params Params)
+{
+    void *Result = 0;
+    *IsReused = 0;
+    if(1)//!(Arena->Flags & ArenaFlag_DisallowReuse))
+        {
+            for (Node_arena_header *Node = Arena->Header;
+                 Node;
+                 Node = Node->Next)
+            {
+                arena_header *E = &Node->Value;
+                if(E->IsFree && E->Size >= Size)
+                {
+                    if(E->Size > Size)
+                    {
+                        Node_arena_header *NE = Node->Next;
+                        s32 NewSize = E->Size - (s32)Size;
+                        E->Size = (s32)Size;
+                        
+                        arena_header N = {0};
+                        N.Size = NewSize;
+                        N.Offset = E->Offset + E->Size;
+                        N.IsFree = 1;
+                        Node_arena_header *NewNode = AddNode_arena_header(Node, N);
+                        NewNode->Next = NE;
+                        ++Arena->NodeCount;
+                    }
+                    Result = Arena->Base + E->Offset;
+                    E->Tag = Params.Tag;
+                    E->IsFree = 0;
+                    *IsReused = 1;
+                    return(Result);
+                }
+            }
+        }
+    return(Result);
+}
+
 doc(ArenaPushSize_)
 doc_string(Asks our arena for plotting a block of memory determined by initial size and params requirements.)
 doc_sig(
@@ -446,13 +490,17 @@ ArenaPushSize_(memory_arena *Arena,         // Target arena
 )
 {
     memory_index Size = ArenaGetEffectiveSizeFor(Arena, SizeInit, Params);
-    
-    ArenaExpand(Arena, Size + Params.Expectation);
-
+    b32 IsReused = 0;
     memory_index AlignmentOffset = ArenaGetAlignmentOffset(Arena, Params.Alignment);
-    void *Result = Arena->Base + Arena->Used + AlignmentOffset;
-    Arena->Used += Size;
-
+    void *Result = ArenaReuseMem(Arena, Size, &IsReused, Params);
+    
+    if(!IsReused)
+    {
+        ArenaExpand(Arena, Size + Params.Expectation);
+        Result = Arena->Base + Arena->Used + AlignmentOffset;
+        Arena->Used += Size;
+    }
+    
     Assert(Size >= SizeInit);
 
     if(Params.Flags & ArenaPushFlag_ClearToZero)
@@ -460,7 +508,7 @@ ArenaPushSize_(memory_arena *Arena,         // Target arena
         ZeroSize(SizeInit, Result);
     }
     
-    if(!(Arena->Flags & ArenaFlag_DisallowHeaders))
+    if(!(Arena->Flags & ArenaFlag_DisallowHeaders) && !IsReused)
     {
         arena_header header = {0};
         header.Tag = Params.Tag;
@@ -667,6 +715,7 @@ memory_arena * Arena, // Arena to be serialized.
             *(s32 *)Ptr = E.Size; Ptr += sizeof(s32);
             *(s32 *)Ptr = E.Tag; Ptr += sizeof(u32);
             *(s32 *)Ptr = E.Offset; Ptr += sizeof(u32);
+            *(b32 *)Ptr = E.IsFree; Ptr += sizeof(b32);
         }
     }
     
@@ -704,6 +753,7 @@ u8 * Data)            // Source of our serialized data.
             header.Size = *(s32 *)Data; Data += sizeof(s32);
             header.Tag = *(u32 *)Data; Data += sizeof(u32);
             header.Offset = *(u32 *)Data; Data += sizeof(u32);
+            header.IsFree = *(b32 *)Data; Data += sizeof(b32);
             if(!Arena->Header)
             {
                 arena_header dummy = {0};
@@ -761,6 +811,44 @@ memory_arena * B) // Arena to duplicate to.
     {
         B->Header = B->HeaderEnd = 0;
     }
+}
+
+internal void
+ArenaFreeBlockID(
+memory_arena *Arena,
+mi Idx)
+{
+    mi OurIdx = 0;
+    for(Node_arena_header *Node = Arena->Header;
+        Node;
+        Node = Node->Next
+        )
+    {
+        if(OurIdx == Idx+1)
+        {
+            Node->Value.IsFree = 1;
+            return;
+        }
+        ++OurIdx;
+    }
+}
+
+internal void
+ArenaFreeBlockTag(
+memory_arena *Arena,
+u32 Tag)
+{
+    for(Node_arena_header *Node = Arena->Header->Next;
+        Node;
+        Node = Node->Next
+        )
+{
+    if(Node->Value.Tag == Tag)
+    {
+        Node->Value.IsFree = 1;
+        return;
+    }
+}
 }
 
 #define HFTW_MEM_H
