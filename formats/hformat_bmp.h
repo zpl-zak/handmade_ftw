@@ -1,5 +1,9 @@
 // (c) 2016 ZaKlaus; All Rights Reserved
-
+/*
+ BMP File Format
+Usage: Image format
+SW: N/A
+*/
 #if !defined(HFORMAT_BMP_H)
 
 #include "hftw.h"
@@ -35,18 +39,18 @@ typedef struct
 {
     hformat_bmp_header Header;
     hformat_bmp_info Info;
-    memory_arena Data; // NOTE(zaklaus): DO NOT FORGET to call ArenaFree on the memory arena, once you don't need the BMP!
+     u8 *Data;
 } hformat_bmp;
 
 internal hformat_bmp *
-HFormatLoadBMPImage(FILE *File)
+HFormatLoadBMPImage(s32 HandleIdx)
 {
     hformat_bmp *Image = PlatformMemAlloc(sizeof(hformat_bmp));
     {
         s32 ImageIdx = 0;
         u8 _Swap0 = 0;
         
-        fread(&Image->Header, sizeof(hformat_bmp_header), 1, File);
+        IOFileRead(HandleIdx, &Image->Header, sizeof(hformat_bmp_header));
         
         if(Image->Header.Signature != 0x4D42)
         {
@@ -55,23 +59,32 @@ HFormatLoadBMPImage(FILE *File)
             return(0);
         }
         
-        fread(&Image->Info, sizeof(hformat_bmp_info), 1, File);
+        IOFileRead(HandleIdx, &Image->Info, sizeof(hformat_bmp_info));
         
-        fseek(File, Image->Header.DataOffset, SEEK_SET);
+        IOFileSeek(HandleIdx, Image->Header.DataOffset, SeekOrigin_Set);
         
-        ArenaBuild(&Image->Data, Image->Info.ImageSize);
+        Image->Data = PlatformMemAlloc(Image->Info.ImageSize);
         
-        fread(Image->Data.Base, sizeof(u8), Image->Info.ImageSize, File);
+        IOFileRead(HandleIdx, Image->Data, Image->Info.ImageSize);
         
         for(mi Idx = 0;
             Idx < Image->Info.ImageSize;
             Idx += 3)
         {
-            _Swap0 = Image->Data.Base[Idx];
-            Image->Data.Base[Idx] = Image->Data.Base[Idx + 2];
-            Image->Data.Base[Idx + 2] = _Swap0;
+            _Swap0 = Image->Data[Idx];
+            Image->Data[Idx] = Image->Data[Idx + 2];
+            Image->Data[Idx + 2] = _Swap0;
         }
     }
+    return(Image);
+}
+
+internal hformat_bmp *
+HFormatReleaseBMPImage(hformat_bmp *Image)
+{
+    PlatformMemFree(Image->Data);
+    PlatformMemFree(Image);
+    Image = 0;
     return(Image);
 }
 

@@ -12,3 +12,5 @@
 updocs.*
 *.tmp
 *.out
+id1/
+*.obj
