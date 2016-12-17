@@ -105,7 +105,53 @@ typedef struct
     
     s8 MeshName[255];
     s8 MeshParams[255];
+    
+    memory_arena Geometry;
 } hformat_4ds_mesh;
+
+typedef struct
+{
+     v3 Pos;
+    v3 Normal;
+    v2 UV;
+} hformat_4ds_vertex;
+
+typedef struct
+{
+    u16 FaceCount;
+    memory_arena Faces;
+    u16 MaterialID;
+} hformat_4ds_facegroup;
+
+typedef struct
+{
+    u16 A,B,C;
+} hformat_4ds_face;
+
+typedef struct
+{
+    r32 RelativeDistance;
+    u16 VertexCount;
+    memory_arena Vertices;
+    
+    u8 FaceGroupCount;
+    memory_arena FaceGroups;
+} hformat_4ds_lod;
+
+typedef struct
+{
+    u16 Instanced;
+    
+    // NOTE(zaklaus): For non-instanced mesh
+    u8 LODLevel;
+    memory_arena LODs;
+} hformat_4ds_standard;
+
+typedef struct
+{
+    // NOTE(zaklaus): Bounding box
+    v3 MinBox, MaxBox;
+} hformat_4ds_dummy;
 
 typedef struct
 {
@@ -123,6 +169,8 @@ typedef struct
 internal void
 HFormatLoad4DSMaterial(hformat_4ds_header *Model, FILE *File)
 {
+    fread(&Model->MaterialCount, sizeof(u16), 1, File);
+    
     ArenaBuild(&Model->Materials, sizeof(hformat_4ds_material)*Model->MaterialCount);
     
     for(mi Idx = 0;
@@ -176,6 +224,84 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, FILE *File)
     
 }
 
+internal hformat_4ds_lod
+HFormat4DSLoadLOD(FILE *File)
+{
+    hformat_4ds_lod Lod = {0};
+    fread(&Lod.RelativeDistance, sizeof(r32), 1, File);
+    fread(&Lod.VertexCount, sizeof(u16), 1, File);
+    
+    ArenaBuild(&Lod.Vertices, sizeof(hformat_4ds_vertex)*Lod.VertexCount);
+    
+    for(mi Idx = 0;
+        Idx < Lod.VertexCount;
+        ++Idx)
+    {
+        hformat_4ds_vertex Vertex;
+        
+         fread(&Vertex.Pos, sizeof(v3), 1, File);
+        fread(&Vertex.Normal, sizeof(v3), 1, File);
+        fread(&Vertex.UV, sizeof(v2), 1, File);
+        ArenaPushValue(&Lod.Vertices, hformat_4ds_vertex, Vertex, ArenaDefaultParams());
+    }
+    
+    fread(&Lod.FaceGroupCount, sizeof(u8), 1, File);
+    
+    ArenaBuild(&Lod.FaceGroups, 4);
+    Lod.FaceGroups.Flags |= ArenaFlag_AllowRealloc;
+    
+    for(mi Idx = 0;
+        Idx < Lod.FaceGroupCount;
+        ++Idx)
+    {
+        hformat_4ds_facegroup FaceGroup = {0};
+        {
+            fread(&FaceGroup.FaceCount, sizeof(u16), 1, File);
+            
+            ArenaBuild(&FaceGroup.Faces, sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
+            FaceGroup.Faces.Flags |= ArenaFlag_AllowRealloc;
+            
+            for(mi Idx2 = 0;
+                Idx2 < FaceGroup.FaceCount;
+                ++Idx2)
+            {
+                hformat_4ds_face Face = {0};
+                fread(&Face, sizeof(hformat_4ds_face), 1, File);
+                ArenaPushValue(&FaceGroup.Faces, hformat_4ds_face, Face, ArenaDefaultParams());
+            }
+            fread(&FaceGroup.MaterialID, sizeof(u16), 1, File);
+        }
+        ArenaPushValue(&Lod.FaceGroups, hformat_4ds_facegroup, FaceGroup, ArenaDefaultParams());
+    }
+    
+    return(Lod);
+}
+
+internal hformat_4ds_standard
+HFormatLoad4DSStandard(FILE *File)
+{
+    hformat_4ds_standard Geo = {0};
+    fread(&Geo.Instanced, sizeof(u16), 1, File);
+    
+    if(!Geo.Instanced)
+    {
+        fread(&Geo.LODLevel, sizeof(u8), 1, File);
+        
+        ArenaBuild(&Geo.LODs, 4);
+        Geo.LODs.Flags = ArenaFlag_AllowRealloc;
+        
+        for(mi Idx2 = 0;
+            Idx2 < Geo.LODLevel;
+            ++Idx2)
+        {
+            hformat_4ds_lod Lod = {0};
+            Lod = HFormat4DSLoadLOD(File);
+            ArenaPushValue(&Geo.LODs, hformat_4ds_lod, Lod, ArenaDefaultParams());
+        }
+    }
+    return(Geo);
+}
+
 internal void
 HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
 {
@@ -223,6 +349,41 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
             u8 MeshParamsLength;
             fread(&MeshParamsLength, sizeof(u8), 1, File);
             fread(Mesh.MeshParams, sizeof(s8), MeshParamsLength, File);
+            
+            ArenaBuild(&Mesh.Geometry, 4);
+            Mesh.Geometry.Flags |= ArenaFlag_AllowRealloc;
+            
+            switch(Mesh.MeshType)
+            {
+                case HFormatMeshType_Standard:
+                {
+                    if(!Mesh.VisualMeshType)
+                    {
+                        hformat_4ds_standard Standard = {0};
+                        Standard = HFormatLoad4DSStandard(File);
+                        ArenaPushValue(&Mesh.Geometry, hformat_4ds_standard, Standard, ArenaDefaultParams());
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Not Implemented [VisualMeshType]: %d\n", Mesh.VisualMeshType);
+                    }
+                }break;
+                
+                case HFormatMeshType_Dummy:
+                {
+                    hformat_4ds_dummy Dummy = {0};
+                    fread(&Dummy, sizeof(hformat_4ds_dummy), 1, File);
+                    ArenaPushValue(&Mesh.Geometry, hformat_4ds_dummy, Dummy, ArenaDefaultParams());
+                }break;
+                
+                default:
+                {
+                    if(Mesh.MeshType)
+                    {
+                        fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
+                    }
+                }break;
+            }
         }
         ArenaPushValue(&Model->Meshes, hformat_4ds_mesh, Mesh, ArenaDefaultParams());
     }
@@ -235,9 +396,15 @@ HFormatLoad4DSModel(s8 *Path)
     FILE *File = fopen((char *)Path, "rb");
     {
         fread(&Model->Signature, sizeof(u8), 4, File);
+        
+        if(!StringsAreEqual("4DS", (char *)Model->Signature))
+        {
+            fclose(File);
+            return(0);
+        }
+        
         fread(&Model->FormatVersion, sizeof(u16), 1, File);
         fread(&Model->Timestamp, sizeof(u64), 1, File);
-        fread(&Model->MaterialCount, sizeof(u16), 1, File);
         
         HFormatLoad4DSMaterial(Model, File);
         HFormatLoad4DSMesh(Model, File);
