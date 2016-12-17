@@ -9,8 +9,8 @@
 #else//LIBC_MALLOC
 #include <malloc.h>
 
-doc(PlatformMemAlloc)
-doc_string(Allocates memory using platform-specific call.)
+//doc(PlatformMemAlloc)
+//doc_string(Allocates memory using platform-specific call.)
 doc_sig(
 internal void *
 PlatformMemAlloc(
@@ -25,8 +25,8 @@ size_t Size)  // Requested memory size.
 
 doc_cat(Platform)
 
-doc(PlatformMemFree)
-doc_string(Free memory using platform-specific call.)
+//doc(PlatformMemFree)
+//doc_string(Free memory using platform-specific call.)
 doc_sig(
 internal void
 PlatformMemFree(
@@ -36,8 +36,8 @@ void *Ptr)   // Pointer to allocated block of memory.
     free(Ptr);
 }
 
-doc(PlatformMemRealloc)
-doc_string(Reallocates memory by requested size using platform-specific call.)
+//doc(PlatformMemRealloc)
+//doc_string(Reallocates memory by requested size using platform-specific call.)
 doc_sig(
 internal void *
 PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.

@@ -6,4 +6,7 @@
 *.dll
 *.ctm
 *.pdb
+*.VC.db
 /*.opendb
+
+updocs.*

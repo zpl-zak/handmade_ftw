@@ -2,9 +2,9 @@
 
 #if !defined(HFTW_STRING_H)
 
-doc(string)
+//doc(string)
 doc_cat(String)
-doc_string(Describes string component.)
+//doc_string(Describes string component.)
 doc_sig(
 typedef struct
 {
@@ -17,8 +17,8 @@ typedef struct
 
 doc_sep()
 
-doc(StringCalcHash)
-doc_string(Calculates string hash.)
+//doc(StringCalcHash)
+//doc_string(Calculates string hash.)
 doc_sig(
 internal s32
 StringCalcHash(char *Source, // Source of the raw string to be hashed.
@@ -36,8 +36,8 @@ StringCalcHash(char *Source, // Source of the raw string to be hashed.
     return(Hash);
 }
 
-doc(StringGetLengthFromArray)
-doc_string(Returns length of raw null-terminated string.)
+//doc(StringGetLengthFromArray)
+//doc_string(Returns length of raw null-terminated string.)
 doc_sig(
 internal u32
 StringGetLengthFromArray(char *Src) // Source of the raw string to get length from.
@@ -51,8 +51,8 @@ StringGetLengthFromArray(char *Src) // Source of the raw string to get length fr
     return(Length);
 }
 
-doc(StringCreate)
-doc_string(Returns newly-created managed string.)
+//doc(StringCreate)
+//doc_string(Returns newly-created managed string.)
 doc_example(StringCreate("Hello world!", 11);)
 doc_sig(
 internal string
@@ -72,8 +72,8 @@ StringCreate(char *Source, // Source of the raw string.
     return(Str);
 }
 
-doc(StringCreateUsingArena)
-doc_string(Push string to the provided arena.)
+//doc(StringCreateUsingArena)
+//doc_string(Push string to the provided arena.)
 doc_sig(
 internal string
 StringCreateUsingArena(char *Source,        // Source of the raw string.
@@ -92,9 +92,8 @@ StringCreateUsingArena(char *Source,        // Source of the raw string.
     return(Str);
 }
 
-doc(StringCreateRaw)
-doc_string(Push string to a raw block of memory.<br/>
-           NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).)
+//doc(StringCreateRaw)
+//doc_string(Push string to a raw block of memory.<br/>NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).)
 doc_sig(
 internal string
 StringCreateRaw(char *Source,        // Source of the raw string.
@@ -113,9 +112,8 @@ StringCreateRaw(char *Source,        // Source of the raw string.
     return(Str);
 }
 
-doc(StringDestroy)
-doc_string(Destroys string and de-allocates its memory. <br/>
-           NOTE: Should be used only on strings with independent memory block!)
+//doc(StringDestroy)
+//doc_string(Destroys string and de-allocates its memory. <br/>NOTE: Should be used only on strings with independent memory block!)
 doc_sig(
 internal void
 StringDestroy(string *Str) // Our string.
@@ -125,8 +123,8 @@ StringDestroy(string *Str) // Our string.
 }
 
 // NOTE(zaklaus): Read-Only
-doc(StringGetRaw)
-doc_string(Returns raw string.)
+//doc(StringGetRaw)
+//doc_string(Returns raw string.)
 doc_sig(
 internal const char *
 StringGetRaw(string *Str) // Our string.
@@ -137,8 +135,8 @@ StringGetRaw(string *Str) // Our string.
     return(Source);
 }
 
-doc(StringCompare)
-doc_string(Compares two strings by hash.)
+//doc(StringCompare)
+//doc_string(Compares two strings by hash.)
 doc_ret(Returns 1 if string hashes are equal.)
 doc_sig(
 internal b32
@@ -150,8 +148,8 @@ StringCompare(string *Str1, // Our 1st string.
     return(Result);
 }
 
-doc(StringCompareSlow)
-doc_string(Compares two string by comparing their characters.)
+//doc(StringCompareSlow)
+//doc_string(Compares two string by comparing their characters.)
 doc_sig(
 internal b32
 StringCompareSlow(string *Str1, // Our 1st string.
@@ -162,8 +160,8 @@ StringCompareSlow(string *Str1, // Our 1st string.
     return(Result);
 }
 
-doc(StringBeginEdit)
-doc_string(Tells the string we want to edit it. Therefore entering edit mode.)
+//doc(StringBeginEdit)
+//doc_string(Tells the string we want to edit it. Therefore entering edit mode.)
 doc_sig(
 internal char *
 StringBeginEdit(string *Str) // Our string.
@@ -175,8 +173,8 @@ StringBeginEdit(string *Str) // Our string.
     return(Result);
 }
 
-doc(StringEndEdit)
-doc_string(Tells the string we`re done with editation, therefore it recalculates string`s hash.)
+//doc(StringEndEdit)
+//doc_string(Tells the string we`re done with editation, therefore it recalculates string`s hash.)
 doc_sig(
 internal void
 StringEndEdit(string *Str) // Our string.
@@ -189,8 +187,8 @@ StringEndEdit(string *Str) // Our string.
     Str->IsModified = 0;
 }
 
-doc(StringGetLength)
-doc_string(Returns the length of our string.)
+//doc(StringGetLength)
+//doc_string(Returns the length of our string.)
 doc_sig(
 internal u32
 StringGetLength(
@@ -202,8 +200,8 @@ string *Str) // Our string.
     return(Length);
 }
 
-doc(StringGetAllocatedLength)
-doc_string(Returns the allocated memory for our string.)
+//doc(StringGetAllocatedLength)
+//doc_string(Returns the allocated memory for our string.)
 doc_sig(
 internal u32
 StringGetAllocatedLength(
@@ -215,8 +213,8 @@ string *Str) // Our string.
     return(Length);
 }
 
-doc(StringCheck)
-doc_string(Checks whether our hash is correct.)
+//doc(StringCheck)
+//doc_string(Checks whether our hash is correct.)
 doc_sig(
 internal void
 StringCheck(
@@ -230,8 +228,8 @@ string *Str) // Our string.
     Assert(CompareHash == Str->StringHash);
 }
 
-doc(StringDuplicate)
-doc_string(Duplicates our string.)
+//doc(StringDuplicate)
+//doc_string(Duplicates our string.)
 doc_sig(
 internal string
 StringDuplicate(
@@ -253,8 +251,8 @@ string *Str) // Our string.
     return(Result);
 }
 
-doc(StringAppend)
-doc_string(Appends our string to our original string.)
+//doc(StringAppend)
+//doc_string(Appends our string to our original string.)
 doc_sig(
 internal void
 StringAppend(string *StrA, // Our string.
@@ -271,4 +269,4 @@ StringAppend(string *StrA, // Our string.
 #define hash_lit(Literal) StringCalcHash( Literal , sizeof( Literal )/sizeof(u8)-1)
 
 #define HFTW_STRING_H
-#endif                                                                   
+#endif

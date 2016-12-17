@@ -378,10 +378,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
                 
                 default:
                 {
-                    if(Mesh.MeshType)
-                    {
                         fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
-                    }
                 }break;
             }
         }
@@ -390,16 +387,15 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
 }
 
 internal hformat_4ds_header *
-HFormatLoad4DSModel(s8 *Path)
+HFormatLoad4DSModel(FILE *File)
 {
     hformat_4ds_header *Model = PlatformMemAlloc(sizeof(hformat_4ds_header));
-    FILE *File = fopen((char *)Path, "rb");
     {
         fread(&Model->Signature, sizeof(u8), 4, File);
         
         if(!StringsAreEqual("4DS", (char *)Model->Signature))
         {
-            fclose(File);
+            PlatformMemFree(Model);
             return(0);
         }
         
@@ -409,7 +405,6 @@ HFormatLoad4DSModel(s8 *Path)
         HFormatLoad4DSMaterial(Model, File);
         HFormatLoad4DSMesh(Model, File);
     }
-    fclose(File);
     return(Model);
 }
 
