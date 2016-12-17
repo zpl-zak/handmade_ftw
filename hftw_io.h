@@ -1,6 +1,6 @@
 // (c) 2016 ZaKlaus; All Rights Reserved
 
-#if !defined(HFTW_FILE_H)
+#if !defined(HFTW_IO_H)
 
-#define HFTW_FILE_H
+#define HFTW_IO_H
 #endif
