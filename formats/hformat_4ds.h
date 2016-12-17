@@ -9,7 +9,7 @@ SW: Mafia TCOLH
 #include "hftw.h"
 #include "stdio.h"
 
- enum
+enum
 {
     HFormatMaterialFlag_TextureDiffuse = 0x0004,
     HFormatMaterialFlag_Colored = 0x08,
@@ -111,7 +111,7 @@ typedef struct
 
 typedef struct
 {
-     v3 Pos;
+    v3 Pos;
     v3 Normal;
     v2 UV;
 } hformat_4ds_vertex;
@@ -160,7 +160,7 @@ typedef struct
     u64 Timestamp;
     
     u16 MaterialCount;
-     memory_arena Materials;
+    memory_arena Materials;
     
     u16 MeshCount;
     memory_arena Meshes;
@@ -239,7 +239,7 @@ HFormat4DSLoadLOD(FILE *File)
     {
         hformat_4ds_vertex Vertex;
         
-         fread(&Vertex.Pos, sizeof(v3), 1, File);
+        fread(&Vertex.Pos, sizeof(v3), 1, File);
         fread(&Vertex.Normal, sizeof(v3), 1, File);
         fread(&Vertex.UV, sizeof(v2), 1, File);
         ArenaPushValue(&Lod.Vertices, hformat_4ds_vertex, Vertex, ArenaDefaultParams());
@@ -329,7 +329,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
             fread(&Mesh.Scale, sizeof(v3), 1, File);
             fread(&Mesh.Rot, sizeof(v4), 1, File);
             
-
+            
             f32 _Swap0 = Mesh.Rot.W;
             f32 _Swap1 = Mesh.Rot.X;
             f32 _Swap2 = Mesh.Rot.Y;
@@ -378,7 +378,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
                 
                 default:
                 {
-                        fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
+                    fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
                 }break;
             }
         }
