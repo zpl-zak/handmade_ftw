@@ -18,6 +18,7 @@
 #define ECS_TEST 0
 #define DATA_PACKING 0
 #define REUSE_TEST 1
+#define IO_TEST 1
 
 int
 cmp(const void *a, const void *b)
@@ -153,6 +154,23 @@ main(void)
                 *(Numbers.Base+sizeof(s32) + sizeof(s16)*2 + sizeof(s32)));
     }
     #endif
+    
+#if IO_TEST
+    {
+        ms Size = 0;
+        s32 File = IOFileOpenRead("test.c", &Size);
+        
+        u8 *SourceCode = PlatformMemAlloc(Size);
+        IOFileRead(File, SourceCode, Size);
+        
+        s32 File2 = IOFileOpenWrite("test.out");
+        IOFileWrite(File2, SourceCode, Size);
+        
+        IOFileClose(File);
+        IOFileClose(File2);
+        PlatformMemFree(SourceCode);
+    }
+#endif
     
     fprintf(stdout, "\n");
     return(0);
