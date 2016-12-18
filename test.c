@@ -11,6 +11,7 @@
 #include "formats/hformat_bmp.h"
 #include "formats/hformat_pak.h"
 #include "formats/hformat_4ds.h"
+#include "formats/hformat_wad.h"
 
 /* TEST SWITCHES */
 #define MONSTER_DYNAMIC_PROPERTY 0
@@ -23,9 +24,11 @@
 #define DATA_PACKING 0
 #define REUSE_TEST 0
 #define IO_TEST 0
+
 #define BMP_TEST 0
 #define PAK_TEST 0
 #define _4DS_TEST 1
+#define WAD_TEST 0
 
 int
 cmp(const void *a, const void *b)
@@ -202,17 +205,23 @@ main(void)
         hformat_pak *Pak = HFormatLoadPakArchive(PakHandle);
         hformat_pak_file *Files = Pak->Files;
         
-        ms MedKeySize;
-        s8 *MedKey = HFormatLoadPakFile("sound/misc/medkey.wav", Pak, &MedKeySize);
-        s32 MedKeyFile = IOFileOpenWrite("data/medkey.wav");
-        IOFileWrite(MedKeyFile, MedKey, MedKeySize);
-        IOFileClose(MedKeyFile);
-        PlatformMemFree(MedKey);
+        ms GFXSize;
+        s8 *GFX = HFormatLoadPakFile("gfx.wad", Pak, &GFXSize);
+        s32 GFXFile = IOFileOpenWrite("data/gfx.wad");
+        IOFileWrite(GFXFile, GFX, GFXSize);
+        IOFileClose(GFXFile);
+        PlatformMemFree(GFX);
         
         s32 NumPackFiles = Pak->FileCount;
         fprintf(stdout, "Number of files in PAK: %d\n", NumPackFiles);
         Pak = HFormatReleasePakArchive(Pak);
         IOFileClose(PakHandle);
+    }
+    #endif
+    
+    #if WAD_TEST
+    {
+        
     }
     #endif
     

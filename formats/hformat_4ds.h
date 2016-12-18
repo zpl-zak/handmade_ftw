@@ -127,6 +127,13 @@ typedef struct
 
 typedef struct
 {
+    hformat_4ds_standard Standard;
+    u32 RotationAxis;
+    u8 IgnoreCamera;
+} hformat_4ds_billboard;
+
+typedef struct
+{
     // NOTE(zaklaus): Bounding box
     v3 MinBox, MaxBox;
 } hformat_4ds_dummy;
@@ -181,6 +188,7 @@ typedef struct
     hformat_4ds_dummy Dummy;
     hformat_4ds_mirror Mirror;
     hformat_4ds_glow Glow;
+    hformat_4ds_billboard Billboard;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -431,6 +439,15 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                             hformat_4ds_glow Glow = {0};
                             Glow = HFormatLoad4DSGlow(FileIdx);
                             Mesh.Glow = Glow;
+                        }break;
+                        
+                        case HFormatVisualMeshType_Billboard:
+                        {
+                            hformat_4ds_billboard Billboard = {0};
+                            Billboard.Standard = HFormatLoad4DSStandard(FileIdx);
+                            IOFileRead(FileIdx, &Billboard.RotationAxis, sizeof(u32));
+                            IOFileRead(FileIdx, &Billboard.IgnoreCamera, sizeof(u8));
+                            Mesh.Billboard = Billboard;
                         }break;
                         
                         default:
