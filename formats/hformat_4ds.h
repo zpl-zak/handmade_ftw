@@ -168,9 +168,9 @@ typedef struct
 } hformat_4ds_header;
 
 internal void
-HFormatLoad4DSMaterial(hformat_4ds_header *Model, FILE *File)
+HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
 {
-    fread(&Model->MaterialCount, sizeof(u16), 1, File);
+    IOFileRead(FileIdx, &Model->MaterialCount, sizeof(u16));
     
     Model->Materials = PlatformMemAlloc(sizeof(hformat_4ds_material)*Model->MaterialCount);
     
@@ -181,41 +181,41 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, FILE *File)
         hformat_4ds_material Mat = {0};
         {
             ms msize = sizeof(r32);
-            fread(&Mat.Flags, msize, 1, File);
-            fread(&Mat.Ambient, sizeof(v3), 1, File);
-            fread(&Mat.Diffuse, sizeof(v3), 1, File);
-            fread(&Mat.Emission, sizeof(v3), 1, File);
-            fread(&Mat.Transparency, msize, 1, File);
+            IOFileRead(FileIdx, &Mat.Flags, msize);
+            IOFileRead(FileIdx, &Mat.Ambient, sizeof(v3));
+            IOFileRead(FileIdx, &Mat.Diffuse, sizeof(v3));
+            IOFileRead(FileIdx, &Mat.Emission, sizeof(v3));
+            IOFileRead(FileIdx, &Mat.Transparency, msize);
             
             if(Mat.Flags & HFormatMaterialFlag_EnvironmentMap)
             {
-                fread(&Mat.EnvRatio, sizeof(r32), 1, File);
+                IOFileRead(FileIdx, &Mat.EnvRatio, sizeof(r32));
                 u8 EnvNameLength = 0;
-                fread(&EnvNameLength, sizeof(u8), 1, File);
-                fread(Mat.EnvMapName, sizeof(s8), EnvNameLength, File);
+                IOFileRead(FileIdx, &EnvNameLength, sizeof(u8));
+                IOFileRead(FileIdx, Mat.EnvMapName, EnvNameLength);
             }
             
             u8 DiffuseNameLength = 0;
-            fread(&DiffuseNameLength, sizeof(u8), 1, File);
-            fread(Mat.DiffuseMapName, sizeof(s8), DiffuseNameLength, File);
+            IOFileRead(FileIdx, &DiffuseNameLength, sizeof(u8));
+            IOFileRead(FileIdx, Mat.DiffuseMapName, DiffuseNameLength);
             
             
             if(Mat.Flags & HFormatMaterialFlag_AlphaTexture)
             {
                 u8 AlphaNameLength = 0;
-                fread(&AlphaNameLength, sizeof(u8), 1, File);
-                fread(Mat.AlphaMapName, sizeof(s8), AlphaNameLength, File);
+                IOFileRead(FileIdx, &AlphaNameLength, sizeof(u8));
+                IOFileRead(FileIdx, Mat.AlphaMapName, AlphaNameLength);
             }
             
             if(Mat.Flags & HFormatMaterialFlag_AnimatedTextureDiffuse ||
                Mat.Flags & HFormatMaterialFlag_AnimatedTextureAlpha)
             {
                 
-                fread(&Mat.AnimSequenceLength, sizeof(u32), 1, File);
-                fread(&Mat._Ignored0, sizeof(u16), 1, File);
-                fread(&Mat.FramePeriod, sizeof(u32), 1, File);
-                fread(&Mat._Ignored1, sizeof(u32), 1, File);
-                fread(&Mat._Ignored2, sizeof(u32), 1, File);
+                IOFileRead(FileIdx, &Mat.AnimSequenceLength, sizeof(u32));
+                IOFileRead(FileIdx, &Mat._Ignored0, sizeof(u16));
+                IOFileRead(FileIdx, &Mat.FramePeriod, sizeof(u32));
+                IOFileRead(FileIdx, &Mat._Ignored1, sizeof(u32));
+                IOFileRead(FileIdx, &Mat._Ignored2, sizeof(u32));
                 
             }
             
@@ -226,17 +226,17 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, FILE *File)
 }
 
 internal hformat_4ds_lod
-HFormat4DSLoadLOD(FILE *File)
+HFormat4DSLoadLOD(s32 FileIdx)
 {
     hformat_4ds_lod Lod = {0};
-    fread(&Lod.RelativeDistance, sizeof(r32), 1, File);
-    fread(&Lod.VertexCount, sizeof(u16), 1, File);
+    IOFileRead(FileIdx, &Lod.RelativeDistance, sizeof(r32));
+    IOFileRead(FileIdx, &Lod.VertexCount, sizeof(u16));
     
     Lod.Vertices = PlatformMemAlloc(sizeof(hformat_4ds_vertex)*Lod.VertexCount);
     
-    fread(Lod.Vertices, 1, sizeof(hformat_4ds_vertex)*Lod.VertexCount, File);
+    IOFileRead(FileIdx, Lod.Vertices, sizeof(hformat_4ds_vertex)*Lod.VertexCount);
     
-    fread(&Lod.FaceGroupCount, sizeof(u8), 1, File);
+    IOFileRead(FileIdx, &Lod.FaceGroupCount, sizeof(u8));
     
     Lod.FaceGroups = PlatformMemAlloc(sizeof(hformat_4ds_facegroup)*Lod.FaceGroupCount);
     
@@ -246,13 +246,13 @@ HFormat4DSLoadLOD(FILE *File)
     {
         hformat_4ds_facegroup FaceGroup = {0};
         {
-            fread(&FaceGroup.FaceCount, sizeof(u16), 1, File);
+            IOFileRead(FileIdx, &FaceGroup.FaceCount, sizeof(u16));
             
             FaceGroup.Faces = PlatformMemAlloc(sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
             
-            fread(FaceGroup.Faces, 1, sizeof(hformat_4ds_face)*FaceGroup.FaceCount, File);
+            IOFileRead(FileIdx, FaceGroup.Faces, sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
             
-            fread(&FaceGroup.MaterialID, sizeof(u16), 1, File);
+            IOFileRead(FileIdx, &FaceGroup.MaterialID, sizeof(u16));
         }
         Lod.FaceGroups[Idx] = FaceGroup;
     }
@@ -261,14 +261,14 @@ HFormat4DSLoadLOD(FILE *File)
 }
 
 internal hformat_4ds_standard
-HFormatLoad4DSStandard(FILE *File)
+HFormatLoad4DSStandard(s32 FileIdx)
 {
     hformat_4ds_standard Geo = {0};
-    fread(&Geo.Instanced, sizeof(u16), 1, File);
+    IOFileRead(FileIdx, &Geo.Instanced, sizeof(u16));
     
     if(!Geo.Instanced)
     {
-        fread(&Geo.LODLevel, sizeof(u8), 1, File);
+        IOFileRead(FileIdx, &Geo.LODLevel, sizeof(u8));
         
         Geo.LODs = PlatformMemAlloc(sizeof(hformat_4ds_lod)*Geo.LODLevel);
         
@@ -277,7 +277,7 @@ HFormatLoad4DSStandard(FILE *File)
             ++Idx)
         {
             hformat_4ds_lod Lod = {0};
-            Lod = HFormat4DSLoadLOD(File);
+            Lod = HFormat4DSLoadLOD(FileIdx);
             Geo.LODs[Idx] = Lod;
         }
     }
@@ -285,9 +285,9 @@ HFormatLoad4DSStandard(FILE *File)
 }
 
 internal void
-HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
+HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
-    fread(&Model->MeshCount, sizeof(u16), 1, File);
+    IOFileRead(FileIdx, &Model->MeshCount, sizeof(u16));
     
     Model->Meshes = PlatformMemAlloc(sizeof(hformat_4ds_mesh)*Model->MeshCount);
     
@@ -297,19 +297,19 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
     {
         hformat_4ds_mesh Mesh = {0};
         {
-            fread(&Mesh.MeshType, sizeof(u8), 1, File);
+            IOFileRead(FileIdx, &Mesh.MeshType, sizeof(u8));
             
             if(Mesh.MeshType & HFormatMeshType_Standard)
             {
-                fread(&Mesh.VisualMeshType, sizeof(u8), 1, File);
-                fread(&Mesh.MeshRenderFlags, sizeof(u16), 1, File);
+                IOFileRead(FileIdx, &Mesh.VisualMeshType, sizeof(u8));
+                IOFileRead(FileIdx, &Mesh.MeshRenderFlags, sizeof(u16));
             }
             
-            fread(&Mesh.ParentID, sizeof(u16), 1, File);
+            IOFileRead(FileIdx, &Mesh.ParentID, sizeof(u16));
             
-            fread(&Mesh.Pos, sizeof(v3), 1, File);
-            fread(&Mesh.Scale, sizeof(v3), 1, File);
-            fread(&Mesh.Rot, sizeof(v4), 1, File);
+            IOFileRead(FileIdx, &Mesh.Pos, sizeof(v3));
+            IOFileRead(FileIdx, &Mesh.Scale, sizeof(v3));
+            IOFileRead(FileIdx, &Mesh.Rot, sizeof(v4));
             
             
             f32 _Swap0 = Mesh.Rot.W;
@@ -322,15 +322,15 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
             Mesh.Rot.Z = _Swap3;
             Mesh.Rot.W = _Swap0;
             
-            fread(&Mesh.CullingFlags, sizeof(u8), 1, File);
+            IOFileRead(FileIdx, &Mesh.CullingFlags, sizeof(u8));
             
             u8 MeshNameLength;
-            fread(&MeshNameLength, sizeof(u8), 1, File);
-            fread(Mesh.MeshName, sizeof(s8), MeshNameLength, File);
+            IOFileRead(FileIdx, &MeshNameLength, sizeof(u8));
+            IOFileRead(FileIdx, Mesh.MeshName, MeshNameLength);
             
             u8 MeshParamsLength;
-            fread(&MeshParamsLength, sizeof(u8), 1, File);
-            fread(Mesh.MeshParams, sizeof(s8), MeshParamsLength, File);
+            IOFileRead(FileIdx, &MeshParamsLength, sizeof(u8));
+            IOFileRead(FileIdx, Mesh.MeshParams, MeshParamsLength);
             
             switch(Mesh.MeshType)
             {
@@ -339,7 +339,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
                     if(!Mesh.VisualMeshType)
                     {
                         hformat_4ds_standard Standard = {0};
-                        Standard = HFormatLoad4DSStandard(File);
+                        Standard = HFormatLoad4DSStandard(FileIdx);
                         Mesh.Standard = Standard;
                     }
                     else
@@ -351,7 +351,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
                 case HFormatMeshType_Dummy:
                 {
                     hformat_4ds_dummy Dummy = {0};
-                    fread(&Dummy, sizeof(hformat_4ds_dummy), 1, File);
+                    IOFileRead(FileIdx, &Dummy, sizeof(hformat_4ds_dummy));
                     Mesh.Dummy = Dummy;
                 }break;
                 
@@ -366,11 +366,11 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, FILE *File)
 }
 
 internal hformat_4ds_header *
-HFormatLoad4DSModel(FILE *File)
+HFormatLoad4DSModel(s32 FileIdx)
 {
     hformat_4ds_header *Model = PlatformMemAlloc(sizeof(hformat_4ds_header));
     {
-        fread(&Model->Signature, sizeof(u8), 4, File);
+        IOFileRead(FileIdx, &Model->Signature, 4);
         
         if(!StringsAreEqual("4DS", (char *)Model->Signature))
         {
@@ -378,11 +378,11 @@ HFormatLoad4DSModel(FILE *File)
             return(0);
         }
         
-        fread(&Model->FormatVersion, sizeof(u16), 1, File);
-        fread(&Model->Timestamp, sizeof(u64), 1, File);
+        IOFileRead(FileIdx, &Model->FormatVersion, sizeof(u16));
+        IOFileRead(FileIdx, &Model->Timestamp, sizeof(u64));
         
-        HFormatLoad4DSMaterial(Model, File);
-        HFormatLoad4DSMesh(Model, File);
+        HFormatLoad4DSMaterial(Model, FileIdx);
+        HFormatLoad4DSMesh(Model, FileIdx);
     }
     return(Model);
 }

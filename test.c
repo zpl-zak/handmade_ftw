@@ -181,7 +181,7 @@ main(void)
     
     #if BMP_TEST
     {
-        s32 FileHandle = IOFileOpenRead("test.bmp", 0);
+        s32 FileHandle = IOFileOpenRead("data/test.bmp", 0);
         hformat_bmp *Image = HFormatLoadBMPImage(FileHandle);
         IOFileClose(FileHandle);
         
@@ -212,9 +212,9 @@ main(void)
     
     #if _4DS_TEST
     {
-        FILE *File = fopen("test.4ds", "rb");
-        hformat_4ds_header *Model = HFormatLoad4DSModel(File);
-        fclose(File);
+        s32 FileHandle = IOFileOpenRead("data/test.4ds", 0);
+        hformat_4ds_header *Model = HFormatLoad4DSModel(FileHandle);
+        IOFileClose(FileHandle);
         
         if(!Model)
         {
