@@ -71,11 +71,14 @@ typedef struct
     
     // NOTE(zaklaus): Environment map
     r32 EnvRatio;
+    u8 EnvMapNameLength;
     s8 EnvMapName[255];
     
+    u8 DiffuseMapNameLength;
     s8 DiffuseMapName[255];
     
     // NOTE(zaklaus): Alpha map
+    u8 AlphaMapNameLength;
     s8 AlphaMapName[255];
     
     // NOTE(zaklaus): Anim map
@@ -181,7 +184,9 @@ typedef struct
     
     u8 CullingFlags;
     
+    u8 MeshNameLength;
     s8 MeshName[255];
+    u8 MeshParamsLength;
     s8 MeshParams[255];
     
     hformat_4ds_standard Standard;
@@ -227,21 +232,18 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
             if(Mat.Flags & HFormatMaterialFlag_EnvironmentMap)
             {
                 IOFileRead(FileIdx, &Mat.EnvRatio, sizeof(r32));
-                u8 EnvNameLength = 0;
-                IOFileRead(FileIdx, &EnvNameLength, sizeof(u8));
-                IOFileRead(FileIdx, Mat.EnvMapName, EnvNameLength);
+                IOFileRead(FileIdx, &Mat.EnvMapNameLength, sizeof(u8));
+                IOFileRead(FileIdx, Mat.EnvMapName, Mat.EnvMapNameLength);
             }
             
-            u8 DiffuseNameLength = 0;
-            IOFileRead(FileIdx, &DiffuseNameLength, sizeof(u8));
-            IOFileRead(FileIdx, Mat.DiffuseMapName, DiffuseNameLength);
+            IOFileRead(FileIdx, &Mat.DiffuseMapNameLength, sizeof(u8));
+            IOFileRead(FileIdx, Mat.DiffuseMapName, Mat.DiffuseMapNameLength);
             
             
             if(Mat.Flags & HFormatMaterialFlag_AlphaTexture)
             {
-                u8 AlphaNameLength = 0;
-                IOFileRead(FileIdx, &AlphaNameLength, sizeof(u8));
-                IOFileRead(FileIdx, Mat.AlphaMapName, AlphaNameLength);
+                IOFileRead(FileIdx, &Mat.AlphaMapNameLength, sizeof(u8));
+                IOFileRead(FileIdx, Mat.AlphaMapName, Mat.AlphaMapNameLength);
             }
             
             if(Mat.Flags & HFormatMaterialFlag_AnimatedTextureDiffuse ||
@@ -406,13 +408,11 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
             
             IOFileRead(FileIdx, &Mesh.CullingFlags, sizeof(u8));
             
-            u8 MeshNameLength;
-            IOFileRead(FileIdx, &MeshNameLength, sizeof(u8));
-            IOFileRead(FileIdx, Mesh.MeshName, MeshNameLength);
+            IOFileRead(FileIdx, &Mesh.MeshNameLength, sizeof(u8));
+            IOFileRead(FileIdx, Mesh.MeshName, Mesh.MeshNameLength);
             
-            u8 MeshParamsLength;
-            IOFileRead(FileIdx, &MeshParamsLength, sizeof(u8));
-            IOFileRead(FileIdx, Mesh.MeshParams, MeshParamsLength);
+            IOFileRead(FileIdx, &Mesh.MeshParamsLength, sizeof(u8));
+            IOFileRead(FileIdx, Mesh.MeshParams, Mesh.MeshParamsLength);
             
             switch(Mesh.MeshType)
             {
