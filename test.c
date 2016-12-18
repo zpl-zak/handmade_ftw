@@ -24,8 +24,8 @@
 #define REUSE_TEST 0
 #define IO_TEST 0
 #define BMP_TEST 0
-#define PAK_TEST 0
-#define _4DS_TEST 1
+#define PAK_TEST 1
+#define _4DS_TEST 0
 
 int
 cmp(const void *a, const void *b)
@@ -200,13 +200,19 @@ main(void)
         s32 PakHandle = IOFileOpenRead("id1/pak0.pak", &PakSize);
         
         hformat_pak *Pak = HFormatLoadPakArchive(PakHandle);
-        IOFileClose(PakHandle);
         hformat_pak_file *Files = Pak->Files;
         
+        ms MedKeySize;
+        s8 *MedKey = HFormatLoadPakFile("sound/misc/medkey.wav", Pak, &MedKeySize);
+        s32 MedKeyFile = IOFileOpenWrite("data/medkey.wav");
+        IOFileWrite(MedKeyFile, MedKey, MedKeySize);
+        IOFileClose(MedKeyFile);
+        PlatformMemFree(MedKey);
         
         s32 NumPackFiles = Pak->FileCount;
         fprintf(stdout, "Number of files in PAK: %d\n", NumPackFiles);
         Pak = HFormatReleasePakArchive(Pak);
+        IOFileClose(PakHandle);
     }
     #endif
     

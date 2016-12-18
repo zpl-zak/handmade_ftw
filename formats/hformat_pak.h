@@ -27,6 +27,7 @@ typedef struct
     hformat_pak_header Header;
      hformat_pak_file *Files;
     s32 FileCount;
+    s32 PakHandle;
 } hformat_pak;
 
 internal hformat_pak *
@@ -51,12 +52,42 @@ HFormatLoadPakArchive(s32 HandleIdx)
         
         IOFileRead(HandleIdx, Pak->Files, Pak->Header.DirectoryLength);
     }
+    Pak->PakHandle = HandleIdx;
     return(Pak);
+}
+
+internal s8 *
+HFormatLoadPakFile(s8 *FileName, hformat_pak *Pak, ms *Size)
+{
+    for(mi Idx = 0;
+        Idx < Pak->FileCount;
+        Idx++)
+    {
+        if(StringsAreEqual((s8 *)Pak->Files[Idx].FileName, FileName))
+        {
+            IOFileSeek(Pak->PakHandle, Pak->Files[Idx].FilePosition, 0);
+            
+            s8 *FileData = PlatformMemAlloc(Pak->Files[Idx].FileLength);
+            IOFileRead(Pak->PakHandle, FileData, Pak->Files[Idx].FileLength);
+            
+            if(Size)
+            {
+                *Size = Pak->Files[Idx].FileLength;
+            }
+            return(FileData);
+        }
+    }
+    if(Size)
+    {
+        *Size = 0;
+    }
+    return(0);
 }
 
 internal hformat_pak *
 HFormatReleasePakArchive(hformat_pak *Pak)
 {
+    IOFileClose(Pak->PakHandle);
     PlatformMemFree(Pak->Files);
     PlatformMemFree(Pak);
     Pak = 0;
