@@ -62,7 +62,7 @@ IOFileOpenRead(s8 *Path, // Path to the file.
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
-    FileHandles[HandleIdx] = fopen(Path, "rb");
+    FileHandles[HandleIdx] = fopen((const char *)Path, "rb");
     
     if(!FileHandles[HandleIdx])
     {
@@ -91,7 +91,7 @@ IOFileOpenWrite(s8 *Path) // Path to the file.
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
-    FileHandles[HandleIdx] = fopen(Path, "wb");
+    FileHandles[HandleIdx] = fopen((const char *)Path, "wb");
     
     if(!FileHandles[HandleIdx])
     {

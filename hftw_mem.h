@@ -421,7 +421,7 @@ ArenaExpand(memory_arena *Arena, // Our arena.
     {
         if(Arena->Flags & ArenaFlag_AllowRealloc)
         {
-            Arena->Base = PlatformMemRealloc(Arena->Base, Arena->Size + Size);
+            Arena->Base = (u8 *)PlatformMemRealloc(Arena->Base, Arena->Size + Size);
             Arena->Size += Size;
             Arena->WasExpanded = 1;
             Assert((Arena->Used + Size) <= Arena->Size);
@@ -690,7 +690,7 @@ memory_arena * Arena, // Arena to be serialized.
 {
     Assert(!Arena->TempCount);
     size_t AllocSize = Arena->Used + sizeof(mi)*2 + sizeof(u8) + sizeof(s32) + sizeof(arena_header)*Arena->NodeCount;
-    u8 * Result = PlatformMemAlloc(AllocSize);
+    u8 * Result = (u8 *)PlatformMemAlloc(AllocSize);
     u8 * Ptr = Result;
     
     // NOTE(zaklaus): size, used, flags, content
@@ -735,7 +735,7 @@ u8 * Data)            // Source of our serialized data.
     Arena->Used = *(mi *)Data; Data += sizeof(mi);
     Arena->Flags = *(u8 *)Data; Data += sizeof(u8);
     Arena->NodeCount = Arena->TempCount = 0;
-    Arena->Base = PlatformMemAlloc(Arena->Size);
+    Arena->Base = (u8 *)PlatformMemAlloc(Arena->Size);
     Copy(Arena->Used, Data, Arena->Base);
     Data += Arena->Used;
     
@@ -783,7 +783,7 @@ memory_arena * B) // Arena to duplicate to.
     B->Flags = A->Flags;
     B->NodeCount = A->NodeCount;
     B->WasExpanded = A->WasExpanded;
-    B->Base = PlatformMemAlloc(B->Size);
+    B->Base = (u8 *)PlatformMemAlloc(B->Size);
     Copy(B->Used, A->Base, B->Base);
     
     if(!(B->Flags & ArenaFlag_DisallowHeaders))

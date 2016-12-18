@@ -262,10 +262,6 @@ internal u32 GetThreadID(void)
 #else
 #endif
 
-#ifdef __cplusplus
-}
-#endif
-
 #define HANDMADEMATH_STATIC
 #define HANDMADE_MATH_IMPLEMENTATION
 
@@ -280,6 +276,10 @@ internal u32 GetThreadID(void)
 #include "hftw_simd.h"
 #include "hftw_string.h"
 #include "hftw_io.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #define HFTW_H
 #endif

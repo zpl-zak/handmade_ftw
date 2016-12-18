@@ -240,7 +240,7 @@ string *Str) // Our string.
     memory_arena NewArena;
     
     // NOTE(zaklaus): Build memory arena ourselves
-    u8 *Buffer = PlatformMemAlloc(CSize(u8, Str->Arena.Size));
+    u8 *Buffer = (u8 *)PlatformMemAlloc(CSize(u8, Str->Arena.Size));
     Copy(Str->Length, Str->Arena.Base, Buffer);
     ArenaInitialize(&NewArena, Str->Arena.Size, Buffer);
     NewArena.Flags = ArenaFlag_AllowRealloc;
@@ -259,7 +259,7 @@ StringAppend(string *StrA, // Our string.
              string *StrB) // Our string.
 )
 {
-     char *Dest = ArenaPushSize_(&(StrA->Arena), StrB->Length, ArenaNoClear());
+    char *Dest = (char *)ArenaPushSize_(&(StrA->Arena), StrB->Length, ArenaNoClear());
     Copy(1, StringGetRaw(StrB), Dest);
     
     StrA->Length += StrB->Length;

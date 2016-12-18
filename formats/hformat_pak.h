@@ -33,11 +33,11 @@ typedef struct
 internal hformat_pak *
 HFormatLoadPakArchive(s32 HandleIdx)
 {
-    hformat_pak *Pak = PlatformMemAlloc(sizeof(hformat_pak));
+    hformat_pak *Pak = (hformat_pak *)PlatformMemAlloc(sizeof(hformat_pak));
     {
         IOFileRead(HandleIdx, &Pak->Header, sizeof(hformat_pak_header));
         
-        if(!StringsAreEqualA(4, (s8 *)Pak->Header.Signature, "PACK"))
+        if(!StringsAreEqualA(4, (char *)Pak->Header.Signature, "PACK"))
         {
             fprintf(stderr, "Not a valid PAK format!\n");
             PlatformMemFree(Pak);
@@ -46,7 +46,7 @@ HFormatLoadPakArchive(s32 HandleIdx)
         
         Pak->FileCount = Pak->Header.DirectoryLength / sizeof(hformat_pak_file);
         
-        Pak->Files = PlatformMemAlloc(sizeof(hformat_pak_file)*Pak->FileCount);
+        Pak->Files = (hformat_pak_file *)PlatformMemAlloc(sizeof(hformat_pak_file)*Pak->FileCount);
         
         IOFileSeek(HandleIdx, Pak->Header.DirectoryOffset, SeekOrigin_Set);
         
@@ -63,11 +63,11 @@ HFormatLoadPakFile(s8 *FileName, hformat_pak *Pak, ms *Size)
         Idx < Pak->FileCount;
         Idx++)
     {
-        if(StringsAreEqual((s8 *)Pak->Files[Idx].FileName, FileName))
+        if(StringsAreEqual((char *)Pak->Files[Idx].FileName, (char *)FileName))
         {
-            IOFileSeek(Pak->PakHandle, Pak->Files[Idx].FilePosition, 0);
+            IOFileSeek(Pak->PakHandle, Pak->Files[Idx].FilePosition, (seek_origin)0);
             
-            s8 *FileData = PlatformMemAlloc(Pak->Files[Idx].FileLength);
+            s8 *FileData = (s8 *)PlatformMemAlloc(Pak->Files[Idx].FileLength);
             IOFileRead(Pak->PakHandle, FileData, Pak->Files[Idx].FileLength);
             
             if(Size)

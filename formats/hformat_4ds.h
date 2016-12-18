@@ -172,7 +172,7 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
 {
     IOFileRead(FileIdx, &Model->MaterialCount, sizeof(u16));
     
-    Model->Materials = PlatformMemAlloc(sizeof(hformat_4ds_material)*Model->MaterialCount);
+    Model->Materials = (hformat_4ds_material *) PlatformMemAlloc(sizeof(hformat_4ds_material)*Model->MaterialCount);
     
     for(mi Idx = 0;
         Idx < Model->MaterialCount;
@@ -232,13 +232,13 @@ HFormat4DSLoadLOD(s32 FileIdx)
     IOFileRead(FileIdx, &Lod.RelativeDistance, sizeof(r32));
     IOFileRead(FileIdx, &Lod.VertexCount, sizeof(u16));
     
-    Lod.Vertices = PlatformMemAlloc(sizeof(hformat_4ds_vertex)*Lod.VertexCount);
+    Lod.Vertices = (hformat_4ds_vertex *) PlatformMemAlloc(sizeof(hformat_4ds_vertex)*Lod.VertexCount);
     
     IOFileRead(FileIdx, Lod.Vertices, sizeof(hformat_4ds_vertex)*Lod.VertexCount);
     
     IOFileRead(FileIdx, &Lod.FaceGroupCount, sizeof(u8));
     
-    Lod.FaceGroups = PlatformMemAlloc(sizeof(hformat_4ds_facegroup)*Lod.FaceGroupCount);
+    Lod.FaceGroups = (hformat_4ds_facegroup *)PlatformMemAlloc(sizeof(hformat_4ds_facegroup)*Lod.FaceGroupCount);
     
     for(mi Idx = 0;
         Idx < Lod.FaceGroupCount;
@@ -248,7 +248,7 @@ HFormat4DSLoadLOD(s32 FileIdx)
         {
             IOFileRead(FileIdx, &FaceGroup.FaceCount, sizeof(u16));
             
-            FaceGroup.Faces = PlatformMemAlloc(sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
+            FaceGroup.Faces = (hformat_4ds_face *)PlatformMemAlloc(sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
             
             IOFileRead(FileIdx, FaceGroup.Faces, sizeof(hformat_4ds_face)*FaceGroup.FaceCount);
             
@@ -270,7 +270,7 @@ HFormatLoad4DSStandard(s32 FileIdx)
     {
         IOFileRead(FileIdx, &Geo.LODLevel, sizeof(u8));
         
-        Geo.LODs = PlatformMemAlloc(sizeof(hformat_4ds_lod)*Geo.LODLevel);
+        Geo.LODs = (hformat_4ds_lod *)PlatformMemAlloc(sizeof(hformat_4ds_lod)*Geo.LODLevel);
         
         for(mi Idx = 0;
             Idx < Geo.LODLevel;
@@ -289,7 +289,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
     IOFileRead(FileIdx, &Model->MeshCount, sizeof(u16));
     
-    Model->Meshes = PlatformMemAlloc(sizeof(hformat_4ds_mesh)*Model->MeshCount);
+    Model->Meshes = (hformat_4ds_mesh *)PlatformMemAlloc(sizeof(hformat_4ds_mesh)*Model->MeshCount);
     
     for(mi Idx = 0;
         Idx < Model->MeshCount;
@@ -368,7 +368,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 internal hformat_4ds_header *
 HFormatLoad4DSModel(s32 FileIdx)
 {
-    hformat_4ds_header *Model = PlatformMemAlloc(sizeof(hformat_4ds_header));
+    hformat_4ds_header *Model = (hformat_4ds_header *)PlatformMemAlloc(sizeof(hformat_4ds_header));
     {
         IOFileRead(FileIdx, &Model->Signature, 4);
         

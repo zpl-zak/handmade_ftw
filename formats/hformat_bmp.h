@@ -45,7 +45,7 @@ typedef struct
 internal hformat_bmp *
 HFormatLoadBMPImage(s32 HandleIdx)
 {
-    hformat_bmp *Image = PlatformMemAlloc(sizeof(hformat_bmp));
+    hformat_bmp *Image = (hformat_bmp *)PlatformMemAlloc(sizeof(hformat_bmp));
     {
         s32 ImageIdx = 0;
         u8 _Swap0 = 0;
@@ -63,7 +63,7 @@ HFormatLoadBMPImage(s32 HandleIdx)
         
         IOFileSeek(HandleIdx, Image->Header.DataOffset, SeekOrigin_Set);
         
-        Image->Data = PlatformMemAlloc(Image->Info.ImageSize);
+        Image->Data = (u8 *)PlatformMemAlloc(Image->Info.ImageSize);
         
         IOFileRead(HandleIdx, Image->Data, Image->Info.ImageSize);
         
