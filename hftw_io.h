@@ -171,7 +171,7 @@ IOFileWrite(s32 HandleIdx, // The ID of the file handle.
     return(BytesWritten);
 }
 
-
+#define IOConsolePrint(out, format, ...) fprintf(out, format, __VA_ARGS__)
 
 #define HFTW_IO_H
 #endif

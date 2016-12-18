@@ -94,5 +94,13 @@ HFormatReleasePakArchive(hformat_pak *Pak)
     return(Pak);
 }
 
+internal s8 *
+HFormatReleasePakFile(s8 *File)
+{
+    PlatformMemFree(File);
+    File = 0;
+    return(File);
+}
+
 #define HFORMAT_PAK_H
 #endif

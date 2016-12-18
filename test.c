@@ -26,8 +26,8 @@
 #define IO_TEST 0
 
 #define BMP_TEST 0
-#define PAK_TEST 0
-#define _4DS_TEST 1
+#define PAK_TEST 1
+#define _4DS_TEST 0
 #define WAD_TEST 0
 
 int
@@ -55,11 +55,9 @@ main(void)
     }
     #endif
     
-    
     #if ECS_TEST
     {
         #define ENTITY_COUNT 5
-        
         entity Entities[ENTITY_COUNT] = {0};
         
         for(mi Idx = 0;
@@ -92,6 +90,7 @@ main(void)
                 fprintf(stdout, "END OF ENTITY\n\n");
             }
         }
+        #undef ENTITY_COUNT
     }
     #endif
     
@@ -200,7 +199,7 @@ main(void)
     #if PAK_TEST // NOTE(zaklaus): You need to provide Quake data yourself. All you need is ID1 folder from Quake 1 game.
     {
          ms PakSize;
-        s32 PakHandle = IOFileOpenRead("id1/pak0.pak", &PakSize);
+        s32 PakHandle = IOFileOpenRead("data/id1/pak0.pak", &PakSize);
         
         hformat_pak *Pak = HFormatLoadPakArchive(PakHandle);
         hformat_pak_file *Files = Pak->Files;
@@ -210,7 +209,7 @@ main(void)
         s32 GFXFile = IOFileOpenWrite("data/gfx.wad");
         IOFileWrite(GFXFile, GFX, GFXSize);
         IOFileClose(GFXFile);
-        PlatformMemFree(GFX);
+        GFX = HFormatReleasePakFile(GFX);
         
         s32 NumPackFiles = Pak->FileCount;
         fprintf(stdout, "Number of files in PAK: %d\n", NumPackFiles);
