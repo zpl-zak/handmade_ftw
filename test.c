@@ -24,8 +24,8 @@
 #define REUSE_TEST 0
 #define IO_TEST 0
 #define BMP_TEST 0
-#define PAK_TEST 1
-#define _4DS_TEST 0
+#define PAK_TEST 0
+#define _4DS_TEST 1
 
 int
 cmp(const void *a, const void *b)

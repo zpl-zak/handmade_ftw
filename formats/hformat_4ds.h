@@ -133,6 +133,33 @@ typedef struct
 
 typedef struct
 {
+    r32 Position;
+    u16 MaterialID;
+} hformat_4ds_glowdata;
+
+#pragma pack(push, 1)
+typedef struct
+{
+    u8 GlowCount;
+    hformat_4ds_glowdata *GlowData;
+} hformat_4ds_glow;
+#pragma pack(pop)
+
+typedef struct
+{
+    v3 MinBox, MaxBox;
+    r32 _Ignored[4];
+    mat4 ReflectionMatrix;
+    v3 BackgroundColor;
+    r32 ViewDistance;
+    u32 VertexCount;
+    u32 FaceCount;
+    v3 *Vertices;
+    hformat_4ds_face *Faces;
+} hformat_4ds_mirror;
+
+typedef struct
+{
     u8 MeshType;
     
     // NOTE(zaklaus): Standard mesh type
@@ -152,6 +179,8 @@ typedef struct
     
     hformat_4ds_standard Standard;
     hformat_4ds_dummy Dummy;
+    hformat_4ds_mirror Mirror;
+    hformat_4ds_glow Glow;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -284,6 +313,51 @@ HFormatLoad4DSStandard(s32 FileIdx)
     return(Geo);
 }
 
+
+internal hformat_4ds_mirror
+HFormatLoad4DSMirror(s32 FileIdx)
+{
+    hformat_4ds_mirror Mirror = {0};
+    IOFileRead(FileIdx, &Mirror.MinBox, sizeof(v3));
+    IOFileRead(FileIdx, &Mirror.MaxBox, sizeof(v3));
+    IOFileRead(FileIdx, Mirror._Ignored, sizeof(r32)*4);
+    IOFileRead(FileIdx, &Mirror.ReflectionMatrix, sizeof(mat4));
+    IOFileRead(FileIdx, &Mirror.BackgroundColor, sizeof(v3));
+    IOFileRead(FileIdx, &Mirror.ViewDistance, sizeof(r32));
+    
+    IOFileRead(FileIdx, &Mirror.VertexCount, sizeof(u32));
+    IOFileRead(FileIdx, &Mirror.FaceCount, sizeof(u32));
+    
+    Mirror.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Mirror.VertexCount);
+    Mirror.Faces = (hformat_4ds_face *)PlatformMemAlloc(sizeof(hformat_4ds_face)*Mirror.FaceCount);
+    
+    IOFileRead(FileIdx, Mirror.Vertices, sizeof(v3)*Mirror.VertexCount);
+    IOFileRead(FileIdx, Mirror.Faces, sizeof(hformat_4ds_face)*Mirror.FaceCount);
+    
+    return(Mirror);
+}
+
+internal hformat_4ds_glow
+HFormatLoad4DSGlow(s32 FileIdx)
+{
+    hformat_4ds_glow Glow = {0};
+    IOFileRead(FileIdx, &Glow.GlowCount, sizeof(u8));
+    
+    Glow.GlowData = (hformat_4ds_glowdata *)PlatformMemAlloc(sizeof(hformat_4ds_glowdata)*Glow.GlowCount);
+    
+    for(mi Idx = 0;
+        Idx < Glow.GlowCount;
+        Idx++)
+    {
+        hformat_4ds_glowdata GlowData = {0};
+        IOFileRead(FileIdx, &GlowData.Position, sizeof(r32));
+        IOFileRead(FileIdx, &GlowData.MaterialID, sizeof(u16));
+        Glow.GlowData[Idx] = GlowData;
+    }
+    
+    return(Glow);
+}
+
 internal void
 HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
@@ -336,15 +410,33 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
             {
                 case HFormatMeshType_Standard:
                 {
-                    if(!Mesh.VisualMeshType)
+                    switch(Mesh.VisualMeshType)
                     {
-                        hformat_4ds_standard Standard = {0};
-                        Standard = HFormatLoad4DSStandard(FileIdx);
-                        Mesh.Standard = Standard;
-                    }
-                    else
-                    {
-                        fprintf(stderr, "Not Implemented [VisualMeshType]: %d\n", Mesh.VisualMeshType);
+                        case HFormatVisualMeshType_Standard:
+                        {
+                            hformat_4ds_standard Standard = {0};
+                            Standard = HFormatLoad4DSStandard(FileIdx);
+                            Mesh.Standard = Standard;
+                        }break;
+                        
+                        case HFormatVisualMeshType_Mirror:
+                        {
+                            hformat_4ds_mirror Mirror = {0};
+                            Mirror = HFormatLoad4DSMirror(FileIdx);
+                            Mesh.Mirror = Mirror;
+                        }break;
+                        
+                        case HFormatVisualMeshType_Glow:
+                        {
+                            hformat_4ds_glow Glow = {0};
+                            Glow = HFormatLoad4DSGlow(FileIdx);
+                            Mesh.Glow = Glow;
+                        }break;
+                        
+                        default:
+                        {
+                            fprintf(stderr, "Not Implemented [VisualMeshType]: %d\n", Mesh.VisualMeshType);
+                        }break;
                     }
                 }break;
                 
