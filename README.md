@@ -82,14 +82,20 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>Image Format</td>
 				<td>N/A</td>
 			</tr>
+			
+			<tr>
+				<td>hformat_pak.h</td>
+				<td>PAK</td>
+				<td>Archive Format</td>
+				<td>Quake series</td>
+			</tr>
 		</table>
 	</ul>
 </p>
-
 # Copyright
 ```
 Unless otherwise indicated, all content on this repository 
-is copyrighted by Dominik *ZaKlaus* Madarász. 
+is copyrighted by Dominik *ZaKlaus* Madar??sz. 
 All rights reserved. No part of the content, either text or binary data 
 may be used for any purpose other than personal use. 
 Therefore, reproduction, modification, storage in a retrieval system or retransmission, 

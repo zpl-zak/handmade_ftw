@@ -372,7 +372,7 @@ HFormatLoad4DSModel(s32 FileIdx)
     {
         IOFileRead(FileIdx, &Model->Signature, 4);
         
-        if(!StringsAreEqual("4DS", (char *)Model->Signature))
+        if(!StringsAreEqualA(3, "4DS", (char *)Model->Signature))
         {
             PlatformMemFree(Model);
             return(0);

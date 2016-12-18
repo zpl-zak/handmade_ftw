@@ -2,10 +2,9 @@
 
 #if !defined(HFTW_MEM_H)
 
-doc_cat(Memory Arena)
-
 //doc(arena_header)
 //doc_string(Describes arena elements.)
+doc_cat(Memory Arena)
 doc_sig(
 typedef struct
 {

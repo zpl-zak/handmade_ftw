@@ -16,7 +16,7 @@ typedef enum
 } seek_origin;
 )
 
-#define MAX_HANDLES 32
+#define MAX_HANDLES 128
 global_variable FILE *FileHandles[MAX_HANDLES] = {0};
 
 internal s32
@@ -57,7 +57,7 @@ IOFileLength(FILE *File)
 doc_sig(
 internal s32
 IOFileOpenRead(s8 *Path, // Path to the file.
-               ms *Size) // [OUT] File size. (if Size is not NULL)
+               ms *Size) // [OUT][OPT] File size
 )
 {
     s32 HandleIdx = IOFindHandle();
@@ -123,10 +123,15 @@ doc_sig(
 internal void
 IOFileSeek(s32 HandleIdx,      // The ID of the file handle.
            s32 Position,       // The offset to travel.
-           seek_origin Origin) // Specifies the origin from where to travel.
+           seek_origin Origin) // [OPT] Specifies the origin from where to travel.
 )
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
+    
+    if(!Origin)
+    {
+        Origin = SeekOrigin_Set;
+    }
     
     if(FileHandles[HandleIdx])
     {
