@@ -92,10 +92,10 @@ typedef struct
     
     // NOTE(zaklaus): Anim map
     u32 AnimSequenceLength;
-    u16 _Ignored0;
+    u16 _Unk0;
     u32 FramePeriod;
-    u32 _Ignored1;
-    u32 _Ignored2;
+    u32 _Unk1;
+    u32 _Unk2;
     
 } hformat_4ds_material;
 
@@ -139,18 +139,33 @@ typedef struct
 
 typedef struct
 {
+    u16 _Unk0;
+    u8 TargetCount;
+    u16 *Targets;
+} hformat_4ds_target;
+
+#pragma pack(push, 1)
+typedef struct
+{
+    m4 Transform;
+    u32 BoneID;
+} hformat_4ds_bone;
+#pragma pack(pop)
+
+typedef struct
+{
     u8 VertexCount;
-    u32 _Ignored0; // NOTE(zaklaus): Always 4.
-    v3 _Ignored1;
-    v3 _Ignored2;
+    u32 _Unk0; // NOTE(zaklaus): Always 4.
+    v3 _Unk1;
+    v3 _Unk2;
     v3 *Vertices;
     
 } hformat_4ds_portal;
 
 typedef struct
 {
-    u32 _Ignored0; // NOTE(zaklaus): Always 2049.
-    u32 _Ignored1; // NOTE(zaklaus): Always 0.
+    u32 _Unk0; // NOTE(zaklaus): Always 2049.
+    u32 _Unk1; // NOTE(zaklaus): Always 0.
     u32 VertexCount;
     u32 FaceCount;
     v3 *Vertices;
@@ -191,7 +206,7 @@ typedef struct
 typedef struct
 {
     v3 MinBox, MaxBox;
-    r32 _Ignored[4];
+    r32 _Unk[4];
     mat4 ReflectionMatrix;
     v3 BackgroundColor;
     r32 ViewDistance;
@@ -228,6 +243,8 @@ typedef struct
     hformat_4ds_glow Glow;
     hformat_4ds_billboard Billboard;
     hformat_4ds_sector Sector;
+    hformat_4ds_target Target;
+    hformat_4ds_bone Bone;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -285,10 +302,10 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
             {
                 
                 IOFileRead(FileIdx, &Mat.AnimSequenceLength, sizeof(u32));
-                IOFileRead(FileIdx, &Mat._Ignored0, sizeof(u16));
+                IOFileRead(FileIdx, &Mat._Unk0, sizeof(u16));
                 IOFileRead(FileIdx, &Mat.FramePeriod, sizeof(u32));
-                IOFileRead(FileIdx, &Mat._Ignored1, sizeof(u32));
-                IOFileRead(FileIdx, &Mat._Ignored2, sizeof(u32));
+                IOFileRead(FileIdx, &Mat._Unk1, sizeof(u32));
+                IOFileRead(FileIdx, &Mat._Unk2, sizeof(u32));
                 
             }
             
@@ -364,7 +381,7 @@ HFormatLoad4DSMirror(s32 FileIdx)
     hformat_4ds_mirror Mirror = {0};
     IOFileRead(FileIdx, &Mirror.MinBox, sizeof(v3));
     IOFileRead(FileIdx, &Mirror.MaxBox, sizeof(v3));
-    IOFileRead(FileIdx, Mirror._Ignored, sizeof(r32)*4);
+    IOFileRead(FileIdx, Mirror._Unk, sizeof(r32)*4);
     IOFileRead(FileIdx, &Mirror.ReflectionMatrix, sizeof(mat4));
     IOFileRead(FileIdx, &Mirror.BackgroundColor, sizeof(v3));
     IOFileRead(FileIdx, &Mirror.ViewDistance, sizeof(r32));
@@ -408,9 +425,9 @@ HFormatLoad4DSPortal(s32 FileIdx)
     hformat_4ds_portal Portal = {0};
     
     IOFileRead(FileIdx, &Portal.VertexCount, sizeof(u8));
-    IOFileRead(FileIdx, &Portal._Ignored0, sizeof(u32));
-    IOFileRead(FileIdx, &Portal._Ignored1, sizeof(v3));
-    IOFileRead(FileIdx, &Portal._Ignored2, sizeof(v3));
+    IOFileRead(FileIdx, &Portal._Unk0, sizeof(u32));
+    IOFileRead(FileIdx, &Portal._Unk1, sizeof(v3));
+    IOFileRead(FileIdx, &Portal._Unk2, sizeof(v3));
     
     Portal.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Portal.VertexCount);
     IOFileRead(FileIdx, Portal.Vertices, sizeof(v3)*Portal.VertexCount);
@@ -422,8 +439,8 @@ internal hformat_4ds_sector
 HFormatLoad4DSSector(s32 FileIdx)
 {
     hformat_4ds_sector Sector = {0};
-    IOFileRead(FileIdx, &Sector._Ignored0, sizeof(u32));
-    IOFileRead(FileIdx, &Sector._Ignored1, sizeof(u32));
+    IOFileRead(FileIdx, &Sector._Unk0, sizeof(u32));
+    IOFileRead(FileIdx, &Sector._Unk1, sizeof(u32));
     IOFileRead(FileIdx, &Sector.VertexCount, sizeof(u32));
     IOFileRead(FileIdx, &Sector.FaceCount, sizeof(u32));
     
@@ -450,6 +467,19 @@ HFormatLoad4DSSector(s32 FileIdx)
     }
     
     return(Sector);
+}
+
+internal hformat_4ds_target
+HFormatLoad4DSTarget(s32 FileIdx)
+{
+    hformat_4ds_target Target = {0};
+    IOFileRead(FileIdx, &Target._Unk0, sizeof(u16));
+    IOFileRead(FileIdx, &Target.TargetCount, sizeof(u8));
+    
+    Target.Targets = (u16 *)PlatformMemAlloc(sizeof(u16)*Target.TargetCount);
+    IOFileRead(FileIdx, Target.Targets, sizeof(u16)*Target.TargetCount);
+    
+    return(Target);
 }
 
 internal void
@@ -553,6 +583,20 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                     hformat_4ds_sector Sector = {0};
                     Sector = HFormatLoad4DSSector(FileIdx);
                     Mesh.Sector = Sector;
+                }break;
+                
+                case HFormatMeshType_Target:
+                {
+                    hformat_4ds_target Target = {0};
+                    Target = HFormatLoad4DSTarget(FileIdx);
+                    Mesh.Target = Target;
+                }break;
+                
+                case HFormatMeshType_Bone:
+                {
+                    hformat_4ds_bone Bone = {0};
+                    IOFileRead(FileIdx, &Bone, sizeof(hformat_4ds_bone));
+                    Mesh.Bone = Bone;
                 }break;
                 
                 default:
