@@ -59,6 +59,15 @@ enum
     HFormatMeshRenderFlag_ForbidFog = 0x008
 };
 
+enum
+{
+    HFormatMeshOccludingFlag_Normal = 0x09,
+    HFormatMeshOccludingFlag_Sector = 0x7D,
+    HFormatMeshOccludingFlag_Wall = 0x3D, // NOTE(zaklaus): Mesh in sector (walls).
+    HFormatMeshOccludingFlag_Portal = 0x1D,   // NOTE(zaklaus): Mesh in portal.
+    HFormatMeshOccludingFlag_Inactive = 0x11
+};
+
 typedef struct
 {
     u32 Flags;
@@ -130,6 +139,30 @@ typedef struct
 
 typedef struct
 {
+    u8 VertexCount;
+    u32 _Ignored0; // NOTE(zaklaus): Always 4.
+    v3 _Ignored1;
+    v3 _Ignored2;
+    v3 *Vertices;
+    
+} hformat_4ds_portal;
+
+typedef struct
+{
+    u32 _Ignored0; // NOTE(zaklaus): Always 2049.
+    u32 _Ignored1; // NOTE(zaklaus): Always 0.
+    u32 VertexCount;
+    u32 FaceCount;
+    v3 *Vertices;
+    hformat_4ds_face *Faces;
+    v3 MinBox, MaxBox;
+    u8 PortalCount;
+    hformat_4ds_portal *Portals;
+    
+} hformat_4ds_sector;
+
+typedef struct
+{
     hformat_4ds_standard Standard;
     u32 RotationAxis;
     u8 IgnoreCamera;
@@ -194,6 +227,7 @@ typedef struct
     hformat_4ds_mirror Mirror;
     hformat_4ds_glow Glow;
     hformat_4ds_billboard Billboard;
+    hformat_4ds_sector Sector;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -368,6 +402,56 @@ HFormatLoad4DSGlow(s32 FileIdx)
     return(Glow);
 }
 
+internal hformat_4ds_portal
+HFormatLoad4DSPortal(s32 FileIdx)
+{
+    hformat_4ds_portal Portal = {0};
+    
+    IOFileRead(FileIdx, &Portal.VertexCount, sizeof(u8));
+    IOFileRead(FileIdx, &Portal._Ignored0, sizeof(u32));
+    IOFileRead(FileIdx, &Portal._Ignored1, sizeof(v3));
+    IOFileRead(FileIdx, &Portal._Ignored2, sizeof(v3));
+    
+    Portal.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Portal.VertexCount);
+    IOFileRead(FileIdx, Portal.Vertices, sizeof(v3)*Portal.VertexCount);
+    
+    return(Portal);
+}
+
+internal hformat_4ds_sector
+HFormatLoad4DSSector(s32 FileIdx)
+{
+    hformat_4ds_sector Sector = {0};
+    IOFileRead(FileIdx, &Sector._Ignored0, sizeof(u32));
+    IOFileRead(FileIdx, &Sector._Ignored1, sizeof(u32));
+    IOFileRead(FileIdx, &Sector.VertexCount, sizeof(u32));
+    IOFileRead(FileIdx, &Sector.FaceCount, sizeof(u32));
+    
+    Sector.Vertices = (v3 *)PlatformMemAlloc(Sector.VertexCount);
+    IOFileRead(FileIdx, Sector.Vertices, sizeof(v3));
+    
+    Sector.Faces = (hformat_4ds_face *)PlatformMemAlloc(Sector.FaceCount);
+    IOFileRead(FileIdx, Sector.Faces, sizeof(hformat_4ds_face));
+    
+    IOFileRead(FileIdx, &Sector.MinBox, sizeof(v3));
+    IOFileRead(FileIdx, &Sector.MaxBox, sizeof(v3));
+    
+    IOFileRead(FileIdx, &Sector.PortalCount, sizeof(u8));
+    
+    Sector.Portals = (hformat_4ds_portal *)PlatformMemAlloc(sizeof(hformat_4ds_portal)*Sector.PortalCount);
+    
+    for(mi Idx = 0;
+        Idx < Sector.PortalCount;
+        Idx++)
+    {
+        hformat_4ds_portal Portal = {0};
+        Portal = HFormatLoad4DSPortal(FileIdx);
+        Sector.Portals[Idx] = Portal;
+    }
+    
+    return(Sector);
+}
+
 internal void
 HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
@@ -462,6 +546,13 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                     hformat_4ds_dummy Dummy = {0};
                     IOFileRead(FileIdx, &Dummy, sizeof(hformat_4ds_dummy));
                     Mesh.Dummy = Dummy;
+                }break;
+                
+                case HFormatMeshType_Sector:
+                {
+                    hformat_4ds_sector Sector = {0};
+                    Sector = HFormatLoad4DSSector(FileIdx);
+                    Mesh.Sector = Sector;
                 }break;
                 
                 default:

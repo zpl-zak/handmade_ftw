@@ -26,8 +26,8 @@
 #define IO_TEST 0
 
 #define BMP_TEST 0
-#define PAK_TEST 1
-#define _4DS_TEST 0
+#define PAK_TEST 0
+#define _4DS_TEST 1
 #define WAD_TEST 0
 
 int
