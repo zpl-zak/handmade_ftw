@@ -324,6 +324,7 @@ typedef struct
     
     u16 MeshCount;
     hformat_4ds_mesh *Meshes;
+    u8 Use5DS;
 } hformat_4ds_header;
 
 internal void
@@ -843,6 +844,7 @@ HFormatLoad4DSModel(s32 FileIdx)
         
         HFormatLoad4DSMaterial(Model, FileIdx);
         HFormatLoad4DSMesh(Model, FileIdx);
+        IOFileRead(FileIdx, &Model->Use5DS, sizeof(u8));
     }
     return(Model);
 }
