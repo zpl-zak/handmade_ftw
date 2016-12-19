@@ -2,6 +2,15 @@
 
 #if !defined(HFTW_PLATFORM_H)
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#pragma comment(lib,"user32.lib") 
+#pragma comment(lib,"gdi32.lib") 
+#include "platform/win_time.h"
+#include "platform/win_window.h"
+#endif
+
 // NOTE(zaklaus): Lazy solution for MM.
 // TODO(zaklaus): Make it NOT LAZY : Implement OS-specific routines!!!
 #ifdef PLATFORM_ALLOC

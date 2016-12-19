@@ -1,8 +1,3 @@
-// (c) 2016 ZaKlaus; All Rights Reserved
-
-#define HANDMADE_SLOW
-
-#include "hftw.h"
 #include <stdio.h>
 
 #include "tests/monster.h"
@@ -42,12 +37,9 @@ typedef struct
     u8 Height;
 } some_data;
 
+/// in main()
 
-
-int
-main(void)
-{
-    #if STRING_TEST
+#if STRING_TEST
     {
         string hashTest = StringCreate(literal("hello"));
         s32 hash = hash_lit("hello");
@@ -273,5 +265,3 @@ main(void)
     }
     #endif
     fprintf(stdout, "\n");
-    return(0);
-}

@@ -1,4 +1,4 @@
 @echo off
 
-msvc.bat test.c D
+msvc.bat win32_test.c D
 
