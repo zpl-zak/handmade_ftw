@@ -181,17 +181,21 @@ typedef struct
     u8 IgnoreCamera;
 } hformat_4ds_billboard;
 
+#pragma pack(push, 1)
 typedef struct
 {
     // NOTE(zaklaus): Bounding box
     v3 MinBox, MaxBox;
 } hformat_4ds_dummy;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct
 {
     r32 Position;
     u16 MaterialID;
 } hformat_4ds_glowdata;
+#pragma pack(pop)
 
 #pragma pack(push, 1)
 typedef struct
@@ -237,7 +241,7 @@ typedef struct
     hformat_4ds_standard Standard;
     u8 FrameCount;
     
-    u8 LODLevel; // NOTE(zaklaus): Should equal to Standard.LODLevel.
+    u8 LODLevel; // NOTE(zaklaus): Should be equal to Standard.LODLevel.
     u8 _Unk0;
     hformat_4ds_morph_lod *LODs;
     v3 MinBox, MaxBox;
@@ -488,7 +492,7 @@ HFormatLoad4DSPortal(s32 FileIdx)
     
     IOFileRead(FileIdx, &Portal.VertexCount, sizeof(u8));
     IOFileRead(FileIdx, &Portal._Unk0, sizeof(u32));
-    IOFileRead(FileIdx, &Portal._Unk1, sizeof(r32)*6);
+    IOFileRead(FileIdx, Portal._Unk1, sizeof(r32)*6);
     
     Portal.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Portal.VertexCount);
     IOFileRead(FileIdx, Portal.Vertices, sizeof(v3)*Portal.VertexCount);
@@ -590,7 +594,7 @@ HFormatLoad4DSMorph(s32 FileIdx, b32 IgnoreStandard)
         
         IOFileRead(FileIdx, &Morph.MinBox, sizeof(v3));
         IOFileRead(FileIdx, &Morph.MaxBox, sizeof(v3));
-        IOFileRead(FileIdx, &Morph._Unk1, sizeof(r32)*4);
+        IOFileRead(FileIdx, Morph._Unk1, sizeof(r32)*4);
     }
     return(Morph);
 }
@@ -781,7 +785,8 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                 case HFormat4DSMeshType_Dummy:
                 {
                     hformat_4ds_dummy Dummy = {0};
-                    IOFileRead(FileIdx, &Dummy, sizeof(hformat_4ds_dummy));
+                    IOFileRead(FileIdx, &Dummy.MinBox, sizeof(v3));
+                    IOFileRead(FileIdx, &Dummy.MaxBox, sizeof(v3));
                     Mesh.Dummy = Dummy;
                 }break;
                 
@@ -802,7 +807,8 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                 case HFormat4DSMeshType_Bone:
                 {
                     hformat_4ds_bone Bone = {0};
-                    IOFileRead(FileIdx, &Bone, sizeof(hformat_4ds_bone));
+                    IOFileRead(FileIdx, &Bone.Transform, sizeof(m4));
+                    IOFileRead(FileIdx, &Bone.BoneID, sizeof(u32));
                     Mesh.Bone = Bone;
                 }break;
                 
