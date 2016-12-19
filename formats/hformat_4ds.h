@@ -155,8 +155,7 @@ typedef struct
 {
     u8 VertexCount;
     u32 _Unk0; // NOTE(zaklaus): Always 4.
-    v3 _Unk1;
-    v3 _Unk2;
+    r32 _Unk1[6];
     v3 *Vertices;
     
 } hformat_4ds_portal;
@@ -242,8 +241,7 @@ typedef struct
     u8 _Unk0;
     hformat_4ds_morph_lod *LODs;
     v3 MinBox, MaxBox;
-    v3 _Unk1;
-    r32 _Unk2;
+    r32 _Unk1[4];
     
 } hformat_4ds_morph;
 
@@ -458,8 +456,7 @@ HFormatLoad4DSPortal(s32 FileIdx)
     
     IOFileRead(FileIdx, &Portal.VertexCount, sizeof(u8));
     IOFileRead(FileIdx, &Portal._Unk0, sizeof(u32));
-    IOFileRead(FileIdx, &Portal._Unk1, sizeof(v3));
-    IOFileRead(FileIdx, &Portal._Unk2, sizeof(v3));
+    IOFileRead(FileIdx, &Portal._Unk1, sizeof(r32)*6);
     
     Portal.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Portal.VertexCount);
     IOFileRead(FileIdx, Portal.Vertices, sizeof(v3)*Portal.VertexCount);
@@ -560,8 +557,7 @@ HFormatLoad4DSMorph(s32 FileIdx, b32 IgnoreStandard)
         
         IOFileRead(FileIdx, &Morph.MinBox, sizeof(v3));
         IOFileRead(FileIdx, &Morph.MaxBox, sizeof(v3));
-        IOFileRead(FileIdx, &Morph._Unk1, sizeof(v3));
-        IOFileRead(FileIdx, &Morph._Unk2, sizeof(r32));
+        IOFileRead(FileIdx, &Morph._Unk1, sizeof(r32)*4);
     }
     return(Morph);
 }
