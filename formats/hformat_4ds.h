@@ -98,6 +98,7 @@ typedef struct
     
 } hformat_4ds_material;
 
+#pragma pack(push, 1)
 typedef struct
 {
     v3 Pos;
@@ -109,6 +110,7 @@ typedef struct
 {
     u16 A,B,C;
 } hformat_4ds_face;
+#pragma pack(pop)
 
 typedef struct
 {
@@ -688,7 +690,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
         {
             IOFileRead(FileIdx, &Mesh.MeshType, sizeof(u8));
             
-            if(Mesh.MeshType & HFormat4DSMeshType_Standard)
+            if(Mesh.MeshType == HFormat4DSMeshType_Standard)
             {
                 IOFileRead(FileIdx, &Mesh.VisualMeshType, sizeof(u8));
                 IOFileRead(FileIdx, &Mesh.MeshRenderFlags, sizeof(u16));
