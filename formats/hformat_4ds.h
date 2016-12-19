@@ -271,6 +271,12 @@ typedef struct
 
 typedef struct
 {
+    hformat_4ds_single_mesh SingleMesh;
+    hformat_4ds_morph Morph; // NOTE(zaklaus): Morph without Standard Mesh!
+} hformat_4ds_single_morph;
+
+typedef struct
+{
     u8 MeshType;
     
     // NOTE(zaklaus): Standard mesh type
@@ -300,6 +306,7 @@ typedef struct
     hformat_4ds_bone Bone;
     hformat_4ds_morph Morph;
     hformat_4ds_single_mesh SingleMesh;
+    hformat_4ds_single_morph SingleMorph;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -633,22 +640,31 @@ HFormatLoad4DSSingleMeshLOD(s32 FileIdx)
 internal hformat_4ds_single_mesh
 HFormatLoad4DSSingleMesh(s32 FileIdx)
 {
-    hformat_4ds_single_mesh Mesh = {0};
+    hformat_4ds_single_mesh SingleMesh = {0};
     
-    Mesh.Standard = HFormatLoad4DSStandard(FileIdx);
+    SingleMesh.Standard = HFormatLoad4DSStandard(FileIdx);
     
-    Mesh.LODs = (hformat_4ds_single_mesh_lod *)PlatformMemAlloc(sizeof(hformat_4ds_single_mesh_lod)*Mesh.Standard.LODLevel);
+    SingleMesh.LODs = (hformat_4ds_single_mesh_lod *)PlatformMemAlloc(sizeof(hformat_4ds_single_mesh_lod)*SingleMesh.Standard.LODLevel);
     
     for(mi Idx = 0;
-        Idx < Mesh.Standard.LODLevel;
+        Idx < SingleMesh.Standard.LODLevel;
         Idx++)
     {
         hformat_4ds_single_mesh_lod LOD = {0};
         LOD = HFormatLoad4DSSingleMeshLOD(FileIdx);
-        Mesh.LODs[Idx] = LOD;
+        SingleMesh.LODs[Idx] = LOD;
     }
     
-    return(Mesh);
+    return(SingleMesh);
+}
+
+internal hformat_4ds_single_morph
+HFormatLoad4DSSingleMorph(s32 FileIdx)
+{
+    hformat_4ds_single_morph SingleMorph;
+    SingleMorph.SingleMesh = HFormatLoad4DSSingleMesh(FileIdx);
+    SingleMorph.Morph = HFormatLoad4DSMorph(FileIdx, 1);
+    return(SingleMorph);
 }
 
 internal void
@@ -745,6 +761,13 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                             hformat_4ds_single_mesh SingleMesh = {0};
                             SingleMesh = HFormatLoad4DSSingleMesh(FileIdx);
                             Mesh.SingleMesh = SingleMesh;
+                        }break;
+                        
+                        case HFormat4DSVisualMeshType_SingleMorph:
+                        {
+                            hformat_4ds_single_morph SingleMorph = {0};
+                            SingleMorph = HFormatLoad4DSSingleMorph(FileIdx);
+                            Mesh.SingleMorph = SingleMorph;
                         }break;
                         
                         default:
