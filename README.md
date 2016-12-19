@@ -95,7 +95,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 # Copyright
 ```
 Unless otherwise indicated, all content on this repository 
-is copyrighted by Dominik *ZaKlaus* Madar??sz. 
+is copyrighted by Dominik *ZaKlaus* Madarász. 
 All rights reserved. No part of the content, either text or binary data 
 may be used for any purpose other than personal use. 
 Therefore, reproduction, modification, storage in a retrieval system or retransmission, 
@@ -106,6 +106,4 @@ is strictly prohibited without prior written permission.
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 ```
