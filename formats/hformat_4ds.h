@@ -247,6 +247,30 @@ typedef struct
 
 typedef struct
 {
+    m4 Transform;
+    u32 _Unk0;
+    u32 AdditionalValuesCount;
+    u32 BoneID;
+    v3 MinBox, MaxBox;
+    r32 *AdditionalValues;
+} hformat_4ds_single_mesh_lod_joint;
+
+typedef struct
+{
+    u8 JointCount;
+    u32 _Unk0;
+    v3 MinBox, MaxBox;
+    hformat_4ds_single_mesh_lod_joint *Joints;
+} hformat_4ds_single_mesh_lod;
+
+typedef struct
+{
+    hformat_4ds_standard Standard;
+    hformat_4ds_single_mesh_lod *LODs; // NOTE(zaklaus): LODLevel == Standard.LODLevel.
+} hformat_4ds_single_mesh;
+
+typedef struct
+{
     u8 MeshType;
     
     // NOTE(zaklaus): Standard mesh type
@@ -275,6 +299,7 @@ typedef struct
     hformat_4ds_target Target;
     hformat_4ds_bone Bone;
     hformat_4ds_morph Morph;
+    hformat_4ds_single_mesh SingleMesh;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -562,6 +587,70 @@ HFormatLoad4DSMorph(s32 FileIdx, b32 IgnoreStandard)
     return(Morph);
 }
 
+internal hformat_4ds_single_mesh_lod_joint
+HFormatLoad4DSSingleMeshLODJoint(s32 FileIdx)
+{
+    hformat_4ds_single_mesh_lod_joint Joint = {0};
+    
+    IOFileRead(FileIdx, &Joint.Transform, sizeof(m4));
+    IOFileRead(FileIdx, &Joint._Unk0, sizeof(u32));
+    IOFileRead(FileIdx, &Joint.AdditionalValuesCount, sizeof(u32));
+    IOFileRead(FileIdx, &Joint.BoneID, sizeof(u32));
+    IOFileRead(FileIdx, &Joint.MinBox, sizeof(v3));
+    IOFileRead(FileIdx, &Joint.MaxBox, sizeof(v3));
+    
+    Joint.AdditionalValues = (r32 *)PlatformMemAlloc(sizeof(r32)*Joint.AdditionalValuesCount);
+    
+    IOFileRead(FileIdx, Joint.AdditionalValues, sizeof(r32)*Joint.AdditionalValuesCount);
+    
+    return(Joint);
+}
+
+internal hformat_4ds_single_mesh_lod
+HFormatLoad4DSSingleMeshLOD(s32 FileIdx)
+{
+    hformat_4ds_single_mesh_lod LOD = {0};
+    
+    IOFileRead(FileIdx, &LOD.JointCount, sizeof(u8));
+    IOFileRead(FileIdx, &LOD._Unk0, sizeof(u32));
+    IOFileRead(FileIdx, &LOD.MinBox, sizeof(v3));
+    IOFileRead(FileIdx, &LOD.MaxBox, sizeof(v3));
+    
+    LOD.Joints = (hformat_4ds_single_mesh_lod_joint *)PlatformMemAlloc(sizeof(hformat_4ds_single_mesh_lod_joint)*LOD.JointCount);
+    
+    for(mi Idx = 0;
+        Idx < LOD.JointCount;
+        Idx++)
+    {
+        hformat_4ds_single_mesh_lod_joint Joint = {0};
+        Joint = HFormatLoad4DSSingleMeshLODJoint(FileIdx);
+        LOD.Joints[Idx] = Joint;
+    }
+    
+    return(LOD);
+}
+
+internal hformat_4ds_single_mesh
+HFormatLoad4DSSingleMesh(s32 FileIdx)
+{
+    hformat_4ds_single_mesh Mesh = {0};
+    
+    Mesh.Standard = HFormatLoad4DSStandard(FileIdx);
+    
+    Mesh.LODs = (hformat_4ds_single_mesh_lod *)PlatformMemAlloc(sizeof(hformat_4ds_single_mesh_lod)*Mesh.Standard.LODLevel);
+    
+    for(mi Idx = 0;
+        Idx < Mesh.Standard.LODLevel;
+        Idx++)
+    {
+        hformat_4ds_single_mesh_lod LOD = {0};
+        LOD = HFormatLoad4DSSingleMeshLOD(FileIdx);
+        Mesh.LODs[Idx] = LOD;
+    }
+    
+    return(Mesh);
+}
+
 internal void
 HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
@@ -649,6 +738,13 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                             hformat_4ds_morph Morph = {0};
                             Morph = HFormatLoad4DSMorph(FileIdx, 0);
                             Mesh.Morph = Morph;
+                        }break;
+                        
+                        case HFormat4DSVisualMeshType_SingleMesh:
+                        {
+                            hformat_4ds_single_mesh SingleMesh = {0};
+                            SingleMesh = HFormatLoad4DSSingleMesh(FileIdx);
+                            Mesh.SingleMesh = SingleMesh;
                         }break;
                         
                         default:
