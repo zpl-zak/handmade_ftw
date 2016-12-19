@@ -35,29 +35,29 @@ WinMain(HINSTANCE hInstance,
         int nCmdShow)
 {
     WindowCreateClass(hInstance, &WndProc);
-
-window_dim PosDim = {0};
-window_dim ResDim = {0};
-ResDim.X = 800;
-ResDim.Y = 600;
-
-WindowCreateWindowed("Win32 Test", 0, 0, ResDim, PosDim, CW_USEDEFAULT);
-
-WindowUpdate();
-TimeInit();
-
- IsRunning = 1;
-r64 OldTime = TimeGet();
-
-while(IsRunning)
-{
-    r64 NewTime = TimeGet();
+    
+    window_dim PosDim = {0};
+    window_dim ResDim = {0};
+    ResDim.X = 800;
+    ResDim.Y = 600;
+    
+    WindowCreateWindowed("Win32 Test", 0, 0, ResDim, PosDim, CW_USEDEFAULT);
+    
+    WindowUpdate();
+    TimeInit();
+    
+    IsRunning = 1;
+    r64 OldTime = TimeGet();
+    
+    while(IsRunning)
     {
-        WindowUpdate();
-        Sleep(10);
+        r64 NewTime = TimeGet();
+        {
+            WindowUpdate();
+            Sleep(10);
+        }
+        OldTime = NewTime;
     }
-    OldTime = NewTime;
-}
-
+    
     return(0);
 }
