@@ -27,7 +27,7 @@
 
 #define BMP_TEST 0
 #define PAK_TEST 0
-#define _4DS_TEST 1
+#define _4DS_TEST 0
 #define WAD_TEST 0
 
 int
@@ -110,11 +110,11 @@ main(void)
           u8 * Data = ArenaSerialize(&TestArena, &DataSize);
         Assert(Data);
         printf("Packed size: %d, Arena size: %zd", (int)DataSize, *(mi *)Data);
-        FILE *File = fopen("memdata.dat", "wb");
+        FILE *File = fopen("data\\memdata.dat", "wb");
         fwrite(Data, 1, DataSize, File);
         fclose(File);
         
-        FILE *File2 = fopen("memdata.dat", "rb");
+        FILE *File2 = fopen("data\\memdata.dat", "rb");
         fseek(File2, 0, SEEK_END);
         int fsize = ftell(File2);
         rewind(File2);

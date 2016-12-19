@@ -41,9 +41,9 @@ typedef struct
 doc_sig(
 typedef enum
 {
-    ArenaFlag_AllowRealloc = 0x1,    // Allows re-allocation of the memory, if expansion is required.
-    ArenaFlag_DisallowHeaders = 0x2, // Disallows tracking of elements. Useful if elements are of uniform size. This also disables Arena memory reuse.
-    ArenaFlag_DisallowReuse = 0x3,   // Disallows the ability to reuse freed memory in arena.
+    ArenaFlag_AllowRealloc = (1 << 1),    // Allows re-allocation of the memory, if expansion is required.
+    ArenaFlag_DisallowHeaders = (1 << 2), // Disallows tracking of elements. Useful if elements are of uniform size. This also disables Arena memory reuse.
+    ArenaFlag_DisallowReuse = (1 << 3),   // Disallows the ability to reuse freed memory in arena.
 } arena_flags;
 )
 
@@ -445,7 +445,7 @@ ArenaReuseMem(memory_arena *Arena,
 {
     void *Result = 0;
     *IsReused = 0;
-    if(1)//!(Arena->Flags & ArenaFlag_DisallowReuse))
+    if(!(Arena->Flags & ArenaFlag_DisallowReuse))
         {
             for (Node_arena_header *Node = Arena->Header;
                  Node;
