@@ -571,9 +571,10 @@ HFormatLoad4DSMorph(s32 FileIdx, b32 IgnoreStandard)
             
             IOFileRead(FileIdx, &LOD.VertexCount, sizeof(u16));
             
-            LOD.Vertices = (hformat_4ds_morph_lod_vertex *)PlatformMemAlloc(sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount);
+            LOD.Vertices = (hformat_4ds_morph_lod_vertex *)PlatformMemAlloc(sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount * Morph.FrameCount);
+                
+            IOFileRead(FileIdx, LOD.Vertices, sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount * Morph.FrameCount);
             
-            IOFileRead(FileIdx, LOD.Vertices, sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount);
             
             if(LOD.VertexCount * Morph.FrameCount)
             {
