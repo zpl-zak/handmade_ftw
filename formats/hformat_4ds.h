@@ -7,65 +7,64 @@ SW: Mafia TCOLH
 #if !defined(HFORMAT_4DS_H)
 
 #include "hftw.h"
-#include "stdio.h"
 
 enum
 {
-    HFormatMaterialFlag_TextureDiffuse = 0x0004,
-    HFormatMaterialFlag_Colored = 0x08,
-    HFormatMaterialFlag_MipMapping = 0x008,
-    HFormatMaterialFlag_AnimatedTextureDiffuse = 0x04,
-    HFormatMaterialFlag_AnimatedTextureAlpha = 0x02,
-    HFormatMaterialFlag_DoubleSidedMaterial = 0x1,
-    HFormatMaterialFlag_EnvironmentMap = 0x0008,
-    HFormatMaterialFlag_NormalTextureBlend = 0x000001,
-    HFormatMaterialFlag_MultiplyTextureBlend = 0x000002,
-    HFormatMaterialFlag_AdditiveTextureBlend = 0x000004,
-    HFormatMaterialFlag_CalcReflectTextureY = 0x00001,
-    HFormatMaterialFlag_ProjectReflectTextureY = 0x00002,
-    HFormatMaterialFlag_ProjectReflectTextureZ = 0x00004,
-    HFormatMaterialFlag_AdditionalEffect = 0x00008,
-    HFormatMaterialFlag_AlphaTexture = 0x4,
-    HFormatMaterialFlag_ColorKey = 0x2,
-    HFormatMaterialFlag_AdditiveMixing = 0x8
+    HFormat4DSMaterialFlag_TextureDiffuse = 0x0004,
+    HFormat4DSMaterialFlag_Colored = 0x08,
+    HFormat4DSMaterialFlag_MipMapping = 0x008,
+    HFormat4DSMaterialFlag_AnimatedTextureDiffuse = 0x04,
+    HFormat4DSMaterialFlag_AnimatedTextureAlpha = 0x02,
+    HFormat4DSMaterialFlag_DoubleSidedMaterial = 0x1,
+    HFormat4DSMaterialFlag_EnvironmentMap = 0x0008,
+    HFormat4DSMaterialFlag_NormalTextureBlend = 0x000001,
+    HFormat4DSMaterialFlag_MultiplyTextureBlend = 0x000002,
+    HFormat4DSMaterialFlag_AdditiveTextureBlend = 0x000004,
+    HFormat4DSMaterialFlag_CalcReflectTextureY = 0x00001,
+    HFormat4DSMaterialFlag_ProjectReflectTextureY = 0x00002,
+    HFormat4DSMaterialFlag_ProjectReflectTextureZ = 0x00004,
+    HFormat4DSMaterialFlag_AdditionalEffect = 0x00008,
+    HFormat4DSMaterialFlag_AlphaTexture = 0x4,
+    HFormat4DSMaterialFlag_ColorKey = 0x2,
+    HFormat4DSMaterialFlag_AdditiveMixing = 0x8
 };
 
 enum
 {
-    HFormatMeshType_Standard = 0x01,
-    HFormatMeshType_Sector = 0x05,
-    HFormatMeshType_Dummy = 0x06,
-    HFormatMeshType_Target = 0x07,
-    HFormatMeshType_Bone = 0x0a
+    HFormat4DSMeshType_Standard = 0x01,
+    HFormat4DSMeshType_Sector = 0x05,
+    HFormat4DSMeshType_Dummy = 0x06,
+    HFormat4DSMeshType_Target = 0x07,
+    HFormat4DSMeshType_Bone = 0x0a
 };
 
 enum
 {
-    HFormatVisualMeshType_Standard = 0x0,
-    HFormatVisualMeshType_SingleMesh = 0x02,
-    HFormatVisualMeshType_SingleMorph = 0x03,
-    HFormatVisualMeshType_Billboard = 0x04,
-    HFormatVisualMeshType_Morph = 0x05,
-    HFormatVisualMeshType_Glow = 0x06,
-    HFormatVisualMeshType_Mirror = 0x08
+    HFormat4DSVisualMeshType_Standard = 0x0,
+    HFormat4DSVisualMeshType_SingleMesh = 0x02,
+    HFormat4DSVisualMeshType_SingleMorph = 0x03,
+    HFormat4DSVisualMeshType_Billboard = 0x04,
+    HFormat4DSVisualMeshType_Morph = 0x05,
+    HFormat4DSVisualMeshType_Glow = 0x06,
+    HFormat4DSVisualMeshType_Mirror = 0x08
 };
 
 enum
 {
-    HFormatMeshRenderFlag_UseDepthBias = 0x0001,
-    HFormatMeshRenderFlag_UseShadows = 0x0002,
-    HFormatMeshRenderFlag_Unknown = 0x0008,
-    HFormatMeshRenderFlag_UseProjection = 0x002,
-    HFormatMeshRenderFlag_ForbidFog = 0x008
+    HFormat4DSMeshRenderFlag_UseDepthBias = 0x0001,
+    HFormat4DSMeshRenderFlag_UseShadows = 0x0002,
+    HFormat4DSMeshRenderFlag_Unknown = 0x0008,
+    HFormat4DSMeshRenderFlag_UseProjection = 0x002,
+    HFormat4DSMeshRenderFlag_ForbidFog = 0x008
 };
 
 enum
 {
-    HFormatMeshOccludingFlag_Normal = 0x09,
-    HFormatMeshOccludingFlag_Sector = 0x7D,
-    HFormatMeshOccludingFlag_Wall = 0x3D, // NOTE(zaklaus): Mesh in sector (walls).
-    HFormatMeshOccludingFlag_Portal = 0x1D,   // NOTE(zaklaus): Mesh in portal.
-    HFormatMeshOccludingFlag_Inactive = 0x11
+    HFormat4DSMeshOccludingFlag_Normal = 0x09,
+    HFormat4DSMeshOccludingFlag_Sector = 0x7D,
+    HFormat4DSMeshOccludingFlag_Wall = 0x3D, // NOTE(zaklaus): Mesh in sector (walls).
+    HFormat4DSMeshOccludingFlag_Portal = 0x1D,   // NOTE(zaklaus): Mesh in portal.
+    HFormat4DSMeshOccludingFlag_Inactive = 0x11
 };
 
 typedef struct
@@ -313,7 +312,7 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
             IOFileRead(FileIdx, &Mat.Emission, sizeof(v3));
             IOFileRead(FileIdx, &Mat.Transparency, msize);
             
-            if(Mat.Flags & HFormatMaterialFlag_EnvironmentMap)
+            if(Mat.Flags & HFormat4DSMaterialFlag_EnvironmentMap)
             {
                 IOFileRead(FileIdx, &Mat.EnvRatio, sizeof(r32));
                 IOFileRead(FileIdx, &Mat.EnvMapNameLength, sizeof(u8));
@@ -324,14 +323,14 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
             IOFileRead(FileIdx, Mat.DiffuseMapName, Mat.DiffuseMapNameLength);
             
             
-            if(Mat.Flags & HFormatMaterialFlag_AlphaTexture)
+            if(Mat.Flags & HFormat4DSMaterialFlag_AlphaTexture)
             {
                 IOFileRead(FileIdx, &Mat.AlphaMapNameLength, sizeof(u8));
                 IOFileRead(FileIdx, Mat.AlphaMapName, Mat.AlphaMapNameLength);
             }
             
-            if(Mat.Flags & HFormatMaterialFlag_AnimatedTextureDiffuse ||
-               Mat.Flags & HFormatMaterialFlag_AnimatedTextureAlpha)
+            if(Mat.Flags & HFormat4DSMaterialFlag_AnimatedTextureDiffuse ||
+               Mat.Flags & HFormat4DSMaterialFlag_AnimatedTextureAlpha)
             {
                 
                 IOFileRead(FileIdx, &Mat.AnimSequenceLength, sizeof(u32));
@@ -349,7 +348,7 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
 }
 
 internal hformat_4ds_lod
-HFormat4DSLoadLOD(s32 FileIdx)
+HFormat4DS4DSLoadLOD(s32 FileIdx)
 {
     hformat_4ds_lod Lod = {0};
     IOFileRead(FileIdx, &Lod.RelativeDistance, sizeof(r32));
@@ -400,7 +399,7 @@ HFormatLoad4DSStandard(s32 FileIdx)
             ++Idx)
         {
             hformat_4ds_lod Lod = {0};
-            Lod = HFormat4DSLoadLOD(FileIdx);
+            Lod = HFormat4DS4DSLoadLOD(FileIdx);
             Geo.LODs[Idx] = Lod;
         }
     }
@@ -582,7 +581,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
         {
             IOFileRead(FileIdx, &Mesh.MeshType, sizeof(u8));
             
-            if(Mesh.MeshType & HFormatMeshType_Standard)
+            if(Mesh.MeshType & HFormat4DSMeshType_Standard)
             {
                 IOFileRead(FileIdx, &Mesh.VisualMeshType, sizeof(u8));
                 IOFileRead(FileIdx, &Mesh.MeshRenderFlags, sizeof(u16));
@@ -615,32 +614,32 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
             
             switch(Mesh.MeshType)
             {
-                case HFormatMeshType_Standard:
+                case HFormat4DSMeshType_Standard:
                 {
                     switch(Mesh.VisualMeshType)
                     {
-                        case HFormatVisualMeshType_Standard:
+                        case HFormat4DSVisualMeshType_Standard:
                         {
                             hformat_4ds_standard Standard = {0};
                             Standard = HFormatLoad4DSStandard(FileIdx);
                             Mesh.Standard = Standard;
                         }break;
                         
-                        case HFormatVisualMeshType_Mirror:
+                        case HFormat4DSVisualMeshType_Mirror:
                         {
                             hformat_4ds_mirror Mirror = {0};
                             Mirror = HFormatLoad4DSMirror(FileIdx);
                             Mesh.Mirror = Mirror;
                         }break;
                         
-                        case HFormatVisualMeshType_Glow:
+                        case HFormat4DSVisualMeshType_Glow:
                         {
                             hformat_4ds_glow Glow = {0};
                             Glow = HFormatLoad4DSGlow(FileIdx);
                             Mesh.Glow = Glow;
                         }break;
                         
-                        case HFormatVisualMeshType_Billboard:
+                        case HFormat4DSVisualMeshType_Billboard:
                         {
                             hformat_4ds_billboard Billboard = {0};
                             Billboard.Standard = HFormatLoad4DSStandard(FileIdx);
@@ -649,7 +648,7 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                             Mesh.Billboard = Billboard;
                         }break;
                         
-                        case HFormatVisualMeshType_Morph:
+                        case HFormat4DSVisualMeshType_Morph:
                         {
                             hformat_4ds_morph Morph = {0};
                             Morph = HFormatLoad4DSMorph(FileIdx, 0);
@@ -663,28 +662,28 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                     }
                 }break;
                 
-                case HFormatMeshType_Dummy:
+                case HFormat4DSMeshType_Dummy:
                 {
                     hformat_4ds_dummy Dummy = {0};
                     IOFileRead(FileIdx, &Dummy, sizeof(hformat_4ds_dummy));
                     Mesh.Dummy = Dummy;
                 }break;
                 
-                case HFormatMeshType_Sector:
+                case HFormat4DSMeshType_Sector:
                 {
                     hformat_4ds_sector Sector = {0};
                     Sector = HFormatLoad4DSSector(FileIdx);
                     Mesh.Sector = Sector;
                 }break;
                 
-                case HFormatMeshType_Target:
+                case HFormat4DSMeshType_Target:
                 {
                     hformat_4ds_target Target = {0};
                     Target = HFormatLoad4DSTarget(FileIdx);
                     Mesh.Target = Target;
                 }break;
                 
-                case HFormatMeshType_Bone:
+                case HFormat4DSMeshType_Bone:
                 {
                     hformat_4ds_bone Bone = {0};
                     IOFileRead(FileIdx, &Bone, sizeof(hformat_4ds_bone));
