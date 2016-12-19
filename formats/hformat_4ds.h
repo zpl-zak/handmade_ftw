@@ -216,6 +216,38 @@ typedef struct
     hformat_4ds_face *Faces;
 } hformat_4ds_mirror;
 
+#pragma pack(push, 1)
+typedef struct
+{
+    v3 Position;
+    v3 Normals;
+} hformat_4ds_morph_lod_vertex;
+#pragma pack(pop)
+
+typedef struct
+{
+    u16 VertexCount;
+    hformat_4ds_morph_lod_vertex *Vertices;
+    
+    u8 _Unk0;
+    
+    u16 *VertexLinks; // NOTE(zaklaus): Addresses vertices from Standard's LOD mesh.
+} hformat_4ds_morph_lod;
+
+typedef struct
+{
+    hformat_4ds_standard Standard;
+    u8 FrameCount;
+    
+    u8 LODLevel; // NOTE(zaklaus): Should equal to Standard.LODLevel.
+    u8 _Unk0;
+    hformat_4ds_morph_lod *LODs;
+    v3 MinBox, MaxBox;
+    v3 _Unk1;
+    r32 _Unk2;
+    
+} hformat_4ds_morph;
+
 typedef struct
 {
     u8 MeshType;
@@ -245,6 +277,7 @@ typedef struct
     hformat_4ds_sector Sector;
     hformat_4ds_target Target;
     hformat_4ds_bone Bone;
+    hformat_4ds_morph Morph;
 } hformat_4ds_mesh;
 
 typedef struct
@@ -482,6 +515,58 @@ HFormatLoad4DSTarget(s32 FileIdx)
     return(Target);
 }
 
+internal hformat_4ds_morph
+HFormatLoad4DSMorph(s32 FileIdx, b32 IgnoreStandard)
+{
+    hformat_4ds_morph Morph = {0};
+    // NOTE(zaklaus): Single Morph contains Standard Mesh in Single Mesh already.
+    if(!IgnoreStandard) 
+    {
+        Morph.Standard = HFormatLoad4DSStandard(FileIdx);
+    } 
+    // NOTE(zaklaus): ELSE ignore Standard Mesh, since Single Mesh has it.
+    
+    IOFileRead(FileIdx, &Morph.FrameCount, sizeof(u8));
+    
+    if(Morph.FrameCount)
+    {
+        IOFileRead(FileIdx, &Morph.LODLevel, sizeof(u8));
+        IOFileRead(FileIdx, &Morph._Unk0, sizeof(u8));
+        
+        Morph.LODs = (hformat_4ds_morph_lod *)PlatformMemAlloc(sizeof(hformat_4ds_morph_lod)*Morph.LODLevel);
+        
+        for(mi Idx = 0;
+            Idx < Morph.LODLevel;
+            Idx++)
+        {
+            hformat_4ds_morph_lod LOD = {0};
+            
+            IOFileRead(FileIdx, &LOD.VertexCount, sizeof(u16));
+            
+            LOD.Vertices = (hformat_4ds_morph_lod_vertex *)PlatformMemAlloc(sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount);
+            
+            IOFileRead(FileIdx, LOD.Vertices, sizeof(hformat_4ds_morph_lod_vertex)*LOD.VertexCount);
+            
+            if(LOD.VertexCount * Morph.FrameCount)
+            {
+                IOFileRead(FileIdx, &LOD._Unk0, sizeof(u8));
+            }
+            
+            LOD.VertexLinks = (u16 *)PlatformMemAlloc(sizeof(u16)*LOD.VertexCount);
+            
+            IOFileRead(FileIdx, LOD.VertexLinks, sizeof(u16)*LOD.VertexCount);
+            
+            Morph.LODs[Idx] = LOD;
+        }
+        
+        IOFileRead(FileIdx, &Morph.MinBox, sizeof(v3));
+        IOFileRead(FileIdx, &Morph.MaxBox, sizeof(v3));
+        IOFileRead(FileIdx, &Morph._Unk1, sizeof(v3));
+        IOFileRead(FileIdx, &Morph._Unk2, sizeof(r32));
+    }
+    return(Morph);
+}
+
 internal void
 HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
 {
@@ -562,6 +647,13 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                             IOFileRead(FileIdx, &Billboard.RotationAxis, sizeof(u32));
                             IOFileRead(FileIdx, &Billboard.IgnoreCamera, sizeof(u8));
                             Mesh.Billboard = Billboard;
+                        }break;
+                        
+                        case HFormatVisualMeshType_Morph:
+                        {
+                            hformat_4ds_morph Morph = {0};
+                            Morph = HFormatLoad4DSMorph(FileIdx, 0);
+                            Mesh.Morph = Morph;
                         }break;
                         
                         default:
