@@ -807,7 +807,10 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
                 
                 default:
                 {
-                    fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
+                    if(Mesh.MeshType)
+                    {
+                        fprintf(stderr, "Not Implemented [MeshType]: %d\n", Mesh.MeshType);
+                    }
                 }break;
             }
         }
