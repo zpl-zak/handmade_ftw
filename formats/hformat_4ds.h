@@ -512,11 +512,11 @@ HFormatLoad4DSSector(s32 FileIdx)
     IOFileRead(FileIdx, &Sector.VertexCount, sizeof(u32));
     IOFileRead(FileIdx, &Sector.FaceCount, sizeof(u32));
     
-    Sector.Vertices = (v3 *)PlatformMemAlloc(Sector.VertexCount);
-    IOFileRead(FileIdx, Sector.Vertices, sizeof(v3));
+    Sector.Vertices = (v3 *)PlatformMemAlloc(sizeof(v3)*Sector.VertexCount);
+    IOFileRead(FileIdx, Sector.Vertices, sizeof(v3)*Sector.VertexCount);
     
-    Sector.Faces = (hformat_4ds_face *)PlatformMemAlloc(Sector.FaceCount);
-    IOFileRead(FileIdx, Sector.Faces, sizeof(hformat_4ds_face));
+    Sector.Faces = (hformat_4ds_face *)PlatformMemAlloc(sizeof(hformat_4ds_face)*Sector.FaceCount);
+    IOFileRead(FileIdx, Sector.Faces, sizeof(hformat_4ds_face)*Sector.FaceCount);
     
     IOFileRead(FileIdx, &Sector.MinBox, sizeof(v3));
     IOFileRead(FileIdx, &Sector.MaxBox, sizeof(v3));

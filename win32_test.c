@@ -4,6 +4,8 @@
 
 #include "hftw.h"
 
+#include "formats/hformat_4ds.h"
+
 global_variable b32 IsRunning;
 
 LRESULT CALLBACK
@@ -46,8 +48,56 @@ WinMain(HINSTANCE hInstance,
     WindowUpdate();
     TimeInit();
     
-    IsRunning = 1;
+    IsRunning = 0;
     r64 OldTime = TimeGet();
+    
+    // NOTE(zaklaus): 4ds test
+    {
+        s32 FileHandle = IOFileOpenRead("data/test.4ds", 0);
+        hformat_4ds_header *Model = HFormatLoad4DSModel(FileHandle);
+        IOFileClose(FileHandle);
+        
+        if(!Model)
+        {
+            fprintf(stderr, "Not a correct 4ds format!\n");
+            return(1);
+        }
+        
+        fprintf(stdout, "Signature: %.*s\n", 4, &Model->Signature);
+        fprintf(stdout, "Format: %d\n", Model->FormatVersion);
+        fprintf(stdout, "Timestamp: %lld\n", Model->Timestamp);
+        fprintf(stdout, "Material Count: %d\n", Model->MaterialCount);
+        
+        for(mi Idx = 0;
+            Idx < Model->MaterialCount;
+            ++Idx)
+        {
+            hformat_4ds_material *Mat = &Model->Materials[Idx];
+            
+            fprintf(stdout, "Material ID: %zd\nDiffuseR: %f\n", Idx, Mat->Diffuse.R);
+            fprintf(stdout, "DiffuseG: %f\n", Mat->Diffuse.G);
+            fprintf(stdout, "DiffuseB: %f\n", Mat->Diffuse.B);
+            fprintf(stdout, "Transparency: %f\n\n", Mat->Transparency);
+            
+            
+        }
+        
+        fprintf(stdout, "Mesh Count: %d\n", Model->MeshCount);
+        
+        for(mi Idx = 0;
+            Idx < Model->MeshCount;
+            ++Idx)
+        {
+            hformat_4ds_mesh *Mesh = &Model->Meshes[Idx];
+            
+            fprintf(stdout, "\nMeshType ID: %d\n", Mesh->MeshType);
+            fprintf(stdout, "MeshName: %s\n", Mesh->MeshName);
+            fprintf(stdout, "Rotation X: %f\n", Mesh->Rot.X);
+            fprintf(stdout, "Rotation W: %f\n", Mesh->Rot.W);
+            
+        }
+        
+    }
     
     while(IsRunning)
     {
