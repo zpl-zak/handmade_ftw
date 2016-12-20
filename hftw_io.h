@@ -171,6 +171,26 @@ IOFileWrite(s32 HandleIdx, // The ID of the file handle.
     return(BytesWritten);
 }
 
+internal u32
+IOGetStringLength(s32 HandleIdx)
+{
+    Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
+    Assert(FileHandles[HandleIdx]);
+    
+    
+    u8 C;
+    u32 Start = ftell(FileHandles[HandleIdx]);
+        
+        do
+        {
+            fread(&C, sizeof(u8), 1, FileHandles[HandleIdx]);
+        } while(C != 0);
+        u32 End = ftell(FileHandles[HandleIdx]);
+        
+        fseek(FileHandles[HandleIdx], Start, SEEK_SET);
+        return(End - Start);
+}
+
 #define IOConsolePrint(out, format, ...) fprintf(out, format, __VA_ARGS__)
 
 #define HFTW_IO_H
