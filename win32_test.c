@@ -5,6 +5,7 @@
 #include "hftw.h"
 
 #include "formats/hformat_4ds.h"
+#include "formats/hformat_klz.h"
 
 global_variable b32 IsRunning;
 

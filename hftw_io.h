@@ -171,8 +171,12 @@ IOFileWrite(s32 HandleIdx, // The ID of the file handle.
     return(BytesWritten);
 }
 
+//doc(IOGetStringLength)
+//doc_string(Retrieves length of a null-terminated string in stream.)
+doc_sig(
 internal u32
-IOGetStringLength(s32 HandleIdx)
+IOGetStringLength(s32 HandleIdx) // The ID of the file handle.
+)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
     Assert(FileHandles[HandleIdx]);
