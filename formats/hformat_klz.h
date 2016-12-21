@@ -166,15 +166,15 @@ typedef struct
 } hformat_klz;
 
 hformat_klz
-ParseKlzFile(s32 FileIdx)
+HFormatLoadKLZData(s32 FileIdx)
 {
     hformat_klz KLZ = { 0 };
     
     IOFileRead(FileIdx, &KLZ.KlzHeader, sizeof(hformat_klz_header));
     
-    KLZ.LinkNameOffsetTable = malloc( sizeof(u32) * KLZ.KlzHeader.NumLinks );
+    KLZ.LinkNameOffsetTable = PlatformMemAlloc( sizeof(u32) * KLZ.KlzHeader.NumLinks );
     IOFileRead(FileIdx, KLZ.LinkNameOffsetTable, sizeof(u32)*KLZ.KlzHeader.NumLinks);
-    KLZ.LinkTables = malloc(sizeof(hformat_klz_link)* KLZ.KlzHeader.NumLinks);
+    KLZ.LinkTables = PlatformMemAlloc(sizeof(hformat_klz_link)* KLZ.KlzHeader.NumLinks);
     
     for (u32 i = 0; i < KLZ.KlzHeader.NumLinks; i++)
     {
@@ -185,7 +185,7 @@ ParseKlzFile(s32 FileIdx)
         
         u32 NameLength = IOGetStringLength(FileIdx);
         newTable.NameLength = NameLength;
-        newTable.Name = malloc(NameLength); 
+        newTable.Name = PlatformMemAlloc(NameLength); 
         IOFileRead(FileIdx, newTable.Name, sizeof(u8)*NameLength); 
         
         KLZ.LinkTables[i] = newTable;
@@ -194,49 +194,50 @@ ParseKlzFile(s32 FileIdx)
     IOFileSeek(FileIdx, KLZ.KlzHeader.CollisionDataOffset, SeekOrigin_Set);
     IOFileRead(FileIdx, &KLZ.DataHeader, sizeof(hformat_klz_data_header));
     
-    KLZ.CellBoundariesX = malloc(sizeof(f32) * (KLZ.DataHeader.GridWidth + 1));
+    KLZ.CellBoundariesX = PlatformMemAlloc(sizeof(f32) * (KLZ.DataHeader.GridWidth + 1));
     IOFileRead(FileIdx, KLZ.CellBoundariesX, sizeof(f32) * (KLZ.DataHeader.GridWidth + 1));
     
-    KLZ.CellBoundariesY = malloc(sizeof(f32) * (KLZ.DataHeader.GridHeight + 1)); 
+    KLZ.CellBoundariesY = PlatformMemAlloc(sizeof(f32) * (KLZ.DataHeader.GridHeight + 1)); 
     IOFileRead(FileIdx, KLZ.CellBoundariesY, sizeof(f32) * (KLZ.DataHeader.GridHeight + 1));
     
     IOFileRead(FileIdx, &KLZ.CollisionDataMagic, sizeof(u32));
     
-    KLZ.FaceCols = malloc(KLZ.DataHeader.NumFaces * sizeof(hformat_klz_data_facecol));
+    KLZ.FaceCols = PlatformMemAlloc(KLZ.DataHeader.NumFaces * sizeof(hformat_klz_data_facecol));
     IOFileRead(FileIdx, KLZ.FaceCols, sizeof(hformat_klz_data_facecol)*KLZ.DataHeader.NumFaces);
     
-    KLZ.ABBCols = malloc(KLZ.DataHeader.NumAAABBs * sizeof(hformat_klz_data_abbcol));
+    KLZ.ABBCols = PlatformMemAlloc(KLZ.DataHeader.NumAAABBs * sizeof(hformat_klz_data_abbcol));
     IOFileRead(FileIdx, KLZ.ABBCols, sizeof(hformat_klz_data_abbcol)*KLZ.DataHeader.NumAAABBs);
     
-    KLZ.XTOBBCols = malloc(KLZ.DataHeader.NumXTOBBs * sizeof(hformat_klz_data_xtobbcol));
+    KLZ.XTOBBCols = PlatformMemAlloc(KLZ.DataHeader.NumXTOBBs * sizeof(hformat_klz_data_xtobbcol));
     IOFileRead(FileIdx, KLZ.XTOBBCols, sizeof(hformat_klz_data_xtobbcol)*KLZ.DataHeader.NumXTOBBs);
     
-    KLZ.CylinderCols = malloc(KLZ.DataHeader.NumCylinders * sizeof(hformat_klz_data_cylindercol));
+    KLZ.CylinderCols = PlatformMemAlloc(KLZ.DataHeader.NumCylinders * sizeof(hformat_klz_data_cylindercol));
     IOFileRead(FileIdx, KLZ.CylinderCols, sizeof(hformat_klz_data_cylindercol)*KLZ.DataHeader.NumCylinders);
     
-    KLZ.OBBCols = malloc(KLZ.DataHeader.NumOBBs * sizeof(hformat_klz_data_obbcol));
+    KLZ.OBBCols = PlatformMemAlloc(KLZ.DataHeader.NumOBBs * sizeof(hformat_klz_data_obbcol));
     IOFileRead(FileIdx, KLZ.OBBCols, sizeof(hformat_klz_data_obbcol)*KLZ.DataHeader.NumOBBs);
     
-    KLZ.SphereCols = malloc(KLZ.DataHeader.NumSpheres * sizeof(hformat_klz_data_spherecol));
+    KLZ.SphereCols = PlatformMemAlloc(KLZ.DataHeader.NumSpheres * sizeof(hformat_klz_data_spherecol));
     IOFileRead(FileIdx, KLZ.SphereCols, sizeof(hformat_klz_data_spherecol)*KLZ.DataHeader.NumSpheres);
     
     IOFileRead(FileIdx, &KLZ.CollisionGridMagic, sizeof(u32));
     
     u32 girdsize = KLZ.DataHeader.GridWidth * KLZ.DataHeader.GridHeight; 
-    KLZ.GridCellsMemory = malloc(sizeof(hformat_klz_cell) * girdsize);
+    KLZ.GridCellsMemory = PlatformMemAlloc(sizeof(hformat_klz_cell) * girdsize);
     
     for (u32 i = 0; i < girdsize; i++) 
     {
         IOFileRead(FileIdx, &KLZ.GridCellsMemory[i].NumObjects, sizeof(u32));
-        IOFileRead(FileIdx, KLZ.GridCellsMemory[i].Reserved, sizeof(u32)*2); IOFileRead(FileIdx, &KLZ.GridCellsMemory[i].Height, sizeof(f32));
+        IOFileRead(FileIdx, KLZ.GridCellsMemory[i].Reserved, sizeof(u32)*2); 
+        IOFileRead(FileIdx, &KLZ.GridCellsMemory[i].Height, sizeof(f32));
         
         if (KLZ.GridCellsMemory[i].NumObjects)
         {
-            KLZ.GridCellsMemory[i].References = malloc(sizeof(u32) * KLZ.GridCellsMemory[i].NumObjects);
+            KLZ.GridCellsMemory[i].References = PlatformMemAlloc(sizeof(u32) * KLZ.GridCellsMemory[i].NumObjects);
             IOFileRead(FileIdx, KLZ.GridCellsMemory[i].References, sizeof(u32)*KLZ.GridCellsMemory[i].NumObjects);
             
             // NOTE(ASM): needs to be aligned to 4 bytes, purpose unknown
-            KLZ.GridCellsMemory[i].Flags = malloc((KLZ.GridCellsMemory[i].NumObjects + 3) / 4 * sizeof(u32));
+            KLZ.GridCellsMemory[i].Flags = PlatformMemAlloc((KLZ.GridCellsMemory[i].NumObjects + 3) / 4 * sizeof(u32));
             IOFileRead(FileIdx, KLZ.GridCellsMemory[i].Flags, (KLZ.GridCellsMemory[i].NumObjects + 3) / 4 * sizeof(u32));
         }
     }
