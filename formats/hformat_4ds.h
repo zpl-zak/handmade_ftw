@@ -3,6 +3,7 @@
 4DS File Format
 Usage: Model format
 SW: Mafia TCOLH
+Contributor: djbozkosz
 */
 #if !defined(HFORMAT_4DS_H)
 
