@@ -12,19 +12,6 @@
         }
         return dest;
     }
-
-    #pragma function(memcpy)
-    void *memcpy(void *dest, const void *src, size_t count)
-    {
-        char *dest8 = (char *)dest;
-        const char *src8 = (const char *)src;
-        while (count--)
-        {
-            *dest8++ = *src8++;
-        }
-        return dest;
-    }
-
 #ifdef __cplusplus
 }
 #endif
