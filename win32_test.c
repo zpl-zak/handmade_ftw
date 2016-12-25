@@ -6,20 +6,68 @@
 
 #include "formats/hformat_4ds.h"
 #include "formats/hformat_klz.h"
+#include "formats/hformat_bmp.h"
 
-global_variable b32 IsRunning;
+global_variable HINSTANCE GlobalInstance;
+global_variable HWND GlobalWindow;
+global_variable b32 Running = 1;
+global_variable window_bitmap WindowBitmap;
+
+internal void
+RenderGradient(s32 XOffset, s32 YOffset)
+{
+    
+    s32 Width = WindowBitmap.Width;
+    s32 Height = WindowBitmap.Height;
+    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Pitch = Width * BytesPerPixel;
+    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    for(s32 Y = 0;
+        Y < Height;
+        ++Y)
+    {
+        u32 *Pixel = (u32 *)Row;
+        for(s32 X = 0;
+            X < Width;
+            ++X)
+        {
+            u8 Blue = (u8)(X + XOffset);
+            u8 Green = (u8)(Y + YOffset);
+            *Pixel++ = ((Green << 8) | Blue);
+            }
+        Row += Pitch;
+    }
+}
 
 LRESULT CALLBACK
-WndProc(HWND hwnd,
-        UINT uMsg,
-        WPARAM wParam,
-        LPARAM lParam)
+WndProc(HWND Window,
+        UINT Message,
+        WPARAM WParam,
+        LPARAM LParam)
 {
-    switch(uMsg)
+    switch(Message)
     {
-        case WM_CLOSE:
+        case WM_ACTIVATEAPP:
+        case WM_SIZE:
         {
-            IsRunning = 0;
+            RECT ClientRect;
+            GetClientRect(Window, &ClientRect);
+            s32 Width = ClientRect.right - ClientRect.left;
+            s32 Height = ClientRect.bottom - ClientRect.top;
+            window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
+            
+            WindowBitmap = ResizeResult;
+        }break;
+        
+        case WM_CLOSE:
+        case WM_DESTROY:
+        {
+            Running = 0;
+        }break;
+        
+        case WM_PAINT:
+        {
+            
         }break;
         
         default:
@@ -27,9 +75,8 @@ WndProc(HWND hwnd,
             
         }break;
     }
-    return(DefWindowProc(hwnd, uMsg, wParam, lParam));
+    return(DefWindowProc(Window, Message, WParam, LParam));
 }
-
 
 int CALLBACK
 WinMain(HINSTANCE hInstance,
@@ -37,26 +84,38 @@ WinMain(HINSTANCE hInstance,
         LPSTR lpCmdLine,
         int nCmdShow)
 {
-    WindowCreateClass(hInstance, &WndProc);
+    WindowCreateClass(hInstance, "Handmade FTW", &WndProc);
     
     window_dim PosDim = {0};
     window_dim ResDim = {0};
     ResDim.X = 800;
     ResDim.Y = 600;
     
-    WindowCreateWindowed("Win32 Test", 0, 0, ResDim, PosDim, CW_USEDEFAULT);
+    HWND Window;
+    WindowCreateWindowed("Handmade FTW", "Win32 Test", hInstance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
+    
+    GlobalWindow = Window;
     
     WindowUpdate();
     TimeInit();
     
-    IsRunning = 1;
     r64 OldTime = TimeGet();
     
-    while(IsRunning)
+    while(Running)
     {
         r64 NewTime = TimeGet();
         {
             WindowUpdate();
+            {
+                local_persist s32 XOffset = 0;
+                local_persist s32 YOffset = 0;
+                RenderGradient(XOffset, YOffset);
+                
+                ++XOffset;
+                ++YOffset;
+                }
+            WindowBlit(GlobalWindow, &WindowBitmap);
+            
             Sleep(10);
         }
         OldTime = NewTime;

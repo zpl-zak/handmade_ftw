@@ -5,22 +5,6 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#pragma comment(lib,"user32.lib") 
-#pragma comment(lib,"gdi32.lib") 
-#include "platform/win32_time.h"
-#include "platform/win32_window.h"
-#include "platform/win32_crt_math.cpp"
-#include "platform/win32_crt_float.cpp"
-#include "platform/win32_crt_memory.cpp"
-
-internal LONGLONG 
-GetFilePointerEx(HANDLE FileHandle)
-{
-    LARGE_INTEGER Offset={0};
-    LARGE_INTEGER Position={0};
-    SetFilePointerEx(FileHandle, Offset, &Position, FILE_CURRENT);
-    return(Position.QuadPart);
-}
 #endif
 
 #ifndef _WIN32
@@ -75,6 +59,25 @@ PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
     Result = realloc(Result, Size);
     return(Result);
 }
+
+#ifdef _WIN32
+#pragma comment(lib,"user32.lib") 
+#pragma comment(lib,"gdi32.lib") 
+#include "platform/win32_time.h"
+#include "platform/win32_window.h"
+#include "platform/win32_crt_math.cpp"
+#include "platform/win32_crt_float.cpp"
+#include "platform/win32_crt_memory.cpp"
+
+internal LONGLONG 
+GetFilePointerEx(HANDLE FileHandle)
+{
+    LARGE_INTEGER Offset={0};
+    LARGE_INTEGER Position={0};
+    SetFilePointerEx(FileHandle, Offset, &Position, FILE_CURRENT);
+    return(Position.QuadPart);
+}
+#endif
 
 #define HFTW_PLATFORM_H
 #endif

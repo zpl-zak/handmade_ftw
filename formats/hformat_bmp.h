@@ -17,7 +17,7 @@ typedef struct
     u16 _Reserved0;
     u16 _Reserved1;
     u32 DataOffset;
-} hformat_bmp_header;
+} hformat_bmp_info;
 
 typedef struct
 {
@@ -32,7 +32,7 @@ typedef struct
     s32 YPixelsPerMeter; // NOTE(zaklaus): Number of pixels per meter in y axis
     u32 ColorsUsed; // NOTE(zaklaus): Number of colors used by the bitmap
     u32 ColorsImportant; // NOTE(zaklaus): Number of colors that are important
-} hformat_bmp_info;
+} hformat_bmp_header;
 #pragma pack(pop)
 
 typedef struct
@@ -50,25 +50,25 @@ HFormatLoadBMPImage(s32 HandleIdx)
         s32 ImageIdx = 0;
         u8 _Swap0 = 0;
         
-        IOFileRead(HandleIdx, &Image->Header, sizeof(hformat_bmp_header));
+        IOFileRead(HandleIdx, &Image->Info, sizeof(hformat_bmp_info));
         
-        if(Image->Header.Signature != 0x4D42)
+        if(Image->Info.Signature != 0x4D42)
         {
             fprintf(stderr, "Not a valid BMP format!\n");
             PlatformMemFree(Image);
             return(0);
         }
         
-        IOFileRead(HandleIdx, &Image->Info, sizeof(hformat_bmp_info));
+        IOFileRead(HandleIdx, &Image->Header, sizeof(hformat_bmp_header));
         
-        IOFileSeek(HandleIdx, Image->Header.DataOffset, SeekOrigin_Set);
+        IOFileSeek(HandleIdx, Image->Info.DataOffset, SeekOrigin_Set);
         
-        Image->Data = (u8 *)PlatformMemAlloc(Image->Info.ImageSize);
+        Image->Data = (u8 *)PlatformMemAlloc(Image->Header.ImageSize);
         
-        IOFileRead(HandleIdx, Image->Data, Image->Info.ImageSize);
+        IOFileRead(HandleIdx, Image->Data, Image->Header.ImageSize);
         
         for(mi Idx = 0;
-            Idx < Image->Info.ImageSize;
+            Idx < Image->Header.ImageSize;
             Idx += 3)
         {
             _Swap0 = Image->Data[Idx];
