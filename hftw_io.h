@@ -4,20 +4,29 @@
 
 #include <stdio.h>
 
+#ifdef _WIN32
 //doc(seek_origin)
 //doc_cat(IO)
 //doc_string(Origin states used by IOFileSeek.)
 doc_sig(
 typedef enum
 {
-    SeekOrigin_Set = SEEK_SET,     // Seek from the start of the file.
-    SeekOrigin_Cursor = SEEK_CUR,  // Seek from the current position.
-    SeekOrigin_End = SEEK_END      // Seek from the end of the file backwards.
+    SeekOrigin_Set = 0,     // Seek from the start of the file.
+    SeekOrigin_Cursor = 1,  // Seek from the current position.
+    SeekOrigin_End = 2      // Seek from the end of the file backwards.
 } seek_origin;
 )
-
+#else
+typedef enum
+{
+    SeekOrigin_Set = SEEK_SET,        // Seek from the start of the file.
+    SeekOrigin_Cursor = SEEK_ORIGIN,  // Seek from the current position.
+    SeekOrigin_End = SEEK_END         // Seek from the end of the file backwards.
+} seek_origin;
+#endif
 #define MAX_HANDLES 128
 global_variable FILE *FileHandles[MAX_HANDLES] = {0};
+
 
 internal s32
 IOFindHandle(void)
@@ -40,6 +49,12 @@ IOFindHandle(void)
 internal ms
 IOFileLength(FILE *File)
 {
+    #ifdef _WIN32
+    LARGE_INTEGER FileSizeEx;
+    GetFileSizeEx(File, &FileSizeEx);
+    ms FileSize = (ms)FileSizeEx.QuadPart;
+    return(FileSize);
+    #else
      ms Pos, End;
     
     Pos = ftell(File);
@@ -50,6 +65,7 @@ IOFileLength(FILE *File)
     fseek(File, (s32)Pos, SEEK_SET);
     
     return(End);
+    #endif
 }
 
 //doc(IOFileOpenRead)
@@ -62,7 +78,12 @@ IOFileOpenRead(s8 *Path, // Path to the file.
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
+    
+#ifdef _WIN32
+    FileHandles[HandleIdx] = CreateFileA((const char *)Path, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+#else
     FileHandles[HandleIdx] = fopen((const char *)Path, "rb");
+#endif
     
     if(!FileHandles[HandleIdx])
     {
@@ -91,7 +112,12 @@ IOFileOpenWrite(s8 *Path) // Path to the file.
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
+    
+    #ifdef _WIN32
+    FileHandles[HandleIdx] = CreateFileA((const char *)Path, GENERIC_WRITE, FILE_SHARE_WRITE, 0, CREATE_ALWAYS, 0, 0);
+    #else
     FileHandles[HandleIdx] = fopen((const char *)Path, "wb");
+    #endif
     
     if(!FileHandles[HandleIdx])
     {
@@ -112,7 +138,11 @@ IOFileClose(s32 HandleIdx) // The ID of the file handle.
     
     if(FileHandles[HandleIdx])
     {
+        #ifdef _WIN32
+        CloseHandle(FileHandles[HandleIdx]);
+        #else
         fclose(FileHandles[HandleIdx]);
+        #endif
         FileHandles[HandleIdx] = 0;
     }
 }
@@ -135,7 +165,13 @@ IOFileSeek(s32 HandleIdx,      // The ID of the file handle.
     
     if(FileHandles[HandleIdx])
     {
+        #ifdef _WIN32
+        LARGE_INTEGER PositionEx = {0};
+        PositionEx.QuadPart = Position;
+        SetFilePointerEx(FileHandles[HandleIdx], PositionEx, 0, Origin);
+        #else
         fseek(FileHandles[HandleIdx], Position, Origin);
+        #endif
     }
 }
 
@@ -151,7 +187,12 @@ IOFileRead(s32 HandleIdx,  // The ID of the file handle.
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES && Dest);
     Assert(FileHandles[HandleIdx]);
     
+    #ifdef _WIN32
+    ms BytesRead;
+    ReadFile(FileHandles[HandleIdx], Dest, (WORD)Size, (LPDWORD)&BytesRead, 0);
+    #else
     ms BytesRead = fread(Dest, 1, Size, FileHandles[HandleIdx]);
+    #endif
     return(BytesRead);
 }
 
@@ -167,7 +208,12 @@ IOFileWrite(s32 HandleIdx, // The ID of the file handle.
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES && Src);
     Assert(FileHandles[HandleIdx]);
     
-     ms BytesWritten = fwrite(Src, 1, Size, FileHandles[HandleIdx]);
+#ifdef _WIN32
+    ms BytesWritten;
+    WriteFile(FileHandles[HandleIdx], Src, (WORD)Size, (LPDWORD)&BytesWritten, 0);
+#else
+    ms BytesRead = fwrite(Src, 1, Size, FileHandles[HandleIdx]);
+#endif
     return(BytesWritten);
 }
 
@@ -181,18 +227,25 @@ IOGetStringLength(s32 HandleIdx) // The ID of the file handle.
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
     Assert(FileHandles[HandleIdx]);
     
+#ifdef _WIN32
+    #define SZTELL GetFilePointerEx
+    #else
+    #define SZTELL ftell
+    #endif
     
     u8 C;
-    u32 Start = ftell(FileHandles[HandleIdx]);
+    
+    u32 Start = (u32)SZTELL(FileHandles[HandleIdx]);
         
         do
         {
-            fread(&C, sizeof(u8), 1, FileHandles[HandleIdx]);
+            IOFileRead(HandleIdx, &C, sizeof(u8));
         } while(C != 0);
-        u32 End = ftell(FileHandles[HandleIdx]);
+        u32 End = (u32)SZTELL(FileHandles[HandleIdx]);
         
-        fseek(FileHandles[HandleIdx], Start, SEEK_SET);
+        IOFileSeek(HandleIdx, Start, SeekOrigin_Set);
         return(End - Start);
+        #undef SZTELL
 }
 
 #define IOConsolePrint(out, format, ...) fprintf(out, format, __VA_ARGS__)

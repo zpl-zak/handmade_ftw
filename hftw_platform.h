@@ -7,16 +7,25 @@
 #include <windows.h>
 #pragma comment(lib,"user32.lib") 
 #pragma comment(lib,"gdi32.lib") 
-#include "platform/win_time.h"
-#include "platform/win_window.h"
+#include "platform/win32_time.h"
+#include "platform/win32_window.h"
+#include "platform/win32_crt_math.cpp"
+#include "platform/win32_crt_float.cpp"
+#include "platform/win32_crt_memory.cpp"
+
+internal LONGLONG 
+GetFilePointerEx(HANDLE FileHandle)
+{
+    LARGE_INTEGER Offset={0};
+    LARGE_INTEGER Position={0};
+    SetFilePointerEx(FileHandle, Offset, &Position, FILE_CURRENT);
+    return(Position.QuadPart);
+}
 #endif
 
-// NOTE(zaklaus): Lazy solution for MM.
-// TODO(zaklaus): Make it NOT LAZY : Implement OS-specific routines!!!
-#ifdef PLATFORM_ALLOC
-#error Platform-specific MM is not yet implemented
-#else//LIBC_MALLOC
+#ifndef _WIN32
 #include <malloc.h>
+#endif
 
 //doc(PlatformMemAlloc)
 //doc_string(Allocates memory using platform-specific call.)
@@ -27,7 +36,12 @@ size_t Size)  // Requested memory size.
 )
 {
     void *Result = 0;
+    
+    #ifdef _WIN32
+    Result = VirtualAlloc(0, Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    #else
     Result = malloc(Size);
+    #endif
     
     return(Result);
 }
@@ -42,7 +56,11 @@ PlatformMemFree(
 void *Ptr)   // Pointer to allocated block of memory.
 )
 {
+    #ifdef _WIN32
+    VirtualFree(Ptr, 0, MEM_RELEASE);
+    #else
     free(Ptr);
+    #endif
 }
 
 //doc(PlatformMemRealloc)
@@ -57,7 +75,6 @@ PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
     Result = realloc(Result, Size);
     return(Result);
 }
-#endif
 
 #define HFTW_PLATFORM_H
 #endif
