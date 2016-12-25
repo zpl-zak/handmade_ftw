@@ -8,15 +8,12 @@
 #include "formats/hformat_klz.h"
 #include "formats/hformat_bmp.h"
 
-global_variable HINSTANCE GlobalInstance;
-global_variable HWND GlobalWindow;
 global_variable b32 Running = 1;
 global_variable window_bitmap WindowBitmap;
 
 internal void
 RenderGradient(s32 XOffset, s32 YOffset)
 {
-    
     s32 Width = WindowBitmap.Width;
     s32 Height = WindowBitmap.Height;
     s32 BytesPerPixel = WindowBitmap.BPP;
@@ -54,6 +51,7 @@ WndProc(HWND Window,
             GetClientRect(Window, &ClientRect);
             s32 Width = ClientRect.right - ClientRect.left;
             s32 Height = ClientRect.bottom - ClientRect.top;
+            
             window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
             
             WindowBitmap = ResizeResult;
@@ -79,12 +77,12 @@ WndProc(HWND Window,
 }
 
 int CALLBACK
-WinMain(HINSTANCE hInstance,
-        HINSTANCE hPrevInstance,
-        LPSTR lpCmdLine,
-        int nCmdShow)
+WinMain(HINSTANCE Instance,
+        HINSTANCE PrevInstance,
+        LPSTR CmdLine,
+        int CmdShow)
 {
-    WindowCreateClass(hInstance, "Handmade FTW", &WndProc);
+    WindowCreateClass(Instance, "Handmade FTW", &WndProc);
     
     window_dim PosDim = {0};
     window_dim ResDim = {0};
@@ -92,9 +90,7 @@ WinMain(HINSTANCE hInstance,
     ResDim.Y = 600;
     
     HWND Window;
-    WindowCreateWindowed("Handmade FTW", "Win32 Test", hInstance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
-    
-    GlobalWindow = Window;
+    WindowCreateWindowed("Handmade FTW", "Win32 Test", Instance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
     
     WindowUpdate();
     TimeInit();
@@ -114,7 +110,7 @@ WinMain(HINSTANCE hInstance,
                 ++XOffset;
                 ++YOffset;
                 }
-            WindowBlit(GlobalWindow, &WindowBitmap);
+            WindowBlit(Window, &WindowBitmap);
             
             Sleep(10);
         }
