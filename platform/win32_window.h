@@ -38,7 +38,13 @@ internal b32
 WindowCreateWindowed(LPCSTR ClassName, LPCSTR Title, HINSTANCE Instance, s32 Style, s32 ExStyle, window_dim Resolution, window_dim Position, int PositionSpecial, HWND *Window)
 {
     DWORD WindowExStyle = ExStyle;
-    DWORD WindowStyle = WS_OVERLAPPEDWINDOW | WS_VISIBLE | Style;
+    DWORD WindowStyle = 
+        CS_HREDRAW
+        |CS_VREDRAW
+        |CS_OWNDC
+        |WS_OVERLAPPEDWINDOW
+        |WS_VISIBLE
+        |Style;
     
     if(PositionSpecial)
     {

@@ -36,6 +36,103 @@ RenderGradient(s32 XOffset, s32 YOffset)
     }
 }
 
+internal void
+RenderPixel(v3 Color, v2 Position, s32 Margin)
+{
+    s32 Width = WindowBitmap.Width;
+    s32 Height = WindowBitmap.Height;
+    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Pitch = Width * BytesPerPixel;
+    u32 *Memory = (u32 *)WindowBitmap.BitmapMemory;
+    
+    if(!Margin)
+    {
+        s32 X = (s32)Position.X;
+        s32 Y = (s32)Position.Y;
+        u8 Red = (u8)Color.R;
+        u8 Green = (u8)Color.G;
+        u8 Blue = (u8)Color.B;
+        Memory[Y*Width+X] = ((Red << 16) | (Green << 8) | Blue);
+        return;
+    }
+    
+    for(s32 Y = 0;
+        Y < Height;
+        ++Y)
+    {
+        for(s32 X = 0;
+            X < Width;
+            ++X)
+        {
+            // TODO(zaklaus): Replace with direct write!
+            if((Position.X >= X - Margin && Position.X <= X + Margin) &&
+               (Position.Y >= Y - Margin && Position.Y <= Y + Margin))
+            {
+                u8 Red = (u8)Color.R;
+                u8 Green = (u8)Color.G;
+                u8 Blue = (u8)Color.B;
+                Memory[Y*Width+X] = ((Red << 16) | (Green << 8) | Blue);
+            }
+        }
+    }
+}
+
+internal void
+RenderBlank(u8 Red, u8 Green, u8 Blue)
+{
+    s32 Width = WindowBitmap.Width;
+    s32 Height = WindowBitmap.Height;
+    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Pitch = Width * BytesPerPixel;
+    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    for(s32 Y = 0;
+        Y < Height;
+        ++Y)
+    {
+        u32 *Pixel = (u32 *)Row;
+        for(s32 X = 0;
+            X < Width;
+            ++X)
+        {
+            *Pixel++ = ((Red << 16) | (Green << 8) | Blue);
+        }
+        Row += Pitch;
+    }
+}
+
+internal void
+RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image)
+{
+    s32 Width = Image->Header.Width;
+    s32 Height = Image->Header.Height;
+    u8 *Memory = (u8 *)WindowBitmap.BitmapMemory;
+    u8 *ImageMemory = Image->Data;
+    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Pitch = WindowBitmap.Width * BytesPerPixel;
+    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    
+    for(s32 Y = 0;
+        Y < Height;
+        ++Y)
+    {
+        u32 *Pixel = (u32 *)Row;
+        for(s32 X = 0;
+            X < Width;
+            ++X)
+        {
+            u32 Data = 
+                (*ImageMemory++ << 16)
+                |(*ImageMemory++ << 8)
+                |(*ImageMemory++);
+            
+                /*|(*ImageMemory++ << 16)
+                |(*ImageMemory++ << 8);*/
+            *Pixel++ = Data;
+        }
+        Row += Pitch;
+    }
+}
+
 LRESULT CALLBACK
 WndProc(HWND Window,
         UINT Message,
@@ -55,6 +152,8 @@ WndProc(HWND Window,
             window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
             
             WindowBitmap = ResizeResult;
+            
+            WindowBlit(Window, &WindowBitmap);
         }break;
         
         case WM_CLOSE:
@@ -92,23 +191,44 @@ WinMain(HINSTANCE Instance,
     HWND Window;
     WindowCreateWindowed("Handmade FTW", "Win32 Test", Instance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
     
+    RECT ClientRect;
+    GetClientRect(Window, &ClientRect);
+    s32 Width = ClientRect.right - ClientRect.left;
+    s32 Height = ClientRect.bottom - ClientRect.top;
+    
+    window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
+    
+    WindowBitmap = ResizeResult;
+    
     WindowUpdate();
     TimeInit();
+    RenderBlank(255, 255, 255);
     
     r64 OldTime = TimeGet();
+    
+    s32 FileIndex = IOFileOpenRead("data/test.bmp", 0);
+    
+    hformat_bmp *Image = HFormatLoadBMPImage(FileIndex, 0);
     
     while(Running)
     {
         r64 NewTime = TimeGet();
+        r64 DeltaTime = NewTime - OldTime;
         {
             WindowUpdate();
             {
                 local_persist s32 XOffset = 0;
                 local_persist s32 YOffset = 0;
-                RenderGradient(XOffset, YOffset);
+                
+                RenderBMPImage(0, 0, Image);
                 
                 ++XOffset;
                 ++YOffset;
+                    
+                    if(XOffset > WindowBitmap.Width)
+                    {
+                        XOffset = 0;
+                    }
                 }
             WindowBlit(Window, &WindowBitmap);
             
@@ -118,10 +238,4 @@ WinMain(HINSTANCE Instance,
     }
     
     return(0);
-}
-
-void WinMainCRTStartup(void)
-{
-    int Result = WinMain(GetModuleHandle(0), 0, 0, 0);
-    ExitProcess(Result);
 }

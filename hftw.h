@@ -14,7 +14,7 @@
 #define doc_example(...)
 #define doc_ret(...) 
 #define doc_tags(...)
-#define doc_sig(...) __VA_ARGS__
+//#define doc_sig(...) __VA_ARGS__
 #define doc_sep()
 #define doc_hunt()
 

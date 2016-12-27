@@ -5,17 +5,16 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-//doc(seek_origin)
-//doc_cat(IO)
-//doc_string(Origin states used by IOFileSeek.)
-doc_sig(
+doc(seek_origin)
+doc_cat(IO)
+doc_string(Origin states used by IOFileSeek.)
+
 typedef enum
 {
     SeekOrigin_Set = 0,     // Seek from the start of the file.
     SeekOrigin_Cursor = 1,  // Seek from the current position.
     SeekOrigin_End = 2      // Seek from the end of the file backwards.
 } seek_origin;
-)
 #else
 typedef enum
 {
@@ -46,6 +45,9 @@ IOFindHandle(void)
     return(HandleIdx);
 }
 
+doc(IOFileLength)
+doc_string(Retrieves the file length.)
+
 internal ms
 IOFileLength(FILE *File)
 {
@@ -68,13 +70,12 @@ IOFileLength(FILE *File)
     #endif
 }
 
-//doc(IOFileOpenRead)
-//doc_string(Opens file for read access.)
-doc_sig(
+doc(IOFileOpenRead)
+doc_string(Opens file for read access.)
+
 internal s32
 IOFileOpenRead(s8 *Path, // Path to the file.
                ms *Size) // [OUT][OPT] File size
-)
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
@@ -103,12 +104,11 @@ IOFileOpenRead(s8 *Path, // Path to the file.
     return(HandleIdx);
 }
 
-//doc(IOFileOpenWrite)
-//doc_string(Opens file for write access.)
-doc_sig(
+doc(IOFileOpenWrite)
+doc_string(Opens file for write access.)
+
 internal s32
 IOFileOpenWrite(s8 *Path) // Path to the file.
-)
 {
     s32 HandleIdx = IOFindHandle();
     Assert(!FileHandles[HandleIdx]);
@@ -127,12 +127,11 @@ IOFileOpenWrite(s8 *Path) // Path to the file.
     return(HandleIdx);
 }
 
-//doc(IOFileClose)
-//doc_string(Closes the file handle.)
-doc_sig(
+doc(IOFileClose)
+doc_string(Closes the file handle.)
+
 internal void
 IOFileClose(s32 HandleIdx) // The ID of the file handle.
-)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
     
@@ -147,14 +146,13 @@ IOFileClose(s32 HandleIdx) // The ID of the file handle.
     }
 }
 
-//doc(IOFileSeek)
-//doc_string(Moves the position of the cursor in the file.)
-doc_sig(
+doc(IOFileSeek)
+doc_string(Moves the position of the cursor in the file.)
+
 internal void
 IOFileSeek(s32 HandleIdx,      // The ID of the file handle.
            s32 Position,       // The offset to travel.
            seek_origin Origin) // [OPT] Specifies the origin from where to travel.
-)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
     
@@ -175,14 +173,13 @@ IOFileSeek(s32 HandleIdx,      // The ID of the file handle.
     }
 }
 
-//doc(IOFileRead)
-//doc_string(Reads the data from the file.)
-doc_sig(
+doc(IOFileRead)
+doc_string(Reads the data from the file.)
+
 internal ms
 IOFileRead(s32 HandleIdx,  // The ID of the file handle.
            void *Dest,     // Destination to write read data to.
            ms Size)        // The size to read.
-)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES && Dest);
     Assert(FileHandles[HandleIdx]);
@@ -196,14 +193,13 @@ IOFileRead(s32 HandleIdx,  // The ID of the file handle.
     return(BytesRead);
 }
 
-//doc(IOFileWrite)
-//doc_string(Writes the data to the file.)
-doc_sig(
+doc(IOFileWrite)
+doc_string(Writes the data to the file.)
+
 internal ms
 IOFileWrite(s32 HandleIdx, // The ID of the file handle.
             void *Src,     // Source to read the data from.
             ms Size)       // The size to be written.
-)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES && Src);
     Assert(FileHandles[HandleIdx]);
@@ -217,12 +213,11 @@ IOFileWrite(s32 HandleIdx, // The ID of the file handle.
     return(BytesWritten);
 }
 
-//doc(IOGetStringLength)
-//doc_string(Retrieves length of a null-terminated string in stream.)
-doc_sig(
+doc(IOGetStringLength)
+doc_string(Retrieves length of a null-terminated string in stream.)
+
 internal u32
 IOGetStringLength(s32 HandleIdx) // The ID of the file handle.
-)
 {
     Assert(HandleIdx >= 0 && HandleIdx < MAX_HANDLES);
     Assert(FileHandles[HandleIdx]);

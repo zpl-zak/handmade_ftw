@@ -43,7 +43,7 @@ typedef struct
 } hformat_bmp;
 
 internal hformat_bmp *
-HFormatLoadBMPImage(s32 HandleIdx)
+HFormatLoadBMPImage(s32 HandleIdx, b32 SwapChannels)
 {
     hformat_bmp *Image = (hformat_bmp *)PlatformMemAlloc(sizeof(hformat_bmp));
     {
@@ -67,6 +67,8 @@ HFormatLoadBMPImage(s32 HandleIdx)
         
         IOFileRead(HandleIdx, Image->Data, Image->Header.ImageSize);
         
+        if(SwapChannels)
+        {
         for(mi Idx = 0;
             Idx < Image->Header.ImageSize;
             Idx += 3)
@@ -75,6 +77,7 @@ HFormatLoadBMPImage(s32 HandleIdx)
             Image->Data[Idx] = Image->Data[Idx + 2];
             Image->Data[Idx + 2] = _Swap0;
         }
+    }
     }
     return(Image);
 }

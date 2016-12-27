@@ -2,10 +2,10 @@
 
 #if !defined(HFTW_STRING_H)
 
-//doc(string)
+doc(string)
 doc_cat(String)
-//doc_string(Describes string component.)
-doc_sig(
+doc_string(Describes string component.)
+
 typedef struct
 {
     memory_arena Arena; // Memory arena used by the string.
@@ -13,17 +13,15 @@ typedef struct
     s32 StringHash;     // String's generated hash.
     b32 IsModified;     // Was our string modified?
 } string;
-)
 
 doc_sep()
 
-//doc(StringCalcHash)
-//doc_string(Calculates string hash.)
-doc_sig(
+doc(StringCalcHash)
+doc_string(Calculates string hash.)
+
 internal s32
 StringCalcHash(char *Source, // Source of the raw string to be hashed.
                u32 Length)   // Its length.
-)
 {
     s32 Hash = 0;
     char *Ptr = Source;
@@ -36,12 +34,11 @@ StringCalcHash(char *Source, // Source of the raw string to be hashed.
     return(Hash);
 }
 
-//doc(StringGetLengthFromArray)
-//doc_string(Returns length of raw null-terminated string.)
-doc_sig(
+doc(StringGetLengthFromArray)
+doc_string(Returns length of raw null-terminated string.)
+
 internal u32
 StringGetLengthFromArray(char *Src) // Source of the raw string to get length from.
-)
 {
     u32 Length = 0;
     while(*(Src++))
@@ -51,14 +48,13 @@ StringGetLengthFromArray(char *Src) // Source of the raw string to get length fr
     return(Length);
 }
 
-//doc(StringCreate)
-//doc_string(Returns newly-created managed string.)
+doc(StringCreate)
+doc_string(Returns newly-created managed string.)
 doc_example(StringCreate("Hello world!", 11);)
-doc_sig(
+
 internal string
 StringCreate(char *Source, // Source of the raw string.
              u32 Length)   // Its length.
-)
 {
     string Str = {0};
     memory_arena StringArena = {0};
@@ -72,14 +68,13 @@ StringCreate(char *Source, // Source of the raw string.
     return(Str);
 }
 
-//doc(StringCreateUsingArena)
-//doc_string(Push string to the provided arena.)
-doc_sig(
+doc(StringCreateUsingArena)
+doc_string(Push string to the provided arena.)
+
 internal string
 StringCreateUsingArena(char *Source,        // Source of the raw string.
                        u32 Length,          // Its length.
                        memory_arena *Arena) // Our arena to be used for storing our string.
-)
 {
     string Str = {0};
     memory_arena StringArena = {0};
@@ -92,14 +87,13 @@ StringCreateUsingArena(char *Source,        // Source of the raw string.
     return(Str);
 }
 
-//doc(StringCreateRaw)
-//doc_string(Push string to a raw block of memory.<br/>NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).)
-doc_sig(
+doc(StringCreateRaw)
+doc_string(Push string to a raw block of memory.<br/>NOTE: The block of memory has to expect string length + 1 byte (for null-terminator).)
+
 internal string
 StringCreateRaw(char *Source,        // Source of the raw string.
                        u32 Length,          // Its length.
                         char *Dest)          // The destination to write to.
-)
 {
     string Str = {0};
     memory_arena StringArena = {0};
@@ -112,60 +106,55 @@ StringCreateRaw(char *Source,        // Source of the raw string.
     return(Str);
 }
 
-//doc(StringDestroy)
-//doc_string(Destroys string and de-allocates its memory. <br/>NOTE: Should be used only on strings with independent memory block!)
-doc_sig(
+doc(StringDestroy)
+doc_string(Destroys string and de-allocates its memory. <br/>NOTE: Should be used only on strings with independent memory block!)
+
 internal void
 StringDestroy(string *Str) // Our string.
-)
 {
     ArenaFree(&Str->Arena);
 }
 
 // NOTE(zaklaus): Read-Only
-//doc(StringGetRaw)
-//doc_string(Returns raw string.)
-doc_sig(
+doc(StringGetRaw)
+doc_string(Returns raw string.)
+
 internal const char *
 StringGetRaw(string *Str) // Our string.
-)
 {
     Assert(!Str->IsModified);
     const char *Source = (char *)Str->Arena.Base;
     return(Source);
 }
 
-//doc(StringCompare)
-//doc_string(Compares two strings by hash.)
+doc(StringCompare)
+doc_string(Compares two strings by hash.)
 doc_ret(Returns 1 if string hashes are equal.)
-doc_sig(
+
 internal b32
 StringCompare(string *Str1, // Our 1st string.
               string *Str2) // Our 2nd string.
-)
 {
     b32 Result = Str1->StringHash == Str2->StringHash;
     return(Result);
 }
 
-//doc(StringCompareSlow)
-//doc_string(Compares two string by comparing their characters.)
-doc_sig(
+doc(StringCompareSlow)
+doc_string(Compares two string by comparing their characters.)
+
 internal b32
 StringCompareSlow(string *Str1, // Our 1st string.
                   string *Str2) // Our 2nd string.
-)
 {
     b32 Result = StringsAreEqual((char *)Str1->Arena.Base, (char *)Str2->Arena.Base);
     return(Result);
 }
 
-//doc(StringBeginEdit)
-//doc_string(Tells the string we want to edit it. Therefore entering edit mode.)
-doc_sig(
+doc(StringBeginEdit)
+doc_string(Tells the string we want to edit it. Therefore entering edit mode.)
+
 internal char *
 StringBeginEdit(string *Str) // Our string.
-)
 {
     Assert(!Str->IsModified);
     char * Result = (char *)Str->Arena.Base;
@@ -173,12 +162,11 @@ StringBeginEdit(string *Str) // Our string.
     return(Result);
 }
 
-//doc(StringEndEdit)
-//doc_string(Tells the string we`re done with editation, therefore it recalculates string`s hash.)
-doc_sig(
+doc(StringEndEdit)
+doc_string(Tells the string we`re done with editation, therefore it recalculates string`s hash.)
+
 internal void
 StringEndEdit(string *Str) // Our string.
-)
 {
     Assert(Str->IsModified);
     char *Source = (char *)Str->Arena.Base;
@@ -187,39 +175,36 @@ StringEndEdit(string *Str) // Our string.
     Str->IsModified = 0;
 }
 
-//doc(StringGetLength)
-//doc_string(Returns the length of our string.)
-doc_sig(
+doc(StringGetLength)
+doc_string(Returns the length of our string.)
+
 internal u32
 StringGetLength(
 string *Str) // Our string.
-)
 {
     Assert(!Str->IsModified);
     u32 Length = Str->Length;
     return(Length);
 }
 
-//doc(StringGetAllocatedLength)
-//doc_string(Returns the allocated memory for our string.)
-doc_sig(
+doc(StringGetAllocatedLength)
+doc_string(Returns the allocated memory for our string.)
+
 internal u32
 StringGetAllocatedLength(
 string *Str) // Our string.
-)
 {
     Assert(!Str->IsModified);
     u32 Length = (u32)Str->Arena.Size;
     return(Length);
 }
 
-//doc(StringCheck)
-//doc_string(Checks whether our hash is correct.)
-doc_sig(
+doc(StringCheck)
+doc_string(Checks whether our hash is correct.)
+
 internal void
 StringCheck(
 string *Str) // Our string.
-)
 {
     Assert(!Str->IsModified);
     char *Source = (char *)Str->Arena.Base;
@@ -228,13 +213,12 @@ string *Str) // Our string.
     Assert(CompareHash == Str->StringHash);
 }
 
-//doc(StringDuplicate)
-//doc_string(Duplicates our string.)
-doc_sig(
+doc(StringDuplicate)
+doc_string(Duplicates our string.)
+
 internal string
 StringDuplicate(
 string *Str) // Our string.
-)
 {
     string Result = {0};
     memory_arena NewArena;
@@ -251,13 +235,12 @@ string *Str) // Our string.
     return(Result);
 }
 
-//doc(StringAppend)
-//doc_string(Appends our string to our original string.)
-doc_sig(
+doc(StringAppend)
+doc_string(Appends our string to our original string.)
+
 internal void
 StringAppend(string *StrA, // Our string.
              string *StrB) // Our string.
-)
 {
     char *Dest = (char *)ArenaPushSize_(&(StrA->Arena), StrB->Length, ArenaNoClear());
     Copy(1, StringGetRaw(StrB), Dest);

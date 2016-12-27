@@ -3,7 +3,7 @@
 doc(v3_4x)
 doc_cat(SIMD)
 doc_string(3-dimensional vector component.)
-doc_sig(
+
 typedef union v3_4x
 {
     struct
@@ -24,12 +24,10 @@ typedef union v3_4x
         __m128 B;
     };
 } v3_4x;
-)
-
 
 doc(v4_4x)
 doc_string(4-dimensional vector component.)
-doc_sig(
+
 typedef union v4_4x
 {
     struct
@@ -56,7 +54,6 @@ typedef union v4_4x
         __m128 A;
     };
 } v4_4x;
-)
 
 #define mmSquare(a) _mm_mul_ps(a, a)    
 #define M(a, i) ((float *)&(a))[i]
@@ -66,11 +63,10 @@ doc_sep()
 
 doc(SIMDMultiplyv3_4x)
 doc_string(Multiply v3_4x with scalar.)
-doc_sig(
+
 internal v3_4x
 SIMDMultiplyv3_4x(f32 As,
                   v3_4x B)
-)
 {
     v3_4x Result;
     
@@ -85,11 +81,10 @@ SIMDMultiplyv3_4x(f32 As,
 
 doc(SIMDAddv3_4x)
 doc_string(Add scalar to v3_4x.)
-doc_sig(
+
  internal v3_4x
 SIMDAddv3_4x(v3_4x A, 
              v3_4x B)
-)
 {
     v3_4x Result;
     
@@ -103,11 +98,10 @@ SIMDAddv3_4x(v3_4x A,
 
 doc(SIMDMultiplyv4_4x)
 doc_string(Multiply v4_4x with scalar.)
-doc_sig(
+
 internal v4_4x
 SIMDMultiplyv4_4x(f32 As, 
                   v4_4x B)
-)
 {
     v4_4x Result;
     
@@ -123,11 +117,10 @@ SIMDMultiplyv4_4x(f32 As,
 
 doc(SIMDAddv4_4x)
 doc_string(Add scalar to v4_4x.)
-doc_sig(
+
 internal v4_4x
 SIMDAddv4_4x(v4_4x A, 
              v4_4x B)
-)
 {
     v4_4x Result;
     
@@ -142,11 +135,10 @@ SIMDAddv4_4x(v4_4x A,
 
 doc(SIMDTov3_4x)
 doc_string(Convert v3 to v3_4x.)
-doc_sig(
+
 internal v3_4x 
 SIMDTov3_4x(
 v3 A)
-)
 {
     v3_4x Result;
     

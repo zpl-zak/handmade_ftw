@@ -7,22 +7,22 @@
 #include <windows.h>
 #endif
 
-#ifndef _WIN32
+#ifdef _WIN32
 #include <malloc.h>
 #endif
 
-//doc(PlatformMemAlloc)
-//doc_string(Allocates memory using platform-specific call.)
-doc_sig(
+doc(PlatformMemAlloc)
+doc_string(Allocates memory using platform-specific call.)
+
 internal void *
 PlatformMemAlloc(
 size_t Size)  // Requested memory size.
-)
 {
     void *Result = 0;
     
     #ifdef _WIN32
-    Result = VirtualAlloc(0, Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    //Result = VirtualAlloc(0, Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    Result = malloc(Size);
     #else
     Result = malloc(Size);
     #endif
@@ -32,28 +32,27 @@ size_t Size)  // Requested memory size.
 
 doc_cat(Platform)
 
-//doc(PlatformMemFree)
-//doc_string(Free memory using platform-specific call.)
-doc_sig(
+doc(PlatformMemFree)
+doc_string(Free memory using platform-specific call.)
+
 internal void
 PlatformMemFree(
 void *Ptr)   // Pointer to allocated block of memory.
-)
 {
     #ifdef _WIN32
-    VirtualFree(Ptr, 0, MEM_RELEASE);
+    //VirtualFree(Ptr, 0, MEM_RELEASE);
+    free(Ptr);
     #else
     free(Ptr);
     #endif
 }
 
-//doc(PlatformMemRealloc)
-//doc_string(Reallocates memory by requested size using platform-specific call.)
-doc_sig(
+doc(PlatformMemRealloc)
+doc_string(Reallocates memory by requested size using platform-specific call.)
+
 internal void *
 PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
                    size_t Size) // Requested memory size.
-)
 {
     void *Result = Ptr;
     Result = realloc(Result, Size);
