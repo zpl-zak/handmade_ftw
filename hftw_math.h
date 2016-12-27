@@ -6,23 +6,6 @@
 
 #include <math.h> // TODO(zak): Remove this later on
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#ifdef HANDMADEMATH_STATIC
-#define HFTWDEF internal
-#else
-#define HFTWDEF extern
-#endif
-
-#if _MSC_VER && !__INTEL_COMPILER
-#define HINLINE internal
-#else
-#define HINLINE internal
-#endif
-
 #define MathPI32 3.14159265359f
 #define MathPI 3.14159265358979323846f
 
@@ -31,6 +14,10 @@ extern "C"
 #define MathABS(a) (a) < 0 ? -(a) : (a)
 #define MathMOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
 #define MathSQUARE(x) ((x) * (x))
+
+doc(vec2)
+doc_string(2-sized vector. Alias: v2)
+doc_cat(Math [Unfinished])
 
 typedef union vec2
 {
@@ -51,6 +38,9 @@ typedef union vec2
 
     real32 Elements[2];
 } vec2;
+
+doc(vec3)
+doc_string(3-sized vector. Alias: v3)
 
 typedef union vec3
 {
@@ -95,6 +85,9 @@ typedef union vec3
 
     real32 Elements[3];
 } vec3;
+
+doc(vec4)
+doc_string(4-sized vector. Alias: v4)
 
 typedef union vec4
 {
@@ -149,74 +142,27 @@ typedef union vec4
     real32 Elements[4];
 } vec4;
 
+doc(mat4)
+doc_string(4x4 Matrix. Alias: m4)
+
 typedef union mat4
 {
     real32 Elements[4][4];
 } mat4;
+
+doc_ignore()
 
 typedef vec2 v2;
 typedef vec3 v3;
 typedef vec4 v4;
 typedef mat4 m4;    
 
-HFTWDEF real32 MathToRadians(real32 Degrees);
-HFTWDEF real32 MathInner(vec3 A, vec3 B);
-HFTWDEF real32 MathSquareRoot(real32 Float);
-HFTWDEF real32 MathLengthSquareRoot(vec3 A);
-HFTWDEF real32 MathFastInverseSquareRoot(real32 Number);
-HFTWDEF real32 MathLength(vec3 A);    
-HFTWDEF real32 MathPower(real32 Base, int Exponent);
-HFTWDEF real32 MathClamp(real32 Min, real32 Value, real32 Max);
+doc_hunt()
 
-HFTWDEF vec3 MathNormalize(vec3 A);
-HFTWDEF vec3 MathCross(vec3 VecOne, vec3 VecTwo);
-HFTWDEF real32 MathDot(vec3 VecOne, vec3 VecTwo);
+doc(MathToRadians)
+doc_string(Convert Degree value to Radians.)
 
-HFTWDEF vec2 MathVec2i(int X, int Y);
-HFTWDEF vec2 MathVec2(real32 X, real32 Y);
-HFTWDEF vec3 MathVec3(real32 X, real32 Y, real32 Z);
-HFTWDEF vec3 MathVec3i(int X, int Y, int Z);
-HFTWDEF vec4 MathVec4(real32 X, real32 Y, real32 Z, real32 W);
-HFTWDEF vec4 MathVec4i(int X, int Y, int Z, int W);
-
-HFTWDEF vec2 MathAddVec2(vec2 Left, vec2 Right);
-HFTWDEF vec3 MathAddVec3(vec3 Left, vec3 Right);
-HFTWDEF vec4 MathAddVec4(vec4 Left, vec4 Right);
-
-HFTWDEF vec2 MathSubtractVec2(vec2 Left, vec2 Right);
-HFTWDEF vec3 MathSubtractVec3(vec3 Left, vec3 Right);
-HFTWDEF vec4 MathSubtractVec4(vec4 Left, vec4 Right);
-
-HFTWDEF vec2 MathMultiplyVec2(vec2 Left, vec2 Right);
-HFTWDEF vec3 MathMultiplyVec3(vec3 Left, vec3 Right);
-HFTWDEF vec4 MathMultiplyVec4(vec4 Left, vec4 Right);
-
-HFTWDEF vec2 MathDivideVec2(vec2 Left, vec2 Right);
-HFTWDEF vec3 MathDivideVec3(vec3 Left, vec3 Right);
-HFTWDEF vec4 MathDivideVec4(vec4 Left, vec4 Right);
-
-HFTWDEF mat4 MathMat4(void);
-HFTWDEF mat4 MathMat4d(real32 Diagonal);
-HFTWDEF mat4 MathMultiplyMat4(mat4 Left, mat4 Right);
-HFTWDEF vec4 MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector);
-
-HFTWDEF mat4 MathOrthographic(real32 Left, real32 Right, real32 Bottom, real32 Top, real32 Near, real32 Far);
-HFTWDEF mat4 MathPerspective(real32 FOV, real32 AspectRatio, real32 Near, real32 Far);
-HFTWDEF mat4 MathTranslate(vec3 Translation);
-HFTWDEF mat4 MathRotate(real32 Angle, vec3 Axis);
-HFTWDEF mat4 MathScale(vec3 Scale);
-
-HFTWDEF mat4 MathLookAt(vec3 Eye, vec3 Center, vec3 Up);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* HANDMADE_MATH_H */
-
-#ifdef HANDMADE_MATH_IMPLEMENTATION
-
-HINLINE real32
+internal real32
 MathToRadians(real32 Degrees)
 {
     real32 Result = Degrees * (MathPI32 / 180.0f);
@@ -224,7 +170,10 @@ MathToRadians(real32 Degrees)
     return (Result);
 }
 
-HINLINE real32
+doc(MathInner)
+doc_string(Calculates scalar value from 2 vectors.)
+
+internal real32
 MathInner(vec3 A, vec3 B)
 {
     real32 Result = A.X * B.X + A.Y * B.Y + A.Z * B.Z;
@@ -232,7 +181,10 @@ MathInner(vec3 A, vec3 B)
     return (Result);
 }
 
-HINLINE real32
+doc(MathSquareRoot)
+doc_string(Calculates the 2th square root of value.)
+
+internal real32
 MathSquareRoot(real32 Float)
 {    
     real32 Result = sqrtf(Float);
@@ -240,7 +192,10 @@ MathSquareRoot(real32 Float)
     return(Result);
 }
 
-HINLINE real32
+doc(MathLengthSquareRoot)
+doc_string(Calculates the length of a square root.)
+
+internal real32
 MathLengthSquareRoot(vec3 A)
 {
     real32 Result = MathInner(A, A);
@@ -249,7 +204,10 @@ MathLengthSquareRoot(vec3 A)
 }
 
 // Refer to https://en.wikipedia.org/wiki/Fast_inverse_square_root
-HINLINE real32
+doc(MathFastInverseSquareRoot)
+doc_string(Calculates inverse square root of value.)
+
+internal real32
 MathFastInverseSquareRoot(real32 Number)
 {
     long i;
@@ -258,8 +216,8 @@ MathFastInverseSquareRoot(real32 Number)
 
     x2 = Number * 0.5f;
     y  = Number;
-    i  = * ( long * ) &y;          // evil real32ing point bit level hacking
-    i  = 0x5f3759df - ( i >> 1 );  // what the fuck? 
+    i  = * ( long * ) &y;
+    i  = 0x5f3759df - ( i >> 1 );
     y  = * ( real32 * ) &i;
     
     y  = y * ( threehalfs - ( x2 * y * y ) );
@@ -267,14 +225,20 @@ MathFastInverseSquareRoot(real32 Number)
     return ( y );
 }
 
-HINLINE real32
+doc(MathLength)
+doc_string(Calculates the length of vector.)
+
+internal real32
 MathLength(vec3 A)
 {
     real32 Result = MathSquareRoot(MathLengthSquareRoot(A));
     return (Result);
 }
 
-HINLINE real32
+doc(MathPower)
+doc_string(Calculates the power of E for value.)
+
+internal real32
 MathPower(real32 Base, int Exponent)
 {
     real32 Result = 1;
@@ -297,7 +261,10 @@ MathPower(real32 Base, int Exponent)
     return (Result);
 }
 
-HINLINE real32
+doc(MathLerp)
+doc_string(Calculates linear interpolation between 2 values by given time.)
+
+internal real32
 MathLerp(real32 A, real32 Time, real32 B)
 {
     real32 Result = (1.0f - Time) * A + Time * B;
@@ -305,7 +272,10 @@ MathLerp(real32 A, real32 Time, real32 B)
     return (Result);
 }
 
-HINLINE real32
+doc(MathClamp)
+doc_string(Clamps the value between Minima/Maxima.)
+
+internal real32
 MathClamp(real32 Min, real32 Value, real32 Max)
 {
     real32 Result = Value;
@@ -322,7 +292,10 @@ MathClamp(real32 Min, real32 Value, real32 Max)
     return (Result);
 }
 
-HINLINE vec3
+doc(MathNormalize)
+doc_string(Returns normalized vector.)
+
+internal vec3
 MathNormalize(vec3 A)
 {
     vec3 Result = {0};
@@ -334,7 +307,10 @@ MathNormalize(vec3 A)
     return (Result);
 }
 
-HINLINE vec3
+doc(MathCross)
+doc_string(Calculates the cross product of 2 vectors.)
+
+internal vec3
 MathCross(vec3 VecOne, vec3 VecTwo)
 {
     vec3 Result;
@@ -346,7 +322,10 @@ MathCross(vec3 VecOne, vec3 VecTwo)
     return (Result);
 }
 
-HINLINE real32
+doc(MathDot)
+doc_string(Calculates the dot product of 2 vectors.)
+
+internal real32
 MathDot(vec3 VecOne, vec3 VecTwo)
 {
     real32 Result = 0;
@@ -356,7 +335,10 @@ MathDot(vec3 VecOne, vec3 VecTwo)
     return (Result);
 }
 
-HINLINE vec2
+doc(MathVec2)
+doc_string(Returns vec2 from [x;y].)
+
+internal vec2
 MathVec2(real32 X, real32 Y)
 {
     vec2 Result;
@@ -367,7 +349,10 @@ MathVec2(real32 X, real32 Y)
     return (Result);
 }
 
-HINLINE vec2
+doc(MathVec2i)
+doc_string(Returns vec2 from [x;y].)
+
+internal vec2
 MathVec2i(int X, int Y)
 {
     vec2 Result;
@@ -378,7 +363,11 @@ MathVec2i(int X, int Y)
     return (Result);
 }
 
-HINLINE vec3
+
+doc(MathVec3)
+doc_string(Returns vec3 from [x;y;z].)
+
+internal vec3
 MathVec3(real32 X, real32 Y, real32 Z)
 {
     vec3 Result;
@@ -390,7 +379,10 @@ MathVec3(real32 X, real32 Y, real32 Z)
     return (Result);
 }
 
-HINLINE vec3
+doc(MathVec3i)
+doc_string(Returns vec3 from [x;y;z].)
+
+internal vec3
 MathVec3i(int X, int Y, int Z)
 {
     vec3 Result;
@@ -402,7 +394,10 @@ MathVec3i(int X, int Y, int Z)
     return (Result);
 }
 
-HINLINE vec4
+doc(MathVec4)
+doc_string(Returns vec4 from [x;y;z;w].)
+
+internal vec4
 MathVec4(real32 X, real32 Y, real32 Z, real32 W)
 {
     vec4 Result;
@@ -415,7 +410,10 @@ MathVec4(real32 X, real32 Y, real32 Z, real32 W)
     return (Result);
 }
 
-HINLINE vec4
+doc(MathVec4i)
+doc_string(Returns vec4 from [x;y;z;w].)
+
+internal vec4
 MathVec4i(int X, int Y, int Z, int W)
 {
     vec4 Result;
@@ -428,7 +426,10 @@ MathVec4i(int X, int Y, int Z, int W)
     return (Result);
 }
 
-HINLINE vec2
+doc(MathAddVec2)
+doc_string(Adds vector to vec2.)
+
+internal vec2
 MathAddVec2(vec2 Left, vec2 Right)
 {
     vec2 Result;
@@ -439,7 +440,7 @@ MathAddVec2(vec2 Left, vec2 Right)
     return (Result);
 }
 
-HINLINE vec3
+internal vec3
 MathAddVec3(vec3 Left, vec3 Right)
 {
     vec3 Result;
@@ -451,7 +452,7 @@ MathAddVec3(vec3 Left, vec3 Right)
     return (Result);
 }
 
-HINLINE vec4
+internal vec4
 MathAddVec4(vec4 Left, vec4 Right)
 {
     vec4 Result;
@@ -464,7 +465,7 @@ MathAddVec4(vec4 Left, vec4 Right)
     return (Result);
 }
 
-HINLINE vec2
+internal vec2
 MathSubtractVec2(vec2 Left, vec2 Right)
 {
     vec2 Result;
@@ -475,7 +476,7 @@ MathSubtractVec2(vec2 Left, vec2 Right)
     return (Result);
 }
 
-HINLINE vec3
+internal vec3
 MathSubtractVec3(vec3 Left, vec3 Right)
 {
     vec3 Result;
@@ -487,7 +488,7 @@ MathSubtractVec3(vec3 Left, vec3 Right)
     return (Result);
 }
 
-HINLINE vec4
+internal vec4
 MathSubtractVec4(vec4 Left, vec4 Right)
 {
     vec4 Result;
@@ -500,7 +501,7 @@ MathSubtractVec4(vec4 Left, vec4 Right)
     return (Result);
 }
 
-HINLINE vec2
+internal vec2
 MathMultiplyVec2(vec2 Left, vec2 Right)
 {
     vec2 Result;
@@ -511,7 +512,7 @@ MathMultiplyVec2(vec2 Left, vec2 Right)
     return (Result);
 }
 
-HINLINE vec3
+internal vec3
 MathMultiplyVec3(vec3 Left, vec3 Right)
 {
     vec3 Result;
@@ -523,7 +524,7 @@ MathMultiplyVec3(vec3 Left, vec3 Right)
     return (Result);
 }
 
-HINLINE vec4
+internal vec4
 MathMultiplyVec4(vec4 Left, vec4 Right)
 {
     vec4 Result;
@@ -536,7 +537,7 @@ MathMultiplyVec4(vec4 Left, vec4 Right)
     return (Result);
 }
 
-HINLINE vec2
+internal vec2
 MathDivideVec2(vec2 Left, vec2 Right)
 {
     vec2 Result;
@@ -547,7 +548,7 @@ MathDivideVec2(vec2 Left, vec2 Right)
     return (Result);
 }
 
-HINLINE vec3
+internal vec3
 MathDivideVec3(vec3 Left, vec3 Right)
 {
     vec3 Result;
@@ -559,7 +560,7 @@ MathDivideVec3(vec3 Left, vec3 Right)
     return (Result);
 }
 
-HINLINE vec4
+internal vec4
 MathDivideVec4(vec4 Left, vec4 Right)
 {
     vec4 Result;
@@ -572,7 +573,7 @@ MathDivideVec4(vec4 Left, vec4 Right)
     return (Result);
 }
 
-HINLINE mat4
+internal mat4
 MathMat4()
 {
     mat4 Result = {0};
@@ -580,7 +581,7 @@ MathMat4()
     return (Result);
 }
 
-mat4
+internal mat4
 MathMat4d(real32 Diagonal)
 {
     mat4 Result;
@@ -603,7 +604,7 @@ MathMat4d(real32 Diagonal)
     return (Result);
 }
 
-mat4
+internal mat4
 MathMultiplyMat4(mat4 Left, mat4 Right)
 {
     mat4 Result = MathMat4();
@@ -628,7 +629,7 @@ MathMultiplyMat4(mat4 Left, mat4 Right)
     return (Result);
 }
 
-vec4
+internal vec4
 MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector)
 {
     vec4 Result = MathVec4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -648,7 +649,7 @@ MathMultiplyMat4ByVec4(mat4 Matrix, vec4 Vector)
     return (Result);
 }
 
-mat4
+internal mat4
 MathOrthographic(real32 Left, real32 Right, real32 Bottom, real32 Top, real32 Near, real32 Far)
 {
     mat4 Result = MathMat4d(1.0f);
@@ -664,7 +665,7 @@ MathOrthographic(real32 Left, real32 Right, real32 Bottom, real32 Top, real32 Ne
     return (Result);
 }
 
-mat4
+internal mat4
 MathPerspective(real32 FOV, real32 AspectRatio, real32 Near, real32 Far)
 {
     mat4 Result = MathMat4d(1.0f);
@@ -681,7 +682,7 @@ MathPerspective(real32 FOV, real32 AspectRatio, real32 Near, real32 Far)
     return (Result);
 }
 
-mat4
+internal mat4
 MathTranslate(vec3 Translation)
 {
     mat4 Result = MathMat4d(1.0f);
@@ -693,7 +694,7 @@ MathTranslate(vec3 Translation)
     return (Result);
 }
 
-mat4
+internal mat4
 MathRotate(real32 Angle, vec3 Axis)
 {
     mat4 Result = MathMat4d(1.0f);
@@ -719,7 +720,7 @@ MathRotate(real32 Angle, vec3 Axis)
     return (Result);
 }
 
-mat4
+internal mat4
 MathLookAt(vec3 Eye, vec3 Center, vec3 Up)
 {
     mat4 Result = {0};
@@ -748,7 +749,7 @@ MathLookAt(vec3 Eye, vec3 Center, vec3 Up)
     return (Result);
 }
 
-mat4
+internal mat4
 MathScale(vec3 Scale)
 {
     mat4 Result = MathMat4d(1.0f);
@@ -760,4 +761,4 @@ MathScale(vec3 Scale)
     return (Result);
 }
 
-#endif /* HANDMADE_MATH_IMPLEMENTATION */
+#endif /* HANDMADE_MATH_H */

@@ -39,14 +39,9 @@
 #define CSize(type, Count) sizeof(type)*Count
 #define Count(array) sizeof(array)/sizeof(array[0])
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //
 // NOTE(casey): Compilers
 //
-
 
 #ifdef _MSC_VER
 #define COMPILER_MSVC 1
@@ -262,9 +257,6 @@ internal u32 GetThreadID(void)
 #else
 #endif
 
-#define HANDMADEMATH_STATIC
-#define HANDMADE_MATH_IMPLEMENTATION
-
 #include "hftw_math.h"
 #include "hftw_random.h"
 #include "hftw_platform.h"
@@ -276,10 +268,6 @@ internal u32 GetThreadID(void)
 #include "hftw_simd.h"
 #include "hftw_string.h"
 #include "hftw_io.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #define HFTW_H
 #endif
