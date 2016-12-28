@@ -173,5 +173,9 @@ DECOMPRESSION_HANDLER(HENCDecompressLZMemory)
     return(Result);
 }
 
+doc(LZ Compression)
+doc_string(To be documented.)
+doc_embed(lz_doc)
+
 #define HENC_LZ_H
 #endif

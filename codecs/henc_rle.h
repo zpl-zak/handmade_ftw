@@ -122,5 +122,8 @@ DECOMPRESSION_HANDLER(HENCDecompressRLEMemory)
     return(Result);
 }
 
+doc(RLE Compression)
+doc_string(To be documented.)
+
 #define HENC_RLE_H
 #endif
