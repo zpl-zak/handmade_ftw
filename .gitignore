@@ -9,7 +9,7 @@
 *.VC.db
 /*.opendb
 
-updocs.*
+updocs.scr
 *.tmp
 *.out
 id1/
