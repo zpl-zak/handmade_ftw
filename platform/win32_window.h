@@ -5,7 +5,7 @@
 typedef struct
 {
     u32 X,Y;
-} window_dim;
+} window_dim, window_pos, window_size;
 
 typedef struct
 {
@@ -14,7 +14,22 @@ typedef struct
     s32 Height;
     s32 BPP;
     void *BitmapMemory;
-} window_resize_result, window_bitmap;
+} window_resize_result, window_bitmap, window_backbuffer;
+
+internal window_dim
+WindowGetClientRect(HWND Window)
+{
+    RECT ClientRect;
+    GetClientRect(Window, &ClientRect);
+    u32 Width = ClientRect.right - ClientRect.left;
+    u32 Height = ClientRect.bottom - ClientRect.top;
+    
+    window_dim Result = {0};
+    Result.X = Width;
+    Result.Y = Height;
+    
+    return(Result);
+}
 
 internal b32
 WindowCreateClass(HINSTANCE Instance, LPCSTR ClassName, LRESULT (*WndProc)(HWND,UINT,WPARAM,LPARAM))
@@ -57,7 +72,7 @@ WindowCreateWindowed(LPCSTR ClassName, LPCSTR Title, HINSTANCE Instance, s32 Sty
     r.bottom = Resolution.Y;
     AdjustWindowRectEx(&r, WindowStyle, 0, WindowExStyle);
     
-    *Window = CreateWindowEx(WindowExStyle, "Handmade FTW", Title, WindowStyle,
+    *Window = CreateWindowEx(WindowExStyle, ClassName, Title, WindowStyle,
                                   Position.X, Position.Y,
                                   r.right - r.left, r.bottom - r.top,
                                   0, 0,
@@ -131,8 +146,6 @@ WindowBlit(HWND Window, window_bitmap *WindowBitmap)
     HDC DeviceContext = GetDC(Window);
     RECT ClientRect;
     GetClientRect(Window, &ClientRect);
-    s32 Width = ClientRect.right - ClientRect.left;
-    s32 Height = ClientRect.bottom - ClientRect.top;
     
     WindowPaint(DeviceContext, &ClientRect, WindowBitmap);
     ReleaseDC(Window, DeviceContext);

@@ -65,6 +65,8 @@
 #include <limits.h>
 #include <float.h>
 
+doc_ignore()
+
 typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
@@ -106,6 +108,8 @@ typedef real64 r64;
     typedef r64 f64;
 
 typedef uintptr_t umm;
+
+doc_hunt()
 
 #define U32FromPointer(Pointer) ((u32)(memory_index)(Pointer))
 #define PointerFromU32(type, Value) (type *)((memory_index)Value)
@@ -159,6 +163,8 @@ typedef uintptr_t umm;
 #define Align16(Value) ((Value + 15) & ~15)
 #define Maximum64Value 0xFFFFFFFF
     #define Maximum32Value 0xFFFF
+#define Maximum16Value 0xFF
+#define Maximum8Value 0xF
 
 internal uint32
 SafeTruncateUInt64(uint64 Value)
@@ -263,11 +269,12 @@ internal u32 GetThreadID(void)
 #include "hftw_node.h"
 #include "hftw_shared.h"
 #include "hftw_mem.h"
-
 #include "hftw_intrinsics.h"
 #include "hftw_simd.h"
 #include "hftw_string.h"
 #include "hftw_io.h"
+
+#include "henc_rle.h"
 
 #define HFTW_H
 #endif

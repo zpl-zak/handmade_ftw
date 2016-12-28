@@ -144,12 +144,9 @@ WndProc(HWND Window,
         case WM_ACTIVATEAPP:
         case WM_SIZE:
         {
-            RECT ClientRect;
-            GetClientRect(Window, &ClientRect);
-            s32 Width = ClientRect.right - ClientRect.left;
-            s32 Height = ClientRect.bottom - ClientRect.top;
+            window_dim Dim = WindowGetClientRect(Window);
             
-            window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
+            window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowBitmap);
             
             WindowBitmap = ResizeResult;
             
@@ -191,12 +188,8 @@ WinMain(HINSTANCE Instance,
     HWND Window;
     WindowCreateWindowed("Handmade FTW", "Win32 Test", Instance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
     
-    RECT ClientRect;
-    GetClientRect(Window, &ClientRect);
-    s32 Width = ClientRect.right - ClientRect.left;
-    s32 Height = ClientRect.bottom - ClientRect.top;
-    
-    window_resize_result ResizeResult = WindowResize(Width, Height, WindowBitmap);
+    window_dim Dim = WindowGetClientRect(Window);
+    window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowBitmap);
     
     WindowBitmap = ResizeResult;
     
@@ -207,10 +200,35 @@ WinMain(HINSTANCE Instance,
     r64 OldTime = TimeGet();
     
     s32 FileIndex = IOFileOpenRead("data/test.bmp", 0);
-    
     hformat_bmp *Image = HFormatLoadBMPImage(FileIndex, 0);
+    IOFileClose(FileIndex);
     
-    while(Running)
+    // NOTE(zaklaus): RLE test code!
+     ms FileSize;
+    s32 FileIndex2 = IOFileOpenRead("data/test.4ds", &FileSize);
+    {
+        u8 *FileData = PlatformMemAlloc(FileSize);
+        IOFileRead(FileIndex2, FileData, FileSize);
+        henc_rle Data = HENCCompressRLEMemory(FileData, FileSize);
+        
+        s32 OutFile = IOFileOpenWrite("data/test.rle");
+        IOFileWrite(OutFile, Data.Memory, Data.MemorySize);
+        IOFileClose(OutFile);
+        PlatformMemFree(Data.Memory);
+        
+         ms InSize;
+        s32 InFile = IOFileOpenRead("data/test.rle", &InSize);
+        FileData = PlatformMemAlloc(InSize);
+        IOFileRead(InFile, FileData, InSize);
+        henc_rle BMP = HENCDecompressRLEMemory(FileData, InSize);
+        
+        OutFile = IOFileOpenWrite("data/test_rle.4ds");
+        IOFileWrite(OutFile, BMP.Memory, BMP.MemorySize);
+        IOFileClose(OutFile);
+    }
+    IOFileClose(FileIndex2);
+    
+    while(0)
     {
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
