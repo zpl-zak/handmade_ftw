@@ -7,7 +7,7 @@
 #define HENC_MAX_RUN_COUNT 255
 
 doc(henc_rle)
-doc_string(Holds compressed/uncompressed data.)
+doc_string(Holds compressed/uncompressed data.<br/>NOTE: Caller has to free the memory.)
 doc_cat(Compression: RLE)
 
 typedef struct

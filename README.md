@@ -30,6 +30,11 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>hftw_math.h</td>
 				<td>Linear algebra.</td>
 			</tr>
+
+			<tr>
+				<td>henc_rle.h</td>
+				<td>RLE compression algorithm.</td>
+			</tr>
 			
 			<tr>
 				<td>hftw_intrinsics.h</td>
@@ -94,7 +99,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>hformat_pak.h</td>
 				<td>PAK</td>
 				<td>Archive Format</td>
-				<td>Quake series</td>
+				<td>Quake I</td>
 			</tr>
 		</table>
 	</ul>
@@ -102,7 +107,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 # Copyright
 ```
 Unless otherwise indicated, all content on this repository 
-is copyrighted by Dominik *ZaKlaus* Madarász. 
+is copyrighted by Dominik *ZaKlaus* Madar??sz. 
 All rights reserved. No part of the content, either text or binary data 
 may be used for any purpose other than personal use. 
 Therefore, reproduction, modification, storage in a retrieval system or retransmission, 
