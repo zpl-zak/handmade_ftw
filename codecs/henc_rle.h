@@ -3,8 +3,9 @@
 #if !defined(HENC_RLE_H)
 
 // NOTE(zaklaus): can be changed.
-#define HENC_MAX_LITERAL_COUNT 255
-#define HENC_MAX_RUN_COUNT 255
+#define HENC_RLE_MAX_LITERAL_COUNT 255
+#define HENC_RLE_MAX_RUN_COUNT 255
+#define HENC_RLE_MAGIC 0x454c5248
 
 doc(henc_rle)
 doc_string(Holds compressed/uncompressed data.<br/>NOTE: Caller has to free the memory.)
@@ -24,7 +25,7 @@ HENCGetOptimalRLESize(u8 *Src, ms SrcSize)
     return(256 + 2*SrcSize + 8);
 }
 
-doc(RLECompressMemory)
+doc(HENCCompressRLEMemory)
 doc_string(Compresses data using Run-Length Encoding technique.)
 
 internal henc_rle
@@ -35,14 +36,14 @@ HENCCompressRLEMemory(u8 *Src, ms SrcSize)
     ms TotalSize = HENCGetOptimalRLESize(Src, SrcSize);
     u8 *Dst = (u8 *)PlatformMemAlloc(TotalSize);
     u8 *DstInit = Dst;
-    *(u32 *)Dst = 0x454c5248; // NOTE(zaklaus): "HRLE" signature
+    *(u32 *)Dst = HENC_RLE_MAGIC; // NOTE(zaklaus): "HRLE" signature
     Dst += 4;
     
     // TODO(zaklaus): Support files bigger than 4GiB.
     *(u32 *)Dst = (u32)SrcSize;
     Dst += 4;
     
-    u8 Literals[HENC_MAX_LITERAL_COUNT];
+    u8 Literals[HENC_RLE_MAX_LITERAL_COUNT];
        s32 LiteralCount = 0;
     
     u8 *End = Src + SrcSize;
@@ -52,13 +53,13 @@ HENCCompressRLEMemory(u8 *Src, ms SrcSize)
         u8 Value = *Src;
           ms Run = 1;
         while((Run < (ms)(End - Src)) &&
-              (Run < HENC_MAX_RUN_COUNT) &&
+              (Run < HENC_RLE_MAX_RUN_COUNT) &&
               (Src[Run] == Value))
         {
             ++Run;
         }
         
-        if((Run > 1) || (LiteralCount == HENC_MAX_LITERAL_COUNT))
+        if((Run > 1) || (LiteralCount == HENC_RLE_MAX_LITERAL_COUNT))
         {
             Assert(LiteralCount == (u8)LiteralCount);
             *Dst++ = (u8)LiteralCount;
@@ -91,7 +92,7 @@ HENCCompressRLEMemory(u8 *Src, ms SrcSize)
     return(Result);
 }
 
-doc(RLEDecompressMemory)
+doc(HENCDecompressRLEMemory)
 doc_string(Decompresses data using Run-Length Encoding technique.)
 
 internal henc_rle
@@ -99,7 +100,7 @@ HENCDecompressRLEMemory(u8 *Src, ms SrcSize)
 {
     henc_rle Result = {0};
     
-    if(*(u32 *)Src == 0x454c5248) // NOTE(zaklaus): "HRLE" signature
+    if(*(u32 *)Src == HENC_RLE_MAGIC) // NOTE(zaklaus): "HRLE" signature
     {
         Src += 4;
          ms DecompressedSize = *(u32 *)Src;

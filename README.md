@@ -30,11 +30,6 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>hftw_math.h</td>
 				<td>Linear algebra.</td>
 			</tr>
-
-			<tr>
-				<td>henc_rle.h</td>
-				<td>RLE compression algorithm.</td>
-			</tr>
 			
 			<tr>
 				<td>hftw_intrinsics.h</td>
@@ -63,6 +58,32 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 		</table>
 	</ul>
 </p>
+
+<p>
+	These compression formats are available:
+	<ul>
+		<table>
+			<tr>
+				<th>Filename</th>
+				<th>Method</th>
+				<th>Status</th>
+			</tr>
+
+			<tr>
+				<td>henc_rle.h</td>
+				<td>RLE</td>
+				<td>Complete</td>
+			</tr>
+			
+			<tr>
+				<td>henc_lz.h</td>
+				<td>LZ</td>
+				<td>In Progress</td>
+			</tr>
+		</table>
+	</ul>
+</p>
+
 <p>
 	Handmade FTW also offers an API for a various file formats:
 	<ul>
@@ -72,6 +93,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<th>File Format</th>
 				<th>Usage</th>
 				<th>Known SW</th>
+				<th>Status</th>
 			</tr>
 
 			<tr>
@@ -79,6 +101,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>4DS</td>
 				<td>Model Format</td>
 				<td>Mafia: The City of Lost Heaven</td>
+				<td>Complete</td>
 			</tr>
 						
 			<tr>
@@ -86,6 +109,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>KLZ</td>
 				<td>Collision Format</td>
 				<td>Mafia: The City of Lost Heaven</td>
+				<td>Complete</td>
 			</tr>
 			
 			<tr>
@@ -93,6 +117,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>BMP</td>
 				<td>Image Format</td>
 				<td>N/A</td>
+				<td>Complete</td>
 			</tr>
 			
 			<tr>
@@ -100,6 +125,7 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 				<td>PAK</td>
 				<td>Archive Format</td>
 				<td>Quake I</td>
+				<td>Complete</td>
 			</tr>
 		</table>
 	</ul>

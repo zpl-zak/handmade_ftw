@@ -274,7 +274,8 @@ internal u32 GetThreadID(void)
 #include "hftw_string.h"
 #include "hftw_io.h"
 
-#include "henc_rle.h"
+#include "codecs/henc_rle.h"
+#include "codecs/henc_lz.h"
 
 #define HFTW_H
 #endif

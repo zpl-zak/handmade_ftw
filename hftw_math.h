@@ -150,6 +150,8 @@ typedef union mat4
     real32 Elements[4][4];
 } mat4;
 
+doc_sep()
+
 doc_ignore()
 
 typedef vec2 v2;
