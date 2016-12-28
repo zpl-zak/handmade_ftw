@@ -60,75 +60,11 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 </p>
 
 <p>
-	These compression formats are available:
-	<ul>
-		<table>
-			<tr>
-				<th>Filename</th>
-				<th>Method</th>
-				<th>Status</th>
-			</tr>
-
-			<tr>
-				<td>henc_rle.h</td>
-				<td>RLE</td>
-				<td>Complete</td>
-			</tr>
-			
-			<tr>
-				<td>henc_lz.h</td>
-				<td>LZ</td>
-				<td>In Progress</td>
-			</tr>
-		</table>
-	</ul>
+	<h3>Codecs documentation can be found at: <a href="http://madaraszd.net/hftw/codecs/docs.html">Codecs Page.</a></h3>
 </p>
 
 <p>
-	Handmade FTW also offers an API for a various file formats:
-	<ul>
-		<table>
-			<tr>
-				<th>Filename</th>
-				<th>File Format</th>
-				<th>Usage</th>
-				<th>Known SW</th>
-				<th>Status</th>
-			</tr>
-
-			<tr>
-				<td>hformat_4ds.h</td>
-				<td>4DS</td>
-				<td>Model Format</td>
-				<td>Mafia: The City of Lost Heaven</td>
-				<td>Complete</td>
-			</tr>
-						
-			<tr>
-				<td>hformat_klz.h</td>
-				<td>KLZ</td>
-				<td>Collision Format</td>
-				<td>Mafia: The City of Lost Heaven</td>
-				<td>Complete</td>
-			</tr>
-			
-			<tr>
-				<td>hformat_bmp.h</td>
-				<td>BMP</td>
-				<td>Image Format</td>
-				<td>N/A</td>
-				<td>Complete</td>
-			</tr>
-			
-			<tr>
-				<td>hformat_pak.h</td>
-				<td>PAK</td>
-				<td>Archive Format</td>
-				<td>Quake I</td>
-				<td>Complete</td>
-			</tr>
-		</table>
-	</ul>
+	<h3>Formats documentation can be found at: <a href="http://madaraszd.net/hftw/formats/docs.html">Formats Page.</a></h3>
 </p># Copyright
 ```
 Unless otherwise indicated, all content on this repository 
