@@ -7,32 +7,18 @@
 #define HENC_RLE_MAX_RUN_COUNT 255
 #define HENC_RLE_MAGIC 0x454c5248
 
-doc(henc_rle)
-doc_string(Holds compressed/uncompressed data.<br/>NOTE: Caller has to free the memory.)
-doc_cat(Compression: RLE)
+typedef henc_data henc_rle;
 
-typedef struct
-{
-    ms MemorySize;
-    u8 *Memory;
-} henc_rle;
-
-doc_sep()
-
-internal ms
-HENCGetOptimalRLESize(u8 *Src, ms SrcSize)
+COMPRESSION_SIZE_HANDLER(HENCGetOptimalRLESize)
 {
     return(256 + 2*SrcSize + 8);
 }
 
-doc(HENCCompressRLEMemory)
-doc_string(Compresses data using Run-Length Encoding technique.)
-
-internal henc_rle
-HENCCompressRLEMemory(u8 *Src, ms SrcSize)
+COMPRESSION_HANDLER(HENCCompressRLEMemory)
 {
     henc_rle Result = {0};
     
+    u8 *Src = SrcInit;
     ms TotalSize = HENCGetOptimalRLESize(Src, SrcSize);
     u8 *Dst = (u8 *)PlatformMemAlloc(TotalSize);
     u8 *DstInit = Dst;
@@ -92,11 +78,7 @@ HENCCompressRLEMemory(u8 *Src, ms SrcSize)
     return(Result);
 }
 
-doc(HENCDecompressRLEMemory)
-doc_string(Decompresses data using Run-Length Encoding technique.)
-
-internal henc_rle
-HENCDecompressRLEMemory(u8 *Src, ms SrcSize)
+DECOMPRESSION_HANDLER(HENCDecompressRLEMemory)
 {
     henc_rle Result = {0};
     

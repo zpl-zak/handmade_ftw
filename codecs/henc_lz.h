@@ -8,29 +8,14 @@
 #define HENC_LZ_MAX_LOOKBACK_COUNT 255
 #define HENC_LZ_MAGIC 0x305a4c48
 
-doc(henc_lz)
-doc_string(Holds compressed/uncompressed data.<br/>NOTE: Caller has to free the memory.)
-doc_cat(Compression: LZ)
+typedef henc_data henc_lz;
 
-typedef struct
-{
-    ms MemorySize;
-    u8 *Memory;
-} henc_lz;
-
-doc_sep()
-
-internal ms
-HENCGetOptimalLZSize(u8 *Src, ms SrcSize)
+COMPRESSION_SIZE_HANDLER(HENCGetOptimalLZSize)
 {
     return(256 + 2*SrcSize + 8);
 }
 
-doc(HENCCompressLZMemory)
-doc_string(Compresses data using Run-Length Encoding technique.)
-
-internal henc_lz
-HENCCompressLZMemory(u8 *SrcInit, ms SrcSize)
+COMPRESSION_HANDLER(HENCCompressLZMemory)
 {
     henc_lz Result = {0};
     
@@ -142,11 +127,7 @@ HENCCompressLZMemory(u8 *SrcInit, ms SrcSize)
     return(Result);
 }
 
-doc(HENCDecompressLZMemory)
-doc_string(Decompresses data using LZ technique.)
-
-internal henc_lz
-HENCDecompressLZMemory(u8 *Src, ms SrcSize)
+DECOMPRESSION_HANDLER(HENCDecompressLZMemory)
 {
     henc_lz Result = {0};
     

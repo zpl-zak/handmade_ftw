@@ -150,6 +150,7 @@ doc_hunt()
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
+#define StringCase(Name) case Name: {return(#Name);}
 #define Min(a,b) (a < b) ? a : b
 #define Max(a,b) (a > b) ? a : b
 #define Swap(a,b) a = a ^ b; b = a ^ b; a = a ^ b
@@ -273,9 +274,7 @@ internal u32 GetThreadID(void)
 #include "hftw_simd.h"
 #include "hftw_string.h"
 #include "hftw_io.h"
-
-#include "codecs/henc_rle.h"
-#include "codecs/henc_lz.h"
+#include "hftw_henc.h"
 
 #define HFTW_H
 #endif
