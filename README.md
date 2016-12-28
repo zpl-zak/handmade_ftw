@@ -65,7 +65,8 @@ Handmade FTW is a collection of header-only libraries for ease use of common alg
 
 <p>
 	<h3>Formats documentation can be found at: <a href="http://madaraszd.net/hftw/formats/docs.html">Formats Page.</a></h3>
-</p># Copyright
+</p>
+# Copyright
 ```
 Unless otherwise indicated, all content on this repository 
 is copyrighted by Dominik *ZaKlaus* Madarász. 
