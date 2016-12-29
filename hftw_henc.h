@@ -14,11 +14,11 @@ typedef struct
 
 doc_ignore()
 
-#define COMPRESSION_HANDLER(name) internal henc_data name (u8 *SrcInit, ms SrcSize)
+#define COMPRESSION_HANDLER(name) internal henc_data name(u8 *SrcInit, ms SrcSize)
 
-#define DECOMPRESSION_HANDLER(name) internal henc_data name (u8 *Src, ms SrcSize)
+#define DECOMPRESSION_HANDLER(name) internal henc_data name(u8 *Src, ms SrcSize)
 
-#define COMPRESSION_SIZE_HANDLER(name) internal ms name (u8 *SrcInit, ms SrcSize)
+#define COMPRESSION_SIZE_HANDLER(name) internal ms name(u8 *SrcInit, ms SrcSize)
 
 doc_hunt()
 

@@ -58,9 +58,7 @@
 #error SEE/NEON optimizations are not available for this compiler yet!!!!
 #endif
     
-//
-// NOTE(casey): Types
-//
+#include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <limits.h>
@@ -130,17 +128,28 @@ doc_hunt()
 #ifdef HANDMADE_SLOW
     
 #ifdef COMPILER_MSVC
-#define TRAP() *(int *)0 = 0
+#define TRAP() __debugbreak()
 #elif COMPILER_LLVM
 #define TRAP() __builtin_trap()
 #else
 #define TRAP() volatile *(int *)0 = 0
 #endif
 
+#define mmalloc(Size) malloc(Size);fprintf(stderr, "malloc: %zu\t<%s@%d:%s>\n", (ms)Size, __FILE__, __LINE__, __FUNCTION__)
+#define mfree(Ptr) free(Ptr);fprintf(stderr, "free: \t\t<%s@%d:%s>\n", __FILE__, __LINE__, __FUNCTION__)
+#define mrealloc(Ptr, Size) realloc(Ptr, Size);fprintf(stderr, "realloc: %zu\t<%s@%d:%s>\n", (ms)Size, __FILE__, __LINE__, __FUNCTION__)
+
 #define Assert(Expression) if(!(Expression)) {TRAP();}
 #else
 #define Assert(Expression)
+#define mmalloc(Size) malloc(Size)
+#define mfree(Ptr) free(Ptr)
+#define mrealloc(Ptr, Size) realloc(Ptr, Size)
 #endif
+
+#define FSM(name) switch(name)
+#define State(name) s##name :
+#define NextState(name) goto s##name
 
 #define InvalidCodePath Assert(!"InvalidCodePath")
 #define InvalidDefaultCase default: {InvalidCodePath;} break
@@ -267,9 +276,9 @@ internal u32 GetThreadID(void)
 
 #include "hftw_math.h"
 #include "hftw_random.h"
+#include "hftw_shared.h"
 #include "hftw_platform.h"
 #include "hftw_node.h"
-#include "hftw_shared.h"
 #include "hftw_mem.h"
 #include "hftw_intrinsics.h"
 #include "hftw_simd.h"

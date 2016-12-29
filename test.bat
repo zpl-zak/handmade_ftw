@@ -1,4 +1,8 @@
 @echo off
-ctime -begin test.ctm
-win32_test.exe
-ctime -end test.ctm
+REM ctime -begin test.ctm
+
+pushd build
+start win32_test.exe
+popd
+
+REM ctime -end test.ctm

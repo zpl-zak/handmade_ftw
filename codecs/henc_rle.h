@@ -48,6 +48,8 @@ COMPRESSION_HANDLER(HENCCompressRLEMemory)
         if((Run > 1) || (LiteralCount == HENC_RLE_MAX_LITERAL_COUNT))
         {
             Assert(LiteralCount == (u8)LiteralCount);
+            Assert(Run == (u8)Run);
+            
             *Dst++ = (u8)LiteralCount;
             for(s32 LiteralIdx = 0;
                 LiteralIdx < LiteralCount;
@@ -56,8 +58,6 @@ COMPRESSION_HANDLER(HENCCompressRLEMemory)
                 *Dst++ = Literals[LiteralIdx];
             }
             LiteralCount = 0;
-            
-            Assert(Run == (u8)Run);
             *Dst++ = (u8)Run;
             *Dst++ = Value;
             
@@ -72,8 +72,11 @@ COMPRESSION_HANDLER(HENCCompressRLEMemory)
     
     Assert(Src == End);
     
-    Result.MemorySize = Dst - DstInit;
-    Result.Memory = DstInit;
+    ms ResultSize = Dst - DstInit;
+    u8 *ResultPtr = (u8 *)PlatformMemMove(DstInit, ResultSize);
+    
+    Result.MemorySize = ResultSize;
+    Result.Memory = ResultPtr;
     
     return(Result);
 }

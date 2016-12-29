@@ -8,6 +8,8 @@
 #include "formats/hformat_klz.h"
 #include "formats/hformat_bmp.h"
 
+#define COLOR_PURPLE 0x00ff00ff
+
 global_variable b32 Running = 1;
 global_variable window_bitmap WindowBitmap;
 
@@ -64,7 +66,6 @@ RenderPixel(v3 Color, v2 Position, s32 Margin)
             X < Width;
             ++X)
         {
-            // TODO(zaklaus): Replace with direct write!
             if((Position.X >= X - Margin && Position.X <= X + Margin) &&
                (Position.Y >= Y - Margin && Position.Y <= Y + Margin))
             {
@@ -101,15 +102,17 @@ RenderBlank(u8 Red, u8 Green, u8 Blue)
 }
 
 internal void
-RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image)
+RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image, u32 TransparencyKey)
 {
     s32 Width = Image->Header.Width;
     s32 Height = Image->Header.Height;
-    u8 *Memory = (u8 *)WindowBitmap.BitmapMemory;
+    
     u8 *ImageMemory = Image->Data;
     s32 BytesPerPixel = WindowBitmap.BPP;
     s32 Pitch = WindowBitmap.Width * BytesPerPixel;
-    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    u8 *Memory = (u8 *)WindowBitmap.BitmapMemory;
+    u8 *MemoryEnd = Memory + Pitch*WindowBitmap.Height + WindowBitmap.Width*BytesPerPixel;
+    u8 *Row = (u8 *)WindowBitmap.BitmapMemory + sY*Pitch + sX*BytesPerPixel;
     
     for(s32 Y = 0;
         Y < Height;
@@ -125,7 +128,15 @@ RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image)
             u8 Red = *ImageMemory++;
             u32 Data = ((Red << 16) | (Green << 8) | Blue);
             
-            *Pixel++ = Data;
+            if(Pixel > (u32 *)Memory && Pixel < (u32 *)MemoryEnd)
+            {
+            if(Data != TransparencyKey 
+               ||TransparencyKey == 0)
+            {
+            *Pixel = Data;
+            }
+        }
+            ++Pixel;
         }
         Row += Pitch;
     }
@@ -157,21 +168,19 @@ WndProc(HWND Window,
             Running = 0;
         }break;
         
-        case WM_PAINT:
+        case WM_KEYDOWN:
         {
-            
-        }break;
-        
-        default:
-        {
-            
+            if(WParam == VK_ESCAPE)
+            {
+                Running = 0;
+            }
         }break;
     }
     return(DefWindowProc(Window, Message, WParam, LParam));
 }
 
 int CALLBACK
-WinMain(HINSTANCE Instance,
+_WinMain(HINSTANCE Instance,
         HINSTANCE PrevInstance,
         LPSTR CmdLine,
         int CmdShow)
@@ -179,9 +188,7 @@ WinMain(HINSTANCE Instance,
     WindowCreateClass(Instance, "Handmade FTW", &WndProc);
     
     window_dim PosDim = {0};
-    window_dim ResDim = {0};
-    ResDim.X = 800;
-    ResDim.Y = 600;
+    window_dim ResDim = {800, 600};
     
     HWND Window;
     WindowCreateWindowed("Handmade FTW", "Win32 Test", Instance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
@@ -201,83 +208,35 @@ WinMain(HINSTANCE Instance,
     hformat_bmp *Image = HFormatLoadBMPImage(FileIndex, 0);
     IOFileClose(FileIndex);
     
-#if 1
-    {
-    // NOTE(zaklaus): RLE test code!
-    ms FileSize;
-    s32 FileIndex2 = IOFileOpenRead("data/test.bmp", &FileSize);
-    {
-        u8 *FileData = PlatformMemAlloc(FileSize);
-        IOFileRead(FileIndex2, FileData, FileSize);
-        henc_rle Data = HENCCompressRLEMemory(FileData, FileSize);
-        
-        s32 OutFile = IOFileOpenWrite("data/test.rle");
-        IOFileWrite(OutFile, Data.Memory, Data.MemorySize);
-        IOFileClose(OutFile);
-        PlatformMemFree(Data.Memory);
-        
-        ms InSize;
-        s32 InFile = IOFileOpenRead("data/test.rle", &InSize);
-        FileData = PlatformMemAlloc(InSize);
-        IOFileRead(InFile, FileData, InSize);
-        henc_rle BMP = HENCDecompressRLEMemory(FileData, InSize);
-        
-        OutFile = IOFileOpenWrite("data/test_rle.bmp");
-        IOFileWrite(OutFile, BMP.Memory, BMP.MemorySize);
-        IOFileClose(OutFile);
-    }
-    IOFileClose(FileIndex2);
-}
-#endif
-    
-    #if 1
-{
-    // NOTE(zaklaus): LZ test code!
-     ms FileSize;
-    s32 FileIndex2 = IOFileOpenRead("data/test.bmp", &FileSize);
-    {
-        u8 *FileData = PlatformMemAlloc(FileSize);
-        IOFileRead(FileIndex2, FileData, FileSize);
-        henc_lz Data = HENCCompressLZMemory(FileData, FileSize);
-        
-        s32 OutFile = IOFileOpenWrite("data/test.lz");
-        IOFileWrite(OutFile, Data.Memory, Data.MemorySize);
-        IOFileClose(OutFile);
-        PlatformMemFree(Data.Memory);
-        
-         ms InSize;
-        s32 InFile = IOFileOpenRead("data/test.lz", &InSize);
-        FileData = PlatformMemAlloc(InSize);
-        IOFileRead(InFile, FileData, InSize);
-        henc_lz BMP = HENCDecompressLZMemory(FileData, InSize);
-        
-        OutFile = IOFileOpenWrite("data/test_lz.bmp");
-        IOFileWrite(OutFile, BMP.Memory, BMP.MemorySize);
-        IOFileClose(OutFile);
-    }
-    IOFileClose(FileIndex2);
-}
-    #endif
-    
-    while(0)//Running)
+    while(Running)
     {
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
         {
             WindowUpdate();
             {
+                RenderBlank(255,255,255);
                 local_persist s32 XOffset = 0;
                 local_persist s32 YOffset = 0;
+                local_persist s32 FlipDirection = 1;
                 
-                RenderBMPImage(0, 0, Image);
+                RenderBMPImage(220, 120, Image, COLOR_PURPLE);
+                RenderBMPImage(220, 220+XOffset/4, Image, COLOR_PURPLE);
+                RenderBMPImage(80+XOffset, 60, Image, COLOR_PURPLE);
                 
-                ++XOffset;
+                
                 ++YOffset;
                     
-                    if(XOffset > WindowBitmap.Width)
+                    if(XOffset > 80)
                     {
-                        XOffset = 0;
+                        FlipDirection = -1;
                     }
+                    else if(XOffset < 0)
+                    {
+                        FlipDirection = 1;
+                    }
+                    
+                    XOffset += FlipDirection;
                 }
             WindowBlit(Window, &WindowBitmap);
             
@@ -286,5 +245,15 @@ WinMain(HINSTANCE Instance,
         OldTime = NewTime;
     }
     
+    PlatformMemFree(Image->Data);
+    
     return(0);
+}
+
+int
+main(void)
+{
+     LRESULT Result = _WinMain(GetModuleHandle(0), 0, GetCommandLine(), SW_SHOW);
+    
+    return(Result);
 }

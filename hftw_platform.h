@@ -11,6 +11,8 @@
 #include <malloc.h>
 #endif
 
+#if 0
+
 doc(PlatformMemAlloc)
 doc_string(Allocates memory using platform-specific call.)
 
@@ -22,9 +24,9 @@ size_t Size)  // Requested memory size.
     
     #ifdef _WIN32
     //Result = VirtualAlloc(0, Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-    Result = malloc(Size);
+    Result = mmalloc(Size);
     #else
-    Result = malloc(Size);
+    Result = mmalloc(Size);
     #endif
     
     return(Result);
@@ -55,7 +57,26 @@ PlatformMemRealloc(void *Ptr,   // Pointer to allocated block of memory.
                    size_t Size) // Requested memory size.
 {
     void *Result = Ptr;
-    Result = realloc(Result, Size);
+    Result = mrealloc(Result, Size);
+    return(Result);
+}
+
+#endif
+
+#define PlatformMemAlloc mmalloc
+#define PlatformMemFree mfree
+#define PlatformMemRealloc mrealloc
+
+doc(PlatformMemMove)
+doc_string(Moves the content of the memory to a new block.)
+
+internal void *
+PlatformMemMove(void *Ptr, ms NewSize)
+{
+    void *Result = PlatformMemAlloc(NewSize);
+    Copy(NewSize, Ptr, Result);
+    PlatformMemFree(Ptr);
+    
     return(Result);
 }
 

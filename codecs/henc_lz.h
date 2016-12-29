@@ -121,8 +121,11 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
     
     Assert(Src == End);
     
-    Result.MemorySize = Dst - DstInit;
-    Result.Memory = DstInit;
+    ms ResultSize = Dst - DstInit;
+     u8 *ResultPtr = PlatformMemMove(DstInit, ResultSize);
+    
+    Result.MemorySize = ResultSize;
+    Result.Memory = ResultPtr;
     
     return(Result);
 }
