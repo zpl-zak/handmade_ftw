@@ -175,7 +175,7 @@ DECOMPRESSION_HANDLER(HENCDecompressLZMemory)
 
 doc(LZ Compression)
 doc_string(To be documented.)
-doc_embed(lz_doc)
+doc_embed(docs/lz_doc.html)
 
 #define HENC_LZ_H
 #endif
