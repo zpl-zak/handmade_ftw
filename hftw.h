@@ -129,10 +129,8 @@ doc_hunt()
     
 #ifdef COMPILER_MSVC
 #define TRAP() __debugbreak()
-#elif COMPILER_LLVM
-#define TRAP() __builtin_trap()
 #else
-#define TRAP() volatile *(int *)0 = 0
+#define TRAP() __builtin_trap()
 #endif
 
 #define mmalloc(Size) malloc(Size);fprintf(stderr, "malloc: %zu\t<%s@%d:%s>\n", (ms)Size, __FILE__, __LINE__, __FUNCTION__)
@@ -147,9 +145,9 @@ doc_hunt()
 #define mrealloc(Ptr, Size) realloc(Ptr, Size)
 #endif
 
-#define FSM(name) switch(name)
-#define State(name) s##name :
-#define NextState(name) goto s##name
+#define FSM
+#define State(Name) s##Name :
+#define NextState(Name) goto s##Name
 
 #define InvalidCodePath Assert(!"InvalidCodePath")
 #define InvalidDefaultCase default: {InvalidCodePath;} break
