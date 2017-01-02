@@ -1,2 +1,6 @@
+Version 1.0.1
+- Project structure changes.
+- Got rid of obsolete Makefile.
+
 Version 1.0
 - Initial release.
