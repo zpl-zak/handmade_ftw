@@ -7,6 +7,19 @@
 
 #include "win32_opengl_defs.h"
 
+#ifdef OPENGL_VERBOSE_EXTENSIONS
+#define PRINT_OPENGL_EXTENSIONS 1
+#else
+#define PRINT_OPENGL_EXTENSIONS 0
+#endif
+
+#ifndef OPENGL_SKIP_INFO_PRINT
+#define PRINT_OPENGL_INFO 1
+#else
+#define PRINT_OPENGL_INFO 0
+#define PRINT_OPENGL_EXTENSIONS 0
+#endif
+
 typedef struct
 {
     b32 ModernContext;
@@ -493,6 +506,28 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
         
         opengl_info Info = Win32OpenGLGetInfo(*ModernContext);
         
+        // NOTE(zaklaus): OpenGL Info
+            #if PRINT_OPENGL_INFO == 1
+        {
+            printf("OpenGL Context Load:\n===\n");
+            printf("Vendor: %s\nRenderer: %s\nVersion: %s\n",
+                   Info.Vendor, Info.Renderer, Info.Version);
+            
+            if(Info.ModernContext)
+            {
+                printf("Shading Language Version: %s\n",
+                       Info.ShadingLanguageVersion);
+            }
+            
+            #if PRINT_OPENGL_EXTENSIONS == 1
+            {
+                printf("OpenGL Extensions: %s\n", Info.Extensions);
+            }
+            #endif
+            
+            printf("===\n");
+        }
+            #endif
         // zLOAD
         if(Info.GL_ARB_framebuffer_object)
         {

@@ -1,16 +1,14 @@
 
 # Copyright
 ```
-Unless otherwise indicated, all content on this repository 
-is copyrighted by Dominik *ZaKlaus* Madarász. 
-All rights reserved. No part of the content, either text or binary data 
-may be used for any purpose other than personal use. 
-Therefore, reproduction, modification, storage in a retrieval system or retransmission, 
-in any form or by any means, electronic, mechanical or otherwise, 
-for reasons other than personal use, 
-is strictly prohibited without prior written permission.
+You are granted a perpetual, irrevocable license to copy, modify,
+publish, and distribute this file as you see fit.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 ```
