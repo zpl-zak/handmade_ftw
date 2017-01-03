@@ -108,12 +108,107 @@ typedef void WINAPI gl_shader_source(GLuint shader,
                                      const char **string,
                                      const GLint *length);
 typedef void WINAPI gl_delete_shader(GLuint shader);
-typedef void WINAPI gl_detach_shader(GLuint shader);
+typedef void WINAPI gl_detach_shader(GLuint program,
+                                     GLuint shader);
 typedef void WINAPI gl_get_shaderiv(GLuint shader,
                                     GLenum pname,
                                     GLint *params);
 typedef GLuint WINAPI gl_create_program(void);
 typedef void WINAPI gl_use_program(GLuint program);
+typedef void WINAPI gl_link_program(GLuint program);
+typedef void WINAPI gl_get_programiv(GLuint program,
+                                     GLenum pname,
+                                     GLint *params);
+typedef void WINAPI gl_get_shader_info_log(GLuint shader,
+                                           GLsizei maxLength,
+                                           GLsizei *length,
+                                           char *infoLog);
+typedef GLint WINAPI gl_get_uniform_location(GLuint program,
+                                             const char *name);
+
+typedef void WINAPI gl_uniform1f(GLint location,
+                 GLfloat v0);
+
+typedef void WINAPI gl_uniform2f(GLint location,
+                 GLfloat v0,
+                 GLfloat v1);
+
+typedef void WINAPI gl_uniform3f(GLint location,
+                 GLfloat v0,
+                 GLfloat v1,
+                 GLfloat v2);
+
+typedef void WINAPI gl_uniform4f(GLint location,
+                 GLfloat v0,
+                 GLfloat v1,
+                 GLfloat v2,
+                 GLfloat v3);
+
+typedef void WINAPI gl_uniform1i(GLint location,
+                 GLint v0);
+
+typedef void WINAPI gl_uniform2i(GLint location,
+                 GLint v0,
+                 GLint v1);
+
+typedef void WINAPI gl_uniform3i(GLint location,
+                 GLint v0,
+                 GLint v1,
+                 GLint v2);
+
+typedef void WINAPI gl_uniform4i(GLint location,
+                 GLint v0,
+                 GLint v1,
+                 GLint v2,
+                 GLint v3);
+
+typedef void WINAPI gl_uniform1fv(GLint location,
+                  GLsizei count,
+                  const GLfloat *value);
+
+typedef void WINAPI gl_uniform2fv(GLint location,
+                  GLsizei count,
+                  const GLfloat *value);
+
+typedef void WINAPI gl_uniform3fv(GLint location,
+                  GLsizei count,
+                  const GLfloat *value);
+
+typedef void WINAPI gl_uniform4fv(GLint location,
+                  GLsizei count,
+                  const GLfloat *value);
+
+typedef void WINAPI gl_uniform1iv(GLint location,
+                  GLsizei count,
+                  const GLint *value);
+
+typedef void WINAPI gl_uniform2iv(GLint location,
+                  GLsizei count,
+                  const GLint *value);
+
+typedef void WINAPI gl_uniform3iv(GLint location,
+                  GLsizei count,
+                  const GLint *value);
+
+typedef void WINAPI gl_uniform4iv(GLint location,
+                  GLsizei count,
+                  const GLint *value);
+
+typedef void WINAPI gl_uniform_matrix2fv(GLint location,
+                                       GLsizei count,
+                                       b32 transpose,
+                                       const GLfloat *value);
+
+typedef void WINAPI gl_uniform_matrix3fv(GLint location,
+                                       GLsizei count,
+                                       b32 transpose,
+                                       const GLfloat *value);
+
+typedef void WINAPI gl_uniform_matrix4fv(GLint location,
+                                       GLsizei count,
+                                       b32 transpose,
+                                       const GLfloat *value);
+
 
 //
 // NOTE(zaklaus): OpenGL Functions
@@ -140,6 +235,32 @@ global_variable gl_detach_shader *glDetachShader;
 global_variable gl_get_shaderiv *glGetShaderiv;
 global_variable gl_create_program *glCreateProgram;
 global_variable gl_use_program *glUseProgram;
+global_variable gl_link_program *glLinkProgram;
+global_variable gl_get_programiv *glGetProgramiv;
+global_variable gl_get_shader_info_log *glGetShaderInfoLog;
+global_variable gl_get_uniform_location *glGetUniformLocation;
+
+global_variable gl_uniform1f *glUniform1f;
+global_variable gl_uniform2f *glUniform2f;
+global_variable gl_uniform3f *glUniform3f;
+global_variable gl_uniform4f *glUniform4f;
+global_variable gl_uniform1i *glUniform1i;
+global_variable gl_uniform2i *glUniform2i;
+global_variable gl_uniform3i *glUniform3i;
+global_variable gl_uniform4i *glUniform4i;
+global_variable gl_uniform1fv *glUniform1fv;
+global_variable gl_uniform2fv *glUniform2fv;
+global_variable gl_uniform3fv *glUniform3fv;
+global_variable gl_uniform4fv *glUniform4fv;
+global_variable gl_uniform1iv *glUniform1iv;
+global_variable gl_uniform2iv *glUniform2iv;
+global_variable gl_uniform3iv *glUniform3iv;
+global_variable gl_uniform4iv *glUniform4iv;
+global_variable gl_uniform_matrix2fv *glUniformMatrix2fv;
+global_variable gl_uniform_matrix3fv *glUniformMatrix3fv;
+global_variable gl_uniform_matrix4fv *glUniformMatrix4fv;
+
+
 
 // ---
 
@@ -398,6 +519,33 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glGetShaderiv = (gl_get_shaderiv *)Win32OpenGLLoadProc("glGetShaderiv");
             glCreateProgram = (gl_create_program *)Win32OpenGLLoadProc("glCreateProgram");
             glUseProgram = (gl_use_program *)Win32OpenGLLoadProc("glUseProgram");
+            glLinkProgram = (gl_link_program *)Win32OpenGLLoadProc("glLinkProgram");
+            glGetProgramiv = (gl_get_programiv *)Win32OpenGLLoadProc("glGetProgramiv");
+            glGetShaderInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetShaderInfoLog");
+            glGetUniformLocation = (gl_get_uniform_location *)Win32OpenGLLoadProc("glGetUniformLocation");
+            
+            // NOTE(zaklaus): glUniform
+            {
+                glUniform1f = (gl_uniform1f *)Win32OpenGLLoadProc("glUniform1f");
+                glUniform2f = (gl_uniform2f *)Win32OpenGLLoadProc("glUniform2f");
+                glUniform3f = (gl_uniform3f *)Win32OpenGLLoadProc("glUniform3f");
+                glUniform4f = (gl_uniform4f *)Win32OpenGLLoadProc("glUniform4f");
+                glUniform1i = (gl_uniform1i *)Win32OpenGLLoadProc("glUniform1i");
+                glUniform2i = (gl_uniform2i *)Win32OpenGLLoadProc("glUniform2i");
+                glUniform3i = (gl_uniform3i *)Win32OpenGLLoadProc("glUniform3i");
+                glUniform4i = (gl_uniform4i *)Win32OpenGLLoadProc("glUniform4i");
+                glUniform1fv = (gl_uniform1fv *)Win32OpenGLLoadProc("glUniform1fv");
+                glUniform2fv = (gl_uniform2fv *)Win32OpenGLLoadProc("glUniform2fv");
+                glUniform3fv = (gl_uniform3fv *)Win32OpenGLLoadProc("glUniform3fv");
+                glUniform4fv = (gl_uniform4fv *)Win32OpenGLLoadProc("glUniform4fv");
+                glUniform1iv = (gl_uniform1iv *)Win32OpenGLLoadProc("glUniform1iv");
+                glUniform2iv = (gl_uniform2iv *)Win32OpenGLLoadProc("glUniform2iv");
+                glUniform3iv = (gl_uniform3iv *)Win32OpenGLLoadProc("glUniform3iv");
+                glUniform4iv = (gl_uniform4iv *)Win32OpenGLLoadProc("glUniform4iv");
+                glUniformMatrix2fv = (gl_uniform_matrix2fv *)Win32OpenGLLoadProc("glUniformMatrix2fv");
+                glUniformMatrix3fv = (gl_uniform_matrix3fv *)Win32OpenGLLoadProc("glUniformMatrix3fv");
+                glUniformMatrix4fv = (gl_uniform_matrix4fv *)Win32OpenGLLoadProc("glUniformMatrix4fv");
+            }
         }
         
         if(wglSwapIntervalEXT)

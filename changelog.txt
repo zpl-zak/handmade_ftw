@@ -1,3 +1,7 @@
+Version 1.0.2
+- Added OpenGL bindings.
+- Added test code for OpenGL application using shaders.
+
 Version 1.0.1
 - Project structure changes.
 - Got rid of obsolete Makefile.
