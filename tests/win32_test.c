@@ -11,16 +11,16 @@
 #define COLOR_PURPLE 0x00ff00ff
 
 global_variable b32 Running = 1;
-global_variable window_bitmap WindowBitmap;
+global_variable window WindowArea;
 
 internal void
 RenderGradient(s32 XOffset, s32 YOffset)
 {
-    s32 Width = WindowBitmap.Width;
-    s32 Height = WindowBitmap.Height;
-    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Width = WindowArea.Width;
+    s32 Height = WindowArea.Height;
+    s32 BytesPerPixel = WindowArea.BPP;
     s32 Pitch = Width * BytesPerPixel;
-    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    u8 *Row = (u8 *)WindowArea.Memory;
     for(s32 Y = 0;
         Y < Height;
         ++Y)
@@ -41,11 +41,11 @@ RenderGradient(s32 XOffset, s32 YOffset)
 internal void
 RenderPixel(v3 Color, v2 Position, s32 Margin)
 {
-    s32 Width = WindowBitmap.Width;
-    s32 Height = WindowBitmap.Height;
-    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Width = WindowArea.Width;
+    s32 Height = WindowArea.Height;
+    s32 BytesPerPixel = WindowArea.BPP;
     s32 Pitch = Width * BytesPerPixel;
-    u32 *Memory = (u32 *)WindowBitmap.BitmapMemory;
+    u32 *Memory = (u32 *)WindowArea.Memory;
     
     if(!Margin)
     {
@@ -81,11 +81,11 @@ RenderPixel(v3 Color, v2 Position, s32 Margin)
 internal void
 RenderBlank(u8 Red, u8 Green, u8 Blue)
 {
-    s32 Width = WindowBitmap.Width;
-    s32 Height = WindowBitmap.Height;
-    s32 BytesPerPixel = WindowBitmap.BPP;
+    s32 Width = WindowArea.Width;
+    s32 Height = WindowArea.Height;
+    s32 BytesPerPixel = WindowArea.BPP;
     s32 Pitch = Width * BytesPerPixel;
-    u8 *Row = (u8 *)WindowBitmap.BitmapMemory;
+    u8 *Row = (u8 *)WindowArea.Memory;
     for(s32 Y = 0;
         Y < Height;
         ++Y)
@@ -108,11 +108,11 @@ RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image, u32 TransparencyKey)
     s32 Height = Image->Header.Height;
     
     u8 *ImageMemory = Image->Data;
-    s32 BytesPerPixel = WindowBitmap.BPP;
-    s32 Pitch = WindowBitmap.Width * BytesPerPixel;
-    u8 *Memory = (u8 *)WindowBitmap.BitmapMemory;
-    u8 *MemoryEnd = Memory + Pitch*WindowBitmap.Height + WindowBitmap.Width*BytesPerPixel;
-    u8 *Row = (u8 *)WindowBitmap.BitmapMemory + sY*Pitch + sX*BytesPerPixel;
+    s32 BytesPerPixel = WindowArea.BPP;
+    s32 Pitch = WindowArea.Width * BytesPerPixel;
+    u8 *Memory = (u8 *)WindowArea.Memory;
+    u8 *MemoryEnd = Memory + Pitch*WindowArea.Height + WindowArea.Width*BytesPerPixel;
+    u8 *Row = (u8 *)WindowArea.Memory + sY*Pitch + sX*BytesPerPixel;
     
     for(s32 Y = 0;
         Y < Height;
@@ -155,11 +155,13 @@ WndProc(HWND Window,
         {
             window_dim Dim = WindowGetClientRect(Window);
             
-            window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowBitmap);
+            window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
             
-            WindowBitmap = ResizeResult;
+            glViewport(0, 0, WindowArea.Width, WindowArea.Height);
             
-            WindowBlit(Window, &WindowBitmap);
+            WindowArea = ResizeResult;
+            
+            WindowBlit(Window, &WindowArea);
         }break;
         
         case WM_CLOSE:
@@ -194,19 +196,42 @@ _WinMain(HINSTANCE Instance,
     WindowCreateWindowed("Handmade FTW", "Win32 Test", Instance, 0, 0, ResDim, PosDim, CW_USEDEFAULT, &Window);
     
     window_dim Dim = WindowGetClientRect(Window);
-    window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowBitmap);
+    window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
     
-    WindowBitmap = ResizeResult;
+    WindowArea = ResizeResult;
     
     WindowUpdate();
     TimeInit();
-    RenderBlank(255, 255, 255);
     
     r64 OldTime = TimeGet();
     
     s32 FileIndex = IOFileOpenRead("data/test.bmp", 0);
     hformat_bmp *Image = HFormatLoadBMPImage(FileIndex, 0);
     IOFileClose(FileIndex);
+    
+    HDC DeviceContext = GetDC(Window);
+    
+    b32 ModernContext = 1;
+    
+    Win32InitOpenGL(DeviceContext, &ModernContext);
+    
+    glEnable(GL_TEXTURE_2D);
+    
+    u32 VertexArrayID;
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+    
+    static const GLfloat g_vertex_buffer_data[] = {
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
+    };
+    
+    GLuint vertexbuffer;
+    
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
     
     while(Running)
     {
@@ -215,35 +240,33 @@ _WinMain(HINSTANCE Instance,
         {
             WindowUpdate();
             {
-                RenderBlank(255,255,255);
-                local_persist s32 XOffset = 0;
-                local_persist s32 YOffset = 0;
-                local_persist s32 FlipDirection = 1;
+                s32 WindowWidth = WindowArea.Width;
+                s32 WindowHeight = WindowArea.Height;
+                glClearColor(1.f, 1.f, 1.f, 0.f);
+                glClear(GL_COLOR_BUFFER_BIT);
                 
-                RenderBMPImage(220, 120, Image, COLOR_PURPLE);
-                RenderBMPImage(220, 220+XOffset/4, Image, COLOR_PURPLE);
-                RenderBMPImage(80+XOffset, 60, Image, COLOR_PURPLE);
-                
-                
-                ++YOffset;
-                    
-                    if(XOffset > 80)
-                    {
-                        FlipDirection = -1;
-                    }
-                    else if(XOffset < 0)
-                    {
-                        FlipDirection = 1;
-                    }
-                    
-                    XOffset += FlipDirection;
+                glEnableVertexAttribArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+                glVertexAttribPointer(
+                    0,
+                    3,                  // size
+                    GL_FLOAT,           // type
+                    GL_FALSE,           // normalized?
+                    0,                  // stride
+                    (void*)0            // array buffer offset
+                    );
+                // Draw the triangle !
+                glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+                glDisableVertexAttribArray(0);
                 }
-            WindowBlit(Window, &WindowBitmap);
-            
+                SwapBuffers(DeviceContext);
+                
             Sleep(10);
         }
         OldTime = NewTime;
     }
+    
+    ReleaseDC(Window, DeviceContext);
     
     PlatformMemFree(Image->Data);
     

@@ -13,8 +13,8 @@ typedef struct
     s32 Width;
     s32 Height;
     s32 BPP;
-    void *BitmapMemory;
-} window_resize_result, window_bitmap, window_backbuffer;
+    void *Memory;
+} window_resize_result, window_bitmap, window_backbuffer, window;
 
 internal window_dim
 WindowGetClientRect(HWND Window)
@@ -95,17 +95,23 @@ WindowUpdate(void)
 }
 
 internal window_resize_result
-WindowResize(s32 Width, s32 Height, window_bitmap WindowBitmap)
+WindowResize(s32 Width, s32 Height, window_bitmap WindowBitmap, b32 ResizeOnly)
 {
     window_resize_result Result = WindowBitmap;
-    if(Result.BitmapMemory)
+    
+    if(ResizeOnly)
     {
-        PlatformMemFree(Result.BitmapMemory);
+        Result.Width = Width;
+        Result.Height = Height;
+        Result.BPP = 4;
+        return(Result);
     }
     
-    Result.Width = Width;
-    Result.Height = Height;
-    Result.BPP = 4;
+    if(Result.Memory)
+    {
+        PlatformMemFree(Result.Memory);
+    }
+    
     
     BITMAPINFO BitmapInfo = {0};
     BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
@@ -118,7 +124,7 @@ WindowResize(s32 Width, s32 Height, window_bitmap WindowBitmap)
     s32 BytesPerPixel = 4;
     void *Memory = PlatformMemAlloc((Width * Height) * BytesPerPixel);
     
-    Result.BitmapMemory = Memory;
+    Result.Memory = Memory;
     Result.BitmapInfo = BitmapInfo;
     
     return(Result);
@@ -128,17 +134,16 @@ internal void
 WindowPaint(HDC DeviceContext, RECT *ClientRect, window_bitmap *WindowBitmap)
 {
     BITMAPINFO *BitmapInfo = &WindowBitmap->BitmapInfo;
-     void *BitmapMemory = WindowBitmap->BitmapMemory;
+     void *Memory = WindowBitmap->Memory;
     s32 WindowWidth = ClientRect->right - ClientRect->left;
     s32 WindowHeight = ClientRect->bottom - ClientRect->top;
     StretchDIBits(DeviceContext,  
                   0, 0, WindowBitmap->Width, WindowBitmap->Height,
                   0, 0, WindowWidth, WindowHeight,
-                  BitmapMemory,
+                  Memory,
                   BitmapInfo,
                   DIB_RGB_COLORS, SRCCOPY);
 }
-
 
 internal void
 WindowBlit(HWND Window, window_bitmap *WindowBitmap)
