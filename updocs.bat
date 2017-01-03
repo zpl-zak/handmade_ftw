@@ -12,8 +12,9 @@ pushd code\formats
 call updocs
 popd
 
-call docs docs.html docs\title.txt docs\overview.html
+pushd code
+call docs docs.html ..\docs\title.txt ..\docs\overview.html
 REM pageant
-psftp -l zaklaus madaraszd.net -b docs\updocs.scr
-
-move docs.html docs\
+psftp -l zaklaus madaraszd.net -b ..\docs\updocs.scr
+move docs.html ..\docs\docs.html
+popd
