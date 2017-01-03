@@ -19,7 +19,8 @@ SET O=%OPTI%
 if "%ADD%" == "D" SET O=%DEBUG%
 
 SET CODE_HOME=%~dp0
-SET HFTW_PATH=%HFTW_PATH%
+SET "HFTW_CODE=\code"
+SET HFTW_PATH=%HFTW_PATH%%HFTW_CODE%
 
 ctime -begin %SRC%.ctm
 cl /I%CODE_HOME% /I%HFTW_PATH% %OPTS% %O% %SRC% /link %PAL% -stack:0x100000,0x100000 %LIBS% /incremental:no -opt:ref

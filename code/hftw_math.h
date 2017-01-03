@@ -172,6 +172,7 @@ doc_string(4x4 Matrix. Alias: m4)
 typedef union mat4
 {
     real32 Elements[4][4];
+    real32 Elements16[16];
 } mat4;
 
 doc_sep()

@@ -104,6 +104,32 @@ StringsAreEqualAB(memory_index ALength, char *A, memory_index BLength, char *B)
     return(Result);
 }
 
+internal s32
+S32FromZInternal(char **AtInit)
+{
+    s32 Result = 0;
+    
+    char *At = *AtInit;
+    while((*At >= '0') &&
+          (*At <= '9'))
+    {
+        Result *= 10;
+        Result += (*At - '0');
+        ++At;
+    }
+    
+    *AtInit = At;
+    
+    return(Result);
+}
+
+internal s32
+S32FromZ(char *At)
+{
+    char *Ignored = At;
+    s32 Result = S32FromZInternal(&At);
+    return(Result);
+}
 
 #define HFTW_SHARED_H
 #endif
