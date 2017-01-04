@@ -202,7 +202,7 @@ ZeroSize(memory_index Size, void *Ptr)
     }
 }
 
-#if COMPILER_MSVC
+#if COMPILER_MSVC && _WIN64
 #define CompletePreviousReadsBeforeFutureReads _ReadBarrier()
 #define CompletePreviousWritesBeforeFutureWrites _WriteBarrier()
 internal uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)

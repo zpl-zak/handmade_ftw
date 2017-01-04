@@ -10,8 +10,8 @@ SET ADD=%2
 SET PAL=%~3
 SET LIBS=%~4
 
-SET OPTS=/W4 /WX /wd4189 /wd4310 /wd4100 /wd4201 /wd4505 /wd4996 /wd4127 /wd4510 /wd4512 /wd4610 /wd4457 /WX
-SET OPTS=%OPTS% /GR- /nologo -MTd -nologo -fp:fast -fp:except- -Gm- -GR- -EHa- -Zo -Oi -W4 -wd4201 -wd4100 -wd4189 -wd4505 -wd4127 /GS- /Gs9999999
+SET WARN=-D_CRT_SECURE_NO_WARNINGS /wd4189 /wd4310 /wd4100 /wd4201 /wd4505 /wd4996 /wd4127 /wd4510 /wd4512 /wd4610 /wd4457
+SET OPTS=%WARN% /W4 /WX /GR- /nologo -MTd -nologo -fp:fast -fp:except- -Gm- -GR- -EHa- -Zo -Oi /GS- /Gs9999999
 
 SET DEBUG=/Zi /Zo /DEBUG
 SET OPTI=/FC -O2
