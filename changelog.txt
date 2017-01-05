@@ -1,6 +1,9 @@
 Version 1.0.3
 - Added basic GUI.
 - Added font renderer.
+- Added GUI label widget.
+- Added more GUI utility functions.
+- Added the option to cut the string when string's width is bigger than specified capacity. (Needs adjustments!)
 
 Version 1.0.2
 - Added OpenGL bindings.
