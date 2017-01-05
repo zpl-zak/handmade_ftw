@@ -469,9 +469,9 @@ local_persist r32 xflt = 50.f;
                 {
                     v2 WPos = {100, 10};
                     v2 WRes = {320, 500};
-                    WRes.X = yflt;
-                    WRes.Y = yflt;
-                    WPos.X = xflt;
+                    //WRes.X = yflt;
+                    //WRes.Y = yflt;
+                    //WPos.X = xflt;
                     v3 Color = {0.12, 0.56, 0.43};
                     GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
                     {
@@ -489,6 +489,15 @@ local_persist r32 xflt = 50.f;
                             GUILabel("Handmade C Rocks!!1!!!", TextPos, 10, TextColor, "Times New Roman");
                         }
                         GUIEndWindow();
+                    }
+                    GUIEndWindow();
+                    
+                    v2 AnotherPos = {140, 10};
+                    v2 AnotherRes = {540, 230};
+                    v3 AnotherColor = {.78f, 0.f, 0.f};
+                    GUIBeginWindow("Another Window", AnotherPos, AnotherRes, AnotherColor, 0);
+                    {
+                        
                     }
                     GUIEndWindow();
                     
