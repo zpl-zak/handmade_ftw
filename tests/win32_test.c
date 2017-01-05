@@ -294,13 +294,12 @@ _WinMain(HINSTANCE Instance,
     
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
-    
     GLuint ProgramID = TESTLoadShader("simple.vert", "simple.frag");
-    
+                  
     u32 VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-    
+                  
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f,-1.0f,-1.0f, // triangle 1 : begin
         -1.0f,-1.0f, 1.0f,
@@ -338,8 +337,8 @@ _WinMain(HINSTANCE Instance,
         1.0f, 1.0f, 1.0f,
         -1.0f, 1.0f, 1.0f,
         1.0f,-1.0f, 1.0f
-    };
-    
+    };            
+                  
     static const GLfloat g_color_buffer_data[] = {
         0.583f,  0.771f,  0.014f,
         0.609f,  0.115f,  0.436f,
@@ -377,58 +376,58 @@ _WinMain(HINSTANCE Instance,
         0.673f,  0.211f,  0.457f,
         0.820f,  0.883f,  0.371f,
         0.982f,  0.099f,  0.879f
-    };
-    
+    };            
+                  
     GLuint vertexbuffer, colorbuffer;
-    
+                  
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-    
+                  
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-    
-    
+                  
+                  
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
-    
+                  
     while(Running)
-    {
+    {             
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
-        {
+        {         
             WindowUpdate();
-            {
+            {     
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
-                
-                {
+                  
+                { 
                      Dim = WindowGetClientRect(Window);
                     ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
                     glViewport(0, 0, WindowArea.Width, WindowArea.Height);
                     WindowArea = ResizeResult;
-                }
-                
+                } 
+                  
                 glClearColor(1.f, 1.f, 1.f, 0.f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-                
+                  
                 glUseProgram(ProgramID);
-                
-                
+                  
+                  
                 m4 Projection = MathPerspective(45.f, WindowArea.Width / (real32)WindowArea.Height, .1f, 100.f);
-                
+                  
                 v3 Pos = {4, 3, 7};
                 v3 Target = {0};
                 v3 Up = {0, 1, 0};
-                
+                  
                 m4 View = MathLookAt(Pos, Target, Up);
                 m4 Model = MathMat4d(1.f);
-                
+                  
                 mat4 MVP = MathMultiplyMat4(Projection, View);   
                 MVP = MathMultiplyMat4(MVP, Model);
-                
+                  
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP.Elements[0][0]);
-                
+                  
                 glEnableVertexAttribArray(0);
                 glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
                 glVertexAttribPointer(
@@ -439,7 +438,7 @@ _WinMain(HINSTANCE Instance,
                     0,                  // stride
                     (void*)0            // array buffer offset
                     );
-                
+                  
                 glEnableVertexAttribArray(1);
                 glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
                 glVertexAttribPointer(
@@ -455,18 +454,23 @@ _WinMain(HINSTANCE Instance,
                 glDisableVertexAttribArray(1);
                 glDisableVertexAttribArray(0);
                 
-                local_persist r32 xflt = 400.f;
+                local_persist r32 yflt = 200.f;
+local_persist r32 xflt = 50.f;
                 
                 // NOTE(zaklaus): GUI Test
                 {
-                    v2 WPos = {10, 10};
+                    v2 WPos = {100, 10};
                     v2 WRes = {320, 500};
-                    WRes.Y = xflt;
+                    WRes.X = yflt;
+                    WRes.Y = yflt;
+                    WPos.X = xflt;
                     v3 Color = {0.12, 0.56, 0.43};
                     GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
                     {
-                        v2 WPos2 = {5, 10};
+                        v2 WPos2 = {4, 5};
+                        WPos2.Y = xflt - 30;
                         v2 WRes2 = {250, 350};
+                        
                         v3 Color2 = {0.435, 0.334, 0.5456};
                         GUIBeginWindow("Child Window", WPos2, WRes2, Color2, 0);
                         {
@@ -477,9 +481,10 @@ _WinMain(HINSTANCE Instance,
                     GUIEndWindow();
                     
                     xflt += sinf((r32)TimeGet());
+                    yflt += sinf((r32)TimeGet())*2;
                 }
                 
-                GUIDrawFrame(Window);
+                GUIDrawFrame(Window, DeviceContext);
                 }
                 SwapBuffers(DeviceContext);
                 

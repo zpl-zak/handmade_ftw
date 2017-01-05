@@ -276,6 +276,7 @@ internal u32 GetThreadID(void)
 #include "hftw_random.h"
 #include "hftw_shared.h"
 #include "hftw_platform.h"
+#include "hftw_font.h"
 #include "hftw_node.h"
 #include "hftw_mem.h"
 #include "hftw_intrinsics.h"

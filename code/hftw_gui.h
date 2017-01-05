@@ -6,6 +6,8 @@
 #define GUI_WINDOW_PANEL_HEIGHT 50
 #define GUI_WINDOW_PANEL_BUTTON_DIM GUI_WINDOW_PANEL_HEIGHT
 
+#define GUI_DEFAULT_WIDTH 800
+
 typedef struct gui_window_proto
 {
     char *Title;
@@ -19,6 +21,10 @@ typedef struct gui_window_proto
 } gui_window;
 
 global_variable HWND GUIGlobalWindowHandle = 0;
+global_variable HDC GUIGlobalDeviceContext = 0;
+
+global_variable font_data GlobalGUIFont = {0};
+
 global_variable gui_window *GlobalGUICurrentWindow = 0;
 global_variable gui_window GlobalGUIWindows[GUI_MAX_WINDOWS] = {0};
 
@@ -42,19 +48,21 @@ GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
     
     gui_window *Window = GlobalGUIWindows + Slot;
     
+    vec2 dPos = Pos;
+    
     if(!GlobalGUICurrentWindow)
     {
         GlobalGUICurrentWindow = Window;
     }
     else
     {
-        Pos = MathAddVec2(Pos, GlobalGUICurrentWindow->Pos);
+        dPos = MathAddVec2(Pos, GlobalGUICurrentWindow->Pos);
         Window->Parent = GlobalGUICurrentWindow;
         GlobalGUICurrentWindow = Window;
     }
     
     Window->Title = Title;
-    Window->Pos = Pos;
+    Window->Pos = dPos;
     Window->Res = Res;
     Window->Color = Color;
     Window->Used = 1;
@@ -63,19 +71,21 @@ GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
     // NOTE(zaklaus): Correct if within the bounds.
     if(Window->Parent)
     {
-        if(Window->Parent->Pos.Y - Window->Pos.Y < GUI_WINDOW_PANEL_HEIGHT)
+        if(Pos.Y < GUI_WINDOW_PANEL_HEIGHT/2)
         {
-            // NOTE(zaklaus): Window overlaps window panel.
-            Window->Pos.Y = Window->Parent->Pos.Y + GUI_WINDOW_PANEL_HEIGHT;
+            Window->Pos.Y += GUI_WINDOW_PANEL_HEIGHT/2 - Pos.Y;
+            Pos.Y += GUI_WINDOW_PANEL_HEIGHT/2 - Pos.Y;
         }
-    if(Window->Pos.X*2 + Window->Res.X > Window->Parent->Res.X)
+        
+    if(Res.X + Pos.X > Window->Parent->Res.X)
     {
-        Window->Res.X = Window->Parent->Res.X - Window->Pos.X * 2;
+        r32 ddR = Pos.X + Res.X - Window->Parent->Res.X;
+        Window->Res.X -= ddR;
     }
     
-    if(Window->Pos.Y*2 + Window->Res.Y > Window->Parent->Res.Y)
+    if(Pos.Y + Res.Y > Window->Parent->Res.Y)
     {
-        Window->Res.Y = Window->Parent->Res.Y - Window->Pos.Y *2;
+        Window->Res.Y = Window->Parent->Res.Y - Pos.Y;
     }
     
     if(!Visible)
@@ -161,6 +171,27 @@ GUIDrawRectangle(v2 Min, v2 Max, v3 Color)
     glEnd();
 }
 
+internal void
+GUIDrawText(v2 Pos, r32 Scale, v3 Color)
+{
+    window_dim Dimensions = WindowGetClientRect(GUIGlobalWindowHandle);
+    Scale /= 10;
+    
+    Scale /= Dimensions.X / GUI_DEFAULT_WIDTH;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //glOrtho(-100, 100, -100, 100, 0, 1);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    r32 AspectRatio = (real32)Dimensions.X / Dimensions.Y;
+    glTranslatef(Pos.X, Pos.Y, 0.f);
+    glScalef(Scale / AspectRatio, Scale, 1.f);
+    
+    glColor3f(Color.R, Color.G, Color.B);
+}
+
 #define GUIADJP(vector) GUIAdjustDim(vector, 2, -1, 0, 1)
 #define GUIADJR(vector) GUIAdjustDim(vector, 1, 0, 0, 0)
 #define GUIADJRF(value) GUIAdjustDimf(value, 1, 0, 0, 0)
@@ -180,11 +211,19 @@ GUIAdjustRes(v2 Pos, v2 Res)
 }
 
 internal void
-GUIDrawFrame(HWND WindowHandle)
+GUIDrawFrame(HWND WindowHandle, HDC DeviceContext)
 {
     glDisable(GL_DEPTH_TEST);
     glUseProgram(0);
+    
     GUIGlobalWindowHandle = WindowHandle;
+    GUIGlobalDeviceContext = DeviceContext;
+    
+    if(!GlobalGUIFont.FontHandle)
+    {
+        font_style FontStyle = {0};
+        FontBuild("Courier New", 0, FW_BOLD, FontStyle, GUIGlobalDeviceContext, &GlobalGUIFont);
+    }
     
     // NOTE(zaklaus): Window widget.
     {
@@ -203,11 +242,13 @@ GUIDrawFrame(HWND WindowHandle)
                         goto gui_window_end;
                 }
                 
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
+                
                 v2 Position = Window->Pos;
-                {
-                    Position.X *= 2;
-                    Position.Y *= 2;
-                }
                 v2 Resolution = Window->Res;
                 {
                     Resolution.X *= 2;
@@ -243,6 +284,16 @@ GUIDrawFrame(HWND WindowHandle)
                 v3 NewColor = MathAddVec3(Window->Color, MathMultiplyVec3f(ColorDir, -.25));
                 
                 GUIDrawRectangle(GUIADJP(ButtonMin), GUIAdjustRes(ButtonMin, ButtonRes), NewColor);
+            }
+            
+            // NOTE(zaklaus): Draw title.
+            {
+                v2 TextPos = Position;
+                TextPos.Y += 20;
+                v3 TextColor = {1.f, 1.f, 1.f};
+                GUIDrawText(GUIADJP(TextPos), 1, TextColor);
+                FontPrintf(&GlobalGUIFont, Window->Title, Resolution.X - GUI_WINDOW_PANEL_BUTTON_DIM, 1);
+                
             }
             
             gui_window_end:

@@ -1,3 +1,7 @@
+Version 1.0.3
+- Added basic GUI.
+- Added font renderer.
+
 Version 1.0.2
 - Added OpenGL bindings.
 - Added test code for OpenGL application using shaders.
