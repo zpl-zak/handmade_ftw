@@ -283,6 +283,7 @@ internal u32 GetThreadID(void)
 #include "hftw_string.h"
 #include "hftw_io.h"
 #include "hftw_henc.h"
+#include "hftw_gui.h"
 
 #define HFTW_H
 #endif

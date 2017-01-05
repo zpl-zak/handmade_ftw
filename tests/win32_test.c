@@ -12,6 +12,7 @@
 
 global_variable b32 Running = 1;
 global_variable window WindowArea;
+global_variable b32 ShowTestWindow = 1;
 
 internal void
 RenderGradient(s32 XOffset, s32 YOffset)
@@ -148,20 +149,13 @@ WndProc(HWND Window,
         WPARAM WParam,
         LPARAM LParam)
 {
+    GUIProcessFrame(Window, Message, WParam, LParam);
+    
     switch(Message)
     {
         case WM_ACTIVATEAPP:
         case WM_SIZE:
         {
-            window_dim Dim = WindowGetClientRect(Window);
-            
-            window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
-            
-            glViewport(0, 0, WindowArea.Width, WindowArea.Height);
-            
-            WindowArea = ResizeResult;
-            
-            WindowBlit(Window, &WindowArea);
         }break;
         
         case WM_CLOSE:
@@ -175,6 +169,11 @@ WndProc(HWND Window,
             if(WParam == VK_ESCAPE)
             {
                 Running = 0;
+            }
+            
+            if(WParam == VK_RETURN)
+            {
+                ShowTestWindow = !ShowTestWindow;
             }
         }break;
     }
@@ -390,17 +389,6 @@ _WinMain(HINSTANCE Instance,
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
     
-    m4 Projection = MathPerspective(45.f, 4.f / 3.f, .1f, 100.f);
-    
-    v3 Pos = {4, 3, 7};
-    v3 Target = {0};
-    v3 Up = {0, 1, 0};
-    
-    m4 View = MathLookAt(Pos, Target, Up);
-    m4 Model = MathMat4d(1.f);
-    
-    mat4 MVP = MathMultiplyMat4(Projection, View);   
-    MVP = MathMultiplyMat4(MVP, Model);
     
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
     
@@ -413,10 +401,31 @@ _WinMain(HINSTANCE Instance,
             {
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
+                
+                {
+                     Dim = WindowGetClientRect(Window);
+                    ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
+                    glViewport(0, 0, WindowArea.Width, WindowArea.Height);
+                    WindowArea = ResizeResult;
+                }
+                
                 glClearColor(1.f, 1.f, 1.f, 0.f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
                 
                 glUseProgram(ProgramID);
+                
+                
+                m4 Projection = MathPerspective(45.f, WindowArea.Width / (real32)WindowArea.Height, .1f, 100.f);
+                
+                v3 Pos = {4, 3, 7};
+                v3 Target = {0};
+                v3 Up = {0, 1, 0};
+                
+                m4 View = MathLookAt(Pos, Target, Up);
+                m4 Model = MathMat4d(1.f);
+                
+                mat4 MVP = MathMultiplyMat4(Projection, View);   
+                MVP = MathMultiplyMat4(MVP, Model);
                 
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP.Elements[0][0]);
                 
@@ -445,6 +454,32 @@ _WinMain(HINSTANCE Instance,
                 glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
                 glDisableVertexAttribArray(1);
                 glDisableVertexAttribArray(0);
+                
+                local_persist r32 xflt = 400.f;
+                
+                // NOTE(zaklaus): GUI Test
+                {
+                    v2 WPos = {10, 10};
+                    v2 WRes = {320, 500};
+                    WRes.Y = xflt;
+                    v3 Color = {0.12, 0.56, 0.43};
+                    GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
+                    {
+                        v2 WPos2 = {5, 10};
+                        v2 WRes2 = {250, 350};
+                        v3 Color2 = {0.435, 0.334, 0.5456};
+                        GUIBeginWindow("Child Window", WPos2, WRes2, Color2, 0);
+                        {
+                            
+                        }
+                        GUIEndWindow();
+                    }
+                    GUIEndWindow();
+                    
+                    xflt += sinf((r32)TimeGet());
+                }
+                
+                GUIDrawFrame(Window);
                 }
                 SwapBuffers(DeviceContext);
                 
