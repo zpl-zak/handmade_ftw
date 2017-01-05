@@ -10,6 +10,7 @@ typedef struct
 {
     GLuint FontHandle;
     GLYPHMETRICSFLOAT GMF[256];
+    HFONT Font;
 } font_data;
 
 typedef struct
@@ -43,13 +44,24 @@ FontStyle.Strikeout,
                        FontName);
     
     Assert(Font);
+    FontData->Font = Font;
     
     SelectObject(DeviceContext, Font);
     wglUseFontOutlines(DeviceContext, 0, 255, 
                        FontData->FontHandle, 0.f, 0.2f, 
                        WGL_FONT_POLYGONS, FontData->GMF);
     
-    DeleteObject(Font);
+    //DeleteObject(Font);
+}
+
+internal void
+FontSelect(font_data *FontData, HDC DeviceContext)
+{
+    SelectObject(DeviceContext, FontData->Font);
+    wglUseFontOutlines(DeviceContext, 0, 255, 
+                       FontData->FontHandle, 0.f, 0.2f, 
+                       WGL_FONT_POLYGONS, FontData->GMF);
+    
 }
 
 internal void
@@ -70,14 +82,16 @@ FontPrintf(font_data *FontData, char *Format, r32 Capacity, r32 Scale, ...)
     va_end(VarArgs);
     
     GLsizei TextLength = (GLsizei)strlen(Text);
-     r32 Width = 35*Scale;
-    
+    if(Capacity)
+    {
+        r32 Width = 35*Scale / 20;
     if(TextLength*Width > Capacity)
     {
         TextLength = (GLsizei)floor(Capacity / Width);
     }
     Text[TextLength] = 0;
-    
+}
+
     glPushAttrib(GL_LIST_BIT);
     {
         glListBase(FontData->FontHandle);

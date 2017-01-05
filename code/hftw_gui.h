@@ -3,6 +3,9 @@
 #if !defined(HFTW_GUI_H)
 
 #define GUI_MAX_WINDOWS 128
+#define GUI_MAX_FONTS 32
+#define GUI_MAX_LABELS 256
+
 #define GUI_WINDOW_PANEL_HEIGHT 50
 #define GUI_WINDOW_PANEL_BUTTON_DIM GUI_WINDOW_PANEL_HEIGHT
 
@@ -20,13 +23,118 @@ typedef struct gui_window_proto
     struct gui_window_proto *Parent;
 } gui_window;
 
+typedef struct
+{
+    char *Text;
+    char *FontName;
+    v2 Pos;
+    v3 Color;
+    r32 Scale;
+    
+    b32 Used;
+} gui_label;
+
+typedef struct
+{
+    font_data Fonts[GUI_MAX_FONTS];
+    char *FontNames[GUI_MAX_FONTS];
+} gui_fonts;
+
 global_variable HWND GUIGlobalWindowHandle = 0;
 global_variable HDC GUIGlobalDeviceContext = 0;
-
-global_variable font_data GlobalGUIFont = {0};
+global_variable gui_fonts GUIGlobalFonts = {0};
 
 global_variable gui_window *GlobalGUICurrentWindow = 0;
 global_variable gui_window GlobalGUIWindows[GUI_MAX_WINDOWS] = {0};
+global_variable gui_label GlobalGUILabels[GUI_MAX_LABELS] = {0};
+
+internal void
+GUIInitialize(HDC DeviceContext, HWND Window)
+{
+    GUIGlobalWindowHandle = Window;
+    GUIGlobalDeviceContext = DeviceContext;
+}
+
+internal void
+GUICreateFont(char *FontName, 
+              u32 FontHeight, u32 FontWeight, 
+              font_style FontStyle)
+{
+    s32 Idx;
+    for(Idx = 0;
+        Idx < GUI_MAX_FONTS;
+        ++Idx)
+    {
+        char *TargetFontName = GUIGlobalFonts.FontNames[Idx];
+        
+        if(!TargetFontName)
+        {
+            GUIGlobalFonts.FontNames[Idx] = FontName;
+            
+            font_data FontData = {0};
+            FontBuild(FontName, FontHeight, 
+                      FontWeight, FontStyle,
+                      GUIGlobalDeviceContext,
+                      &FontData);
+            
+            GUIGlobalFonts.Fonts[Idx] = FontData;
+            return;
+        }
+    }
+}
+
+internal font_data *
+GUISelectFont(char *FontName)
+{
+    s32 Idx;
+    for(Idx = 0;
+        Idx < GUI_MAX_FONTS;
+        ++Idx)
+    {
+        char **TargetFontName = &GUIGlobalFonts.FontNames[Idx];
+        
+        if(TargetFontName)
+        {
+            if(StringsAreEqual(*TargetFontName, FontName))
+            {
+                return(&GUIGlobalFonts.Fonts[Idx]);
+            }
+        }
+    }
+    return(0);
+}
+
+internal void
+GUIAdjustBounds(gui_window *Window, v2 *Pos, v2 *Res)
+{
+    if(Window)
+    {
+        Pos->Y += GUI_WINDOW_PANEL_HEIGHT/2;
+        
+        if(Res->X + Pos->X > Window->Res.X)
+        {
+            r32 ddR = Res->X + Pos->X - Window->Res.X;
+            Res->X -= ddR;
+        }
+        
+        if(Pos->Y + Res->Y > Window->Res.Y)
+        {
+            r32 ddR = Pos->Y + Res->Y - Window->Res.Y;
+            Res->Y -= ddR;
+        }
+        *Pos = MathAddVec2(Window->Pos, *Pos);
+    }
+}
+
+internal void
+GUIAdjustBoundsPos(gui_window *Window, v2 *Pos, r32 Scale)
+{
+    if(Window)
+    {
+        Pos->Y += GUI_WINDOW_PANEL_HEIGHT/2 + Scale;
+        *Pos = MathAddVec2(Window->Pos, *Pos);
+    }
+}
 
 internal void
 GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
@@ -48,51 +156,31 @@ GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
     
     gui_window *Window = GlobalGUIWindows + Slot;
     
-    vec2 dPos = Pos;
-    
     if(!GlobalGUICurrentWindow)
     {
         GlobalGUICurrentWindow = Window;
     }
     else
     {
-        dPos = MathAddVec2(Pos, GlobalGUICurrentWindow->Pos);
+        GUIAdjustBounds(GlobalGUICurrentWindow, &Pos, &Res);
         Window->Parent = GlobalGUICurrentWindow;
         GlobalGUICurrentWindow = Window;
     }
     
     Window->Title = Title;
-    Window->Pos = dPos;
+    Window->Pos = Pos;
     Window->Res = Res;
     Window->Color = Color;
     Window->Used = 1;
     Window->Visible = Visible;
     
-    // NOTE(zaklaus): Correct if within the bounds.
     if(Window->Parent)
     {
-        if(Pos.Y < GUI_WINDOW_PANEL_HEIGHT/2)
+        if(!Visible)
         {
-            Window->Pos.Y += GUI_WINDOW_PANEL_HEIGHT/2 - Pos.Y;
-            Pos.Y += GUI_WINDOW_PANEL_HEIGHT/2 - Pos.Y;
+            Window->Visible = Window->Parent->Visible;
         }
-        
-    if(Res.X + Pos.X > Window->Parent->Res.X)
-    {
-        r32 ddR = Pos.X + Res.X - Window->Parent->Res.X;
-        Window->Res.X -= ddR;
     }
-    
-    if(Pos.Y + Res.Y > Window->Parent->Res.Y)
-    {
-        Window->Res.Y = Window->Parent->Res.Y - Pos.Y;
-    }
-    
-    if(!Visible)
-    {
-        Window->Visible = Window->Parent->Visible;
-    }
-}
 }
 
 internal void
@@ -101,6 +189,35 @@ GUIEndWindow(void)
     Assert(GlobalGUICurrentWindow);
     
     GlobalGUICurrentWindow = GlobalGUICurrentWindow->Parent;
+}
+
+internal void
+GUILabel(char *Text, v2 Pos, r32 Scale, v3 Color, char *FontName)
+{
+    s32 Slot = -1;
+    for(s32 Idx = 0;
+        Idx < GUI_MAX_LABELS;
+        ++Idx)
+    {
+        if(!GlobalGUILabels[Idx].Used)
+        {
+            Slot = Idx;
+            break;
+        }
+    }
+    
+    Assert(Slot != -1);
+    
+    gui_label *Label = GlobalGUILabels + Slot;
+    
+    GUIAdjustBoundsPos(GlobalGUICurrentWindow, &Pos, Scale);
+    
+    Label->Text = Text;
+    Label->Pos = Pos;
+    Label->Scale = Scale;
+    Label->Color = Color;
+    Label->FontName = FontName;
+    Label->Used = 1;
 }
 
 internal b32
@@ -175,7 +292,7 @@ internal void
 GUIDrawText(v2 Pos, r32 Scale, v3 Color)
 {
     window_dim Dimensions = WindowGetClientRect(GUIGlobalWindowHandle);
-    Scale /= 10;
+    Scale /= 20 * 10;
     
     Scale /= Dimensions.X / GUI_DEFAULT_WIDTH;
     glMatrixMode(GL_PROJECTION);
@@ -211,19 +328,10 @@ GUIAdjustRes(v2 Pos, v2 Res)
 }
 
 internal void
-GUIDrawFrame(HWND WindowHandle, HDC DeviceContext)
+GUIDrawFrame(void)
 {
     glDisable(GL_DEPTH_TEST);
     glUseProgram(0);
-    
-    GUIGlobalWindowHandle = WindowHandle;
-    GUIGlobalDeviceContext = DeviceContext;
-    
-    if(!GlobalGUIFont.FontHandle)
-    {
-        font_style FontStyle = {0};
-        FontBuild("Courier New", 0, FW_BOLD, FontStyle, GUIGlobalDeviceContext, &GlobalGUIFont);
-    }
     
     // NOTE(zaklaus): Window widget.
     {
@@ -288,20 +396,41 @@ GUIDrawFrame(HWND WindowHandle, HDC DeviceContext)
             
             // NOTE(zaklaus): Draw title.
             {
+                font_data *Font = GUISelectFont("Courier New");
                 v2 TextPos = Position;
                 TextPos.Y += 20;
                 v3 TextColor = {1.f, 1.f, 1.f};
-                GUIDrawText(GUIADJP(TextPos), 1, TextColor);
-                FontPrintf(&GlobalGUIFont, Window->Title, Resolution.X - GUI_WINDOW_PANEL_BUTTON_DIM, 1);
-                
+                GUIDrawText(GUIADJP(TextPos), 20, TextColor);
+                FontPrintf(Font, Window->Title, Resolution.X - GUI_WINDOW_PANEL_BUTTON_DIM, 20);
             }
             
             gui_window_end:
                 *Window = Window_;
             }
         }
+        
+        // NOTE(zaklaus): Labels
+        {
+            s32 Idx;
+            for(Idx = 0;
+                Idx < GUI_MAX_LABELS;
+                ++Idx)
+            {
+                gui_label *Label = GlobalGUILabels + Idx;
+                if(Label->Used)
+                {
+                    
+                    gui_label Label_ = {0};
+                    
+                    font_data *Font = GUISelectFont(Label->FontName);
+                    GUIDrawText(GUIADJP(Label->Pos), Label->Scale, Label->Color);
+                    FontPrintf(Font, Label->Text, 0, Label->Scale);
+                    
+                    *Label = Label_;
+                }
+            }
+        }
     }
-    
     glEnable(GL_DEPTH_TEST);
 }
 

@@ -391,6 +391,13 @@ _WinMain(HINSTANCE Instance,
                   
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
                   
+    GUIInitialize(DeviceContext, Window);
+    
+    // NOTE(zaklaus): Build fonts.
+    font_style StandardFontStyle  = {0};
+    GUICreateFont("Courier New", 12, FW_BOLD, StandardFontStyle);
+    GUICreateFont("Times New Roman", 12, FW_DONTCARE, StandardFontStyle);
+    
     while(Running)
     {             
         r64 NewTime = TimeGet();
@@ -456,6 +463,7 @@ _WinMain(HINSTANCE Instance,
                 
                 local_persist r32 yflt = 200.f;
 local_persist r32 xflt = 50.f;
+                local_persist r32 smallxflt = .4f;
                 
                 // NOTE(zaklaus): GUI Test
                 {
@@ -467,24 +475,29 @@ local_persist r32 xflt = 50.f;
                     v3 Color = {0.12, 0.56, 0.43};
                     GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
                     {
-                        v2 WPos2 = {4, 5};
+                        v2 WPos2 = {10, 20};
                         WPos2.Y = xflt - 30;
                         v2 WRes2 = {250, 350};
                         
                         v3 Color2 = {0.435, 0.334, 0.5456};
-                        GUIBeginWindow("Child Window", WPos2, WRes2, Color2, 0);
+                        local_persist b32 ShowChild = 1;
+                        GUIBeginWindow("Child Window", WPos2, WRes2, Color2, &ShowChild);
                         {
-                            
+                            v2 TextPos = {10, 20};
+                            v3 TextColor = {.34, .56, .78};
+                            TextColor.Y = MathLerp(.12f, MathABS(smallxflt), .89f);
+                            GUILabel("Handmade C Rocks!!1!!!", TextPos, 10, TextColor, "Times New Roman");
                         }
                         GUIEndWindow();
                     }
                     GUIEndWindow();
                     
                     xflt += sinf((r32)TimeGet());
+                    smallxflt = sinf((r32)TimeGet());
                     yflt += sinf((r32)TimeGet())*2;
                 }
                 
-                GUIDrawFrame(Window, DeviceContext);
+                GUIDrawFrame();
                 }
                 SwapBuffers(DeviceContext);
                 
