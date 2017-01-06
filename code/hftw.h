@@ -274,6 +274,7 @@ internal u32 GetThreadID(void)
 
 
 // NOTE(zaklaus): Nuklear GUI
+#ifdef HANDMADE_USE_NUKLEAR
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
@@ -283,6 +284,9 @@ internal u32 GetThreadID(void)
 
 #include "nuklear.h"
 #include "nuklear_gdi.h"
+#endif
+
+// NOTE(zaklaus): Handmade Internals
 
 #include "hftw_math.h"
 #include "hftw_random.h"
@@ -296,6 +300,7 @@ internal u32 GetThreadID(void)
 #include "hftw_string.h"
 #include "hftw_io.h"
 #include "hftw_henc.h"
+#include "hftw_gui.H"
 
 #define HFTW_H
 #endif
