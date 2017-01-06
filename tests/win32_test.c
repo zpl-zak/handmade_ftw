@@ -149,7 +149,10 @@ WndProc(HWND Window,
         WPARAM WParam,
         LPARAM LParam)
 {
-    GUIProcessFrame(Window, Message, WParam, LParam);
+    if(nk_gdi_handle_event(Window, Message, WParam, LParam))
+    {
+        return(0);
+    }
     
     switch(Message)
     {
@@ -288,6 +291,9 @@ _WinMain(HINSTANCE Instance,
     
     HDC DeviceContext = GetDC(Window);
     
+    GdiFont *gdiFont = nk_gdifont_create("Arial", 14);
+    struct nk_context *ctx = nk_gdi_init(gdiFont, DeviceContext, 800, 600);
+    
     b32 ModernContext = 1;
     
     Win32InitOpenGL(DeviceContext, &ModernContext);
@@ -391,20 +397,36 @@ _WinMain(HINSTANCE Instance,
                   
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
                   
-    GUIInitialize(DeviceContext, Window);
-    
-    // NOTE(zaklaus): Build fonts.
-    font_style StandardFontStyle  = {0};
-    GUICreateFont("Courier New", 12, FW_BOLD, StandardFontStyle);
-    GUICreateFont("Times New Roman", 12, FW_DONTCARE, StandardFontStyle);
-    
     while(Running)
     {             
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
         {         
+            nk_input_begin(ctx);
             WindowUpdate();
+            nk_input_end(ctx);
             {     
+                
+                if (nk_begin(ctx, "Demo", nk_rect(50, 50, 200, 200),
+                             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+                             NK_WINDOW_CLOSABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+                {
+                    enum {EASY, HARD};
+                    static int op = EASY;
+                    static int property = 20;
+                    
+                    nk_layout_row_static(ctx, 30, 80, 1);
+                    if (nk_button_label(ctx, "button"))
+                        fprintf(stdout, "button pressed\n");
+                    nk_layout_row_dynamic(ctx, 30, 2);
+                    if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
+                    if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
+                    nk_layout_row_dynamic(ctx, 22, 1);
+                    nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+                }
+                nk_end(ctx);
+                nk_gdi_render(nk_rgb(0,0,0));
+                
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
                   
@@ -460,43 +482,6 @@ _WinMain(HINSTANCE Instance,
                 glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
                 glDisableVertexAttribArray(1);
                 glDisableVertexAttribArray(0);
-                
-                local_persist r32 yflt = 200.f;
-local_persist r32 xflt = 50.f;
-                local_persist r32 smallxflt = .4f;
-                
-                // NOTE(zaklaus): GUI Test
-                {
-                    v2 WPos = {100, 10};
-                    v2 WRes = {320, 500};
-                    //WRes.X = yflt;
-                    //WRes.Y = yflt;
-                    //WPos.X = xflt;
-                    v3 Color = {0.12, 0.56, 0.43};
-                    GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
-                    {
-                        local_persist u32 cnt = 0;
-                        char buffer[256];
-                        sprintf(buffer, "Counter: %d", cnt++);
-                        GUILabel(buffer, MathVec2(10, 20), 12, MathVec3(.33,.33,.33), "Courier New");
-                    }
-                    GUIEndWindow();
-                    
-                    v2 AnotherPos = {140, 10};
-                    v2 AnotherRes = {540, 230};
-                    v3 AnotherColor = {.78f, 0.f, 0.f};
-                    GUIBeginWindow("Another Window", AnotherPos, AnotherRes, AnotherColor, 0);
-                    {
-                        
-                    }
-                    GUIEndWindow();
-                    
-                    xflt += sinf((r32)TimeGet());
-                    smallxflt = sinf((r32)TimeGet());
-                    yflt += sinf((r32)TimeGet())*2;
-                }
-                
-                GUIDrawFrame();
                 }
                 SwapBuffers(DeviceContext);
                 
