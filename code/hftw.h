@@ -202,7 +202,7 @@ ZeroSize(memory_index Size, void *Ptr)
     }
 }
 
-#if COMPILER_MSVC
+#if COMPILER_MSVC && _WIN64
 #define CompletePreviousReadsBeforeFutureReads _ReadBarrier()
 #define CompletePreviousWritesBeforeFutureWrites _WriteBarrier()
 internal uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Expected)
@@ -272,10 +272,23 @@ internal u32 GetThreadID(void)
 #else
 #endif
 
+
+// NOTE(zaklaus): Nuklear GUI
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_IMPLEMENTATION
+#define NK_GDI_IMPLEMENTATION
+
+#include "nuklear.h"
+#include "nuklear_gdi.h"
+
 #include "hftw_math.h"
 #include "hftw_random.h"
 #include "hftw_shared.h"
 #include "hftw_platform.h"
+#include "hftw_font.h"
 #include "hftw_node.h"
 #include "hftw_mem.h"
 #include "hftw_intrinsics.h"

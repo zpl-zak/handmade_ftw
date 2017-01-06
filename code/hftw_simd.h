@@ -1,5 +1,9 @@
 // (c) 2016 ZaKlaus; All Rights Reserved
 
+#if !defined(HFTW_SIMD_H)
+
+#ifdef _WIN64
+
 doc(v3_4x)
 doc_cat(SIMD)
 doc_string(3-dimensional vector component.)
@@ -148,3 +152,7 @@ v3 A)
     
     return(Result);
 }
+
+#endif
+#define HFTW_SIMD_H
+#endif

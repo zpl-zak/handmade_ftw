@@ -1,3 +1,18 @@
+Version 1.0.4
+- Replaced my experimental GUI with Nuklear (GDI backend, needs OpenGL impl.)
+
+Version 1.0.3
+- Added basic GUI.
+- Added font renderer.
+- Added GUI label widget.
+- Added more GUI utility functions.
+- Added the option to cut the string when string's width is bigger than specified capacity. (Needs adjustments!)
+- Added basic window events.
+- Added window movement behavior.
+- Added window focus behavior.
+- Disabled child windows.
+- Improved window moving.
+
 Version 1.0.2
 - Added OpenGL bindings.
 - Added test code for OpenGL application using shaders.

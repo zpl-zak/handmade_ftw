@@ -12,6 +12,7 @@
 
 global_variable b32 Running = 1;
 global_variable window WindowArea;
+global_variable b32 ShowTestWindow = 1;
 
 internal void
 RenderGradient(s32 XOffset, s32 YOffset)
@@ -148,20 +149,16 @@ WndProc(HWND Window,
         WPARAM WParam,
         LPARAM LParam)
 {
+    if(nk_gdi_handle_event(Window, Message, WParam, LParam))
+    {
+        return(0);
+    }
+    
     switch(Message)
     {
         case WM_ACTIVATEAPP:
         case WM_SIZE:
         {
-            window_dim Dim = WindowGetClientRect(Window);
-            
-            window_resize_result ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
-            
-            glViewport(0, 0, WindowArea.Width, WindowArea.Height);
-            
-            WindowArea = ResizeResult;
-            
-            WindowBlit(Window, &WindowArea);
         }break;
         
         case WM_CLOSE:
@@ -175,6 +172,11 @@ WndProc(HWND Window,
             if(WParam == VK_ESCAPE)
             {
                 Running = 0;
+            }
+            
+            if(WParam == VK_RETURN)
+            {
+                ShowTestWindow = !ShowTestWindow;
             }
         }break;
     }
@@ -289,19 +291,21 @@ _WinMain(HINSTANCE Instance,
     
     HDC DeviceContext = GetDC(Window);
     
+    GdiFont *gdiFont = nk_gdifont_create("Arial", 14);
+    struct nk_context *ctx = nk_gdi_init(gdiFont, DeviceContext, 800, 600);
+    
     b32 ModernContext = 1;
     
     Win32InitOpenGL(DeviceContext, &ModernContext);
     
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
-    
     GLuint ProgramID = TESTLoadShader("simple.vert", "simple.frag");
-    
+                  
     u32 VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-    
+                  
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f,-1.0f,-1.0f, // triangle 1 : begin
         -1.0f,-1.0f, 1.0f,
@@ -339,8 +343,8 @@ _WinMain(HINSTANCE Instance,
         1.0f, 1.0f, 1.0f,
         -1.0f, 1.0f, 1.0f,
         1.0f,-1.0f, 1.0f
-    };
-    
+    };            
+                  
     static const GLfloat g_color_buffer_data[] = {
         0.583f,  0.771f,  0.014f,
         0.609f,  0.115f,  0.436f,
@@ -378,48 +382,81 @@ _WinMain(HINSTANCE Instance,
         0.673f,  0.211f,  0.457f,
         0.820f,  0.883f,  0.371f,
         0.982f,  0.099f,  0.879f
-    };
-    
+    };            
+                  
     GLuint vertexbuffer, colorbuffer;
-    
+                  
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-    
+                  
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-    
-    m4 Projection = MathPerspective(45.f, 4.f / 3.f, .1f, 100.f);
-    
-    v3 Pos = {4, 3, 7};
-    v3 Target = {0};
-    v3 Up = {0, 1, 0};
-    
-    m4 View = MathLookAt(Pos, Target, Up);
-    m4 Model = MathMat4d(1.f);
-    
-    mat4 MVP = MathMultiplyMat4(Projection, View);   
-    MVP = MathMultiplyMat4(MVP, Model);
-    
+                  
+                  
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
-    
+                  
     while(Running)
-    {
+    {             
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
-        {
+        {         
+            nk_input_begin(ctx);
             WindowUpdate();
-            {
+            nk_input_end(ctx);
+            {     
+                
+                if (nk_begin(ctx, "Demo", nk_rect(50, 50, 200, 200),
+                             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
+                             NK_WINDOW_CLOSABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
+                {
+                    enum {EASY, HARD};
+                    static int op = EASY;
+                    static int property = 20;
+                    
+                    nk_layout_row_static(ctx, 30, 80, 1);
+                    if (nk_button_label(ctx, "button"))
+                        fprintf(stdout, "button pressed\n");
+                    nk_layout_row_dynamic(ctx, 30, 2);
+                    if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
+                    if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
+                    nk_layout_row_dynamic(ctx, 22, 1);
+                    nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
+                }
+                nk_end(ctx);
+                nk_gdi_render(nk_rgb(0,0,0));
+                
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
+                  
+                { 
+                     Dim = WindowGetClientRect(Window);
+                    ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
+                    glViewport(0, 0, WindowArea.Width, WindowArea.Height);
+                    WindowArea = ResizeResult;
+                } 
+                  
                 glClearColor(1.f, 1.f, 1.f, 0.f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-                
+                  
                 glUseProgram(ProgramID);
-                
+                  
+                  
+                m4 Projection = MathPerspective(45.f, WindowArea.Width / (real32)WindowArea.Height, .1f, 100.f);
+                  
+                v3 Pos = {4, 3, 7};
+                v3 Target = {0};
+                v3 Up = {0, 1, 0};
+                  
+                m4 View = MathLookAt(Pos, Target, Up);
+                m4 Model = MathMat4d(1.f);
+                  
+                mat4 MVP = MathMultiplyMat4(Projection, View);   
+                MVP = MathMultiplyMat4(MVP, Model);
+                  
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP.Elements[0][0]);
-                
+                  
                 glEnableVertexAttribArray(0);
                 glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
                 glVertexAttribPointer(
@@ -430,7 +467,7 @@ _WinMain(HINSTANCE Instance,
                     0,                  // stride
                     (void*)0            // array buffer offset
                     );
-                
+                  
                 glEnableVertexAttribArray(1);
                 glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
                 glVertexAttribPointer(

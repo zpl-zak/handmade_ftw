@@ -86,9 +86,6 @@ PlatformMemMove(void *Ptr, ms NewSize)
 #include "platform/win32_time.h"
 #include "platform/win32_window.h"
 #include "platform/win32_opengl.h"
-#include "platform/win32_crt_math.cpp"
-#include "platform/win32_crt_float.cpp"
-#include "platform/win32_crt_memory.cpp"
 
 internal LONGLONG 
 GetFilePointerEx(HANDLE FileHandle)
