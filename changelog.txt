@@ -1,5 +1,9 @@
 Version 1.0.5
 - Actually put Nuklear as an alternative GUI, I'm continuing work on my own.
+- win32_test cleanup:
+  - Got rid of test render code.
+  - Got rid of old software rasterizers.
+- win32_test now serves purpose as a GUI devground.
 
 Version 1.0.4
 - Replaced my experimental GUI with Nuklear (GDI backend, needs OpenGL impl.)
