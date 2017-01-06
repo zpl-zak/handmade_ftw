@@ -475,20 +475,10 @@ local_persist r32 xflt = 50.f;
                     v3 Color = {0.12, 0.56, 0.43};
                     GUIBeginWindow("Handmade FTW", WPos, WRes, Color, &ShowTestWindow);
                     {
-                        v2 WPos2 = {10, 20};
-                        WPos2.Y = xflt - 30;
-                        v2 WRes2 = {250, 350};
-                        
-                        v3 Color2 = {0.435, 0.334, 0.5456};
-                        local_persist b32 ShowChild = 1;
-                        GUIBeginWindow("Child Window", WPos2, WRes2, Color2, &ShowChild);
-                        {
-                            v2 TextPos = {10, 20};
-                            v3 TextColor = {.34, .56, .78};
-                            TextColor.Y = MathLerp(.12f, MathABS(smallxflt), .89f);
-                            GUILabel("Handmade C Rocks!!1!!!", TextPos, 10, TextColor, "Times New Roman");
-                        }
-                        GUIEndWindow();
+                        local_persist u32 cnt = 0;
+                        char buffer[256];
+                        sprintf(buffer, "Counter: %d", cnt++);
+                        GUILabel(buffer, MathVec2(10, 20), 12, MathVec3(.33,.33,.33), "Courier New");
                     }
                     GUIEndWindow();
                     

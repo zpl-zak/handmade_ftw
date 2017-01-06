@@ -49,8 +49,11 @@ typedef struct gui_window_proto
     b32 Used;
     b32 *Visible;
     b32 Overriden;
+    b32 Rendered;
+    b32 Moving;
     
     struct gui_window_proto *Parent;
+    struct gui_window_proto *Children[GUI_MAX_WINDOWS];
 } gui_window;
 
 typedef struct
@@ -79,7 +82,7 @@ internal void
 GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
 {
     gui_window *Window = GlobalGUIWindows;
-     s32 Slot = -1;
+    s32 Slot = -1;
     for(s32 Idx = 0;
         Idx < GUI_MAX_WINDOWS;
         ++Idx)
@@ -91,15 +94,15 @@ GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
         }
         
         if(StringsAreEqual(Window->Title, Title))
-           {
-               Slot = Idx;
-               break;
-           }
+        {
+            Slot = Idx;
+            break;
+        }
     }
-
+    
     Assert(Slot != -1);
     
-     Window = GlobalGUIWindows + Slot;
+    Window = GlobalGUIWindows + Slot;
     
     if(!GlobalGUICurrentWindow)
     {
@@ -107,15 +110,36 @@ GUIBeginWindow(char *Title, v2 Pos, v2 Res, v3 Color, b32 *Visible)
     }
     else
     {
+        
         GUIAdjustBounds(GlobalGUICurrentWindow, &Pos, &Res);
         Window->Parent = GlobalGUICurrentWindow;
+        
+        s32 Idx;
+        for(Idx = 0;
+            Idx < GUI_MAX_WINDOWS;
+            ++Idx)
+        {
+            if(GlobalGUICurrentWindow->Children[Idx])
+            {
+                if(StringsAreEqual(GlobalGUICurrentWindow->Children[Idx]->Title, Title))
+                {
+                    break;
+                }
+            }
+            else
+            {
+                GlobalGUICurrentWindow->Children[Idx] = Window;
+                break;
+            }
+        }
+        
         GlobalGUICurrentWindow = Window;
     }
     
     Window->Title = Title;
     if(!Window->Overriden)
     {
-    Window->Pos = Pos;
+        Window->Pos = Pos;
     }
     Window->Res = Res;
     Window->Color = Color;
@@ -307,7 +331,7 @@ GUIAdjustDim(v2 Dim, r32 NewRange, r32 NewMin, b32 FlipX, b32 FlipY)
 internal r32
 GUIAdjustDimf(r32 Value, r32 NewRange, r32 NewMin, b32 FlipX, b32 FlipY)
 {
-     r32 Result = 0;
+    r32 Result = 0;
     window_dim Dimensions = WindowGetClientRect(GUIGlobalWindowHandle);
     
     if(FlipX)
@@ -422,79 +446,90 @@ GUIUpdateFrame(void)
         --Idx)                       
     {                                
         gui_window *Window = GlobalGUIWindows + Idx;
-                                     
+        
         if(Window->Used)             
         {                            
             v2 Min = Window->Pos;    
             v2 Max = MathAddVec2(Window->Pos, Window->Res);
-                                     
+            
+            if(Window->Moving)
+            {
+                goto case_is_moving;
+            }
+            
             if(GUICheckPointIn2D(Min, Max, CursorPos))
-               {
-                   if(Wnd->MousePress)
-                   {
-                       s32 Slot = -1;
-                       for(s32 Idx2 = GUI_MAX_WINDOWS - 1;
-                           Idx2 >= 0;
-                           --Idx2)
-                       {
-                           gui_window *SecondWindow = GlobalGUIWindows + Idx2;
-                           if(!SecondWindow->Used)
-                           {
-                               Slot = Idx2;
-                           }
-                           else
-                           {
-                               break;
-                           }
-                       }
-                       
-                       gui_window Window_ = *Window;
-                       gui_window Empty_ = {0};
-                       *Window = *(GlobalGUIWindows + Slot);
-                       *(GlobalGUIWindows + Slot) = Window_;
-                       
-                       for(s32 Idx2 = Idx;
-                           Idx2 < Slot;
-                           ++Idx2)
-                       {
-                           *(GlobalGUIWindows + Idx2) = *(GlobalGUIWindows + Idx2 + 1);
-                           *(GlobalGUIWindows + Idx2 + 1) = Empty_;
-                       }
-                   }
-                   
-                   v2 PanelMin = Window->Pos;
-                   v2 PanelMax;
-                   PanelMax.X = Window->Pos.X + Window->Res.X;
-                   PanelMax.Y = Window->Pos.Y + GUI_WINDOW_PANEL_HEIGHT;
-                   
-                   if(GUICheckPointIn2D(PanelMin, PanelMax, CursorPos))
-                   {
-                       if(Wnd->MouseDown)
-                           {
-                               v2 Res = Window->Res;
-                               Res.X /= 2.f;
-                               Res.Y = GUI_WINDOW_PANEL_HEIGHT/2.f;
-                               Window->Pos = MathSubtractVec2(CursorPos, Res);
-                               Window->Overriden = 1;
-                           }
-                   }
-                   
-                   v2 ButtonMin = Window->Pos;
-                   ButtonMin.X += Window->Res.X/2.f;
-                   v2 ButtonMax;
-                   ButtonMax.X = ButtonMin.X - GUI_WINDOW_PANEL_BUTTON_DIM;
-                   ButtonMax.Y = ButtonMin.Y + GUI_WINDOW_PANEL_BUTTON_DIM;
-                   
-                   if(GUICheckPointIn2D(ButtonMin, ButtonMax, CursorPos))
-                   {
-                       if(Wnd->MousePress)
-                       {
-                           Window->Visible = 0;
-                       }
-                   }
-                   
-                   break;
-               }
+            {
+                if(Wnd->MousePress)
+                {
+                    s32 Slot = -1;
+                    for(s32 Idx2 = GUI_MAX_WINDOWS - 1;
+                        Idx2 >= 0;
+                        --Idx2)
+                    {
+                        gui_window *SecondWindow = GlobalGUIWindows + Idx2;
+                        if(!SecondWindow->Used)
+                        {
+                            Slot = Idx2;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    gui_window Window_ = *Window;
+                    gui_window Empty_ = {0};
+                    *Window = *(GlobalGUIWindows + Slot);
+                    *(GlobalGUIWindows + Slot) = Window_;
+                    
+                    for(s32 Idx2 = Idx;
+                        Idx2 < Slot;
+                        ++Idx2)
+                    {
+                        *(GlobalGUIWindows + Idx2) = *(GlobalGUIWindows + Idx2 + 1);
+                        *(GlobalGUIWindows + Idx2 + 1) = Empty_;
+                    }
+                }
+                
+                v2 ButtonMin = Window->Pos;
+                ButtonMin.X += Window->Res.X - GUI_WINDOW_PANEL_BUTTON_DIM/2.f;
+                v2 ButtonMax;
+                ButtonMax.X = ButtonMin.X + GUI_WINDOW_PANEL_BUTTON_DIM/2.f;
+                ButtonMax.Y = ButtonMin.Y + GUI_WINDOW_PANEL_BUTTON_DIM/2.f;
+                if(GUICheckPointIn2D(ButtonMin, ButtonMax, CursorPos))
+                {
+                    if(Wnd->MousePress && Window->Visible)
+                    {
+                        *Window->Visible = 0;
+                        break;
+                    }
+                }
+                
+                v2 PanelMin = Window->Pos;
+                v2 PanelMax;
+                PanelMax.X = Window->Pos.X + Window->Res.X;
+                PanelMax.Y = Window->Pos.Y + GUI_WINDOW_PANEL_HEIGHT/2.f;
+                
+                if(GUICheckPointIn2D(PanelMin, PanelMax, CursorPos))
+                {
+                    case_is_moving:
+                    if(!Wnd->MouseDown)
+                    {
+                        Window->Moving = 0;
+                    }
+                    if(Wnd->MouseDown)
+                    {
+                        Window->Moving = 1;
+                        v2 Res = Window->Res;
+                        Res.X /= 2.f;
+                        Res.Y = GUI_WINDOW_PANEL_HEIGHT/4.f;
+                        Window->Pos = MathSubtractVec2(CursorPos, Res);
+                        Window->Overriden = 1;
+                    }
+                }
+                
+                break;
+            }
         }
     }
     
@@ -502,58 +537,50 @@ GUIUpdateFrame(void)
 }
 
 internal void
-GUIDrawFrame(void)
+GUIDrawWindow(gui_window *Window, b32 IgnoreParent)
 {
-    GUIUpdateFrame();
-    
-    glDisable(GL_DEPTH_TEST);
-    glUseProgram(0);
-    
-    // NOTE(zaklaus): Window widget.
+    if(!Window)
     {
-        for(s32 Idx = 0;
-            Idx < GUI_MAX_WINDOWS;
-            ++Idx)
+        return;
+    }
+    
+        if(Window->Used && (!Window->Parent || IgnoreParent))
         {
-            gui_window *Window = GlobalGUIWindows + Idx;
-            
-            if(Window->Used)
+            if(Window->Visible 
+               && !*Window->Visible)
             {
-                if(Window->Visible 
-                   && !*Window->Visible)
-                {
-                    continue;
-                }
+                return;
+            }
+            
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            
+            v2 Position = Window->Pos;
+            v2 Resolution = Window->Res;
+            {
+                Resolution.X *= 2;
+                Resolution.Y *= 2;
+            }
+            
+            v2 Position2 = GUIAdjustRes(Position, Resolution);
+            GUIDrawRectangle(GUIADJP(Position), Position2, Window->Color);
+            
+            v3 ColorDir = {.1, .1, .1};
+            
+            // NOTE(zaklaus): Draw window panel.
+            {
+                v2 PanelMin = Position;
+                r32 PanelHeight = GUI_WINDOW_PANEL_HEIGHT; 
+                v2 PanelRes;
+                PanelRes.X = Resolution.X;
+                PanelRes.Y = PanelHeight;
                 
-                glMatrixMode(GL_PROJECTION);
-                glLoadIdentity();
+                v3 NewColor =MathAddVec3(Window->Color, MathMultiplyVec3f(ColorDir, 4));
                 
-                glMatrixMode(GL_MODELVIEW);
-                glLoadIdentity();
-                
-                v2 Position = Window->Pos;
-                v2 Resolution = Window->Res;
-                {
-                    Resolution.X *= 2;
-                    Resolution.Y *= 2;
-                }
-                
-                v2 Position2 = GUIAdjustRes(Position, Resolution);
-                GUIDrawRectangle(GUIADJP(Position), Position2, Window->Color);
-                
-                v3 ColorDir = {.1, .1, .1};
-                
-                // NOTE(zaklaus): Draw window panel.
-                {
-                    v2 PanelMin = Position;
-                    r32 PanelHeight = GUI_WINDOW_PANEL_HEIGHT; 
-                    v2 PanelRes;
-                    PanelRes.X = Resolution.X;
-                    PanelRes.Y = PanelHeight;
-                    
-                    v3 NewColor =MathAddVec3(Window->Color, MathMultiplyVec3f(ColorDir, 4));
-                
-                    GUIDrawRectangle(GUIADJP(PanelMin), GUIAdjustRes(PanelMin, PanelRes), NewColor);
+                GUIDrawRectangle(GUIADJP(PanelMin), GUIAdjustRes(PanelMin, PanelRes), NewColor);
             }
             
             // NOTE(zaklaus): Draw panel button.
@@ -610,9 +637,30 @@ GUIDrawFrame(void)
                     }
                 }
             }
-            }
         }
     }
+
+    
+internal void
+GUIDrawFrame(void)
+{
+    GUIUpdateFrame();
+    
+    glDisable(GL_DEPTH_TEST);
+    glUseProgram(0);
+    
+    // NOTE(zaklaus): Window widget.
+    {
+        
+        for(s32 Idx = 0;
+            Idx < GUI_MAX_WINDOWS;
+            ++Idx)
+        {
+            GUIDrawWindow(&GlobalGUIWindows[Idx], 0);
+    }
+    
+    ZeroMemory(GlobalGUILabels, sizeof(gui_label)*GUI_MAX_LABELS);
+}
     glEnable(GL_DEPTH_TEST);
 }
 

@@ -7,6 +7,8 @@ Version 1.0.3
 - Added basic window events.
 - Added window movement behavior.
 - Added window focus behavior.
+- Disabled child windows.
+- Improved window moving.
 
 Version 1.0.2
 - Added OpenGL bindings.
