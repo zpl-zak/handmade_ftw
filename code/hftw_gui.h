@@ -22,6 +22,7 @@ typedef struct
     
     b32 MouseDown;
     b32 MousePress;
+    b32 MouseUp;
 } gui_wndmsg;
 
 typedef struct
@@ -34,7 +35,6 @@ global_variable HWND GUIGlobalWindowHandle = 0;
 global_variable HDC GUIGlobalDeviceContext = 0;
 global_variable gui_fonts GUIGlobalFonts = {0};
 global_variable gui_wndmsg GlobalGUIWindowMessage = {0};
-
 
 //
 // NOTE(zaklaus): Widgets
@@ -51,6 +51,7 @@ typedef struct gui_window_proto
     b32 Overriden;
     b32 Rendered;
     b32 Moving;
+    b32 MightClose;
     
     struct gui_window_proto *Parent;
     struct gui_window_proto *Children[GUI_MAX_WINDOWS];
@@ -235,13 +236,6 @@ GUIAdjustBoundsPos(gui_window *Window, v2 *Pos, r32 Scale)
 }
 
 internal void
-GUIInitialize(HDC DeviceContext, HWND Window)
-{
-    GUIGlobalWindowHandle = Window;
-    GUIGlobalDeviceContext = DeviceContext;
-}
-
-internal void
 GUICreateFont(char *FontName, 
               u32 FontHeight, u32 FontWeight, 
               font_style FontStyle)
@@ -267,6 +261,16 @@ GUICreateFont(char *FontName,
             return;
         }
     }
+}
+
+internal void
+GUIInitialize(HDC DeviceContext, HWND Window)
+{
+    GUIGlobalWindowHandle = Window;
+    GUIGlobalDeviceContext = DeviceContext;
+    
+    font_style FontStyle = {0, 0, 0};
+    GUICreateFont("Courier New", 12, 0, FontStyle);
 }
 
 internal font_data *
@@ -424,11 +428,13 @@ GUIUpdateFrame(void)
         {
             Wnd->MouseDown = 1;
             Wnd->MousePress = 1;
+            Wnd->MouseUp = 0;
         }break;
         
         case WM_LBUTTONUP:
         {
             Wnd->MouseDown = 0;
+            Wnd->MouseUp = 1;
         }break;
     }
     
@@ -498,10 +504,25 @@ GUIUpdateFrame(void)
                 ButtonMax.Y = ButtonMin.Y + GUI_WINDOW_PANEL_BUTTON_DIM/2.f;
                 if(GUICheckPointIn2D(ButtonMin, ButtonMax, CursorPos))
                 {
-                    if(Wnd->MousePress && Window->Visible)
+                    if(Window->Visible)
+                    {
+                    if(Wnd->MouseDown && Window->Visible)
+                    {
+                        Window->MightClose = 1;
+                    }
+                    
+                    if(Wnd->MouseUp && Window->MightClose)
                     {
                         *Window->Visible = 0;
-                        break;
+                    }
+                }
+                break;
+                }
+                else
+                {
+                    if(Wnd->MouseUp)
+                    {
+                        Window->MightClose = 0;
                     }
                 }
                 

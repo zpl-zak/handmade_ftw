@@ -149,7 +149,7 @@ WndProc(HWND Window,
         WPARAM WParam,
         LPARAM LParam)
 {
-    if(nk_gdi_handle_event(Window, Message, WParam, LParam))
+    if(GUIProcessFrame(Window, Message, WParam, LParam))
     {
         return(0);
     }
@@ -291,12 +291,11 @@ _WinMain(HINSTANCE Instance,
     
     HDC DeviceContext = GetDC(Window);
     
-    GdiFont *gdiFont = nk_gdifont_create("Arial", 14);
-    struct nk_context *ctx = nk_gdi_init(gdiFont, DeviceContext, 800, 600);
-    
     b32 ModernContext = 1;
     
     Win32InitOpenGL(DeviceContext, &ModernContext);
+    
+    GUIInitialize(DeviceContext, Window);
     
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -396,37 +395,16 @@ _WinMain(HINSTANCE Instance,
                   
                   
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
+    
+    r64 TargetFPS = 60;
                   
     while(Running)
     {             
         r64 NewTime = TimeGet();
         r64 DeltaTime = NewTime - OldTime;
-        {         
-            nk_input_begin(ctx);
+        {
             WindowUpdate();
-            nk_input_end(ctx);
             {     
-                
-                if (nk_begin(ctx, "Demo", nk_rect(50, 50, 200, 200),
-                             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-                             NK_WINDOW_CLOSABLE|NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
-                {
-                    enum {EASY, HARD};
-                    static int op = EASY;
-                    static int property = 20;
-                    
-                    nk_layout_row_static(ctx, 30, 80, 1);
-                    if (nk_button_label(ctx, "button"))
-                        fprintf(stdout, "button pressed\n");
-                    nk_layout_row_dynamic(ctx, 30, 2);
-                    if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
-                    if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
-                    nk_layout_row_dynamic(ctx, 22, 1);
-                    nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
-                }
-                nk_end(ctx);
-                nk_gdi_render(nk_rgb(0,0,0));
-                
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
                   
@@ -482,12 +460,22 @@ _WinMain(HINSTANCE Instance,
                 glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
                 glDisableVertexAttribArray(1);
                 glDisableVertexAttribArray(0);
+                
+                
+                {
+                    local_persist b32 MainWindowVisible = 1;
+                    GUIBeginWindow("Handmade FTW", MathVec2(20, 20), MathVec2(220, 480), MathVec3(0.12, 0.12, 0.12), &MainWindowVisible);
+                    {
+                        
+                    }
+                    GUIEndWindow();
+                }
+                GUIDrawFrame();
                 }
                 SwapBuffers(DeviceContext);
                 
             Sleep(10);
         }
-        OldTime = NewTime;
     }
     
     ReleaseDC(Window, DeviceContext);
