@@ -135,6 +135,9 @@ typedef void WINAPI gl_get_programiv(GLuint program,
 typedef void WINAPI gl_get_shader_info_log(GLuint shader,
                                            GLsizei maxLength,
                                            GLsizei *length,
+                                           char *infoLog);typedef void WINAPI gl_get_program_info_log(GLuint program,
+                                           GLsizei maxLength,
+                                           GLsizei *length,
                                            char *infoLog);
 typedef GLint WINAPI gl_get_uniform_location(GLuint program,
                                              const char *name);
@@ -251,6 +254,7 @@ global_variable gl_use_program *glUseProgram;
 global_variable gl_link_program *glLinkProgram;
 global_variable gl_get_programiv *glGetProgramiv;
 global_variable gl_get_shader_info_log *glGetShaderInfoLog;
+global_variable gl_get_program_info_log *glGetProgramInfoLog;
 global_variable gl_get_uniform_location *glGetUniformLocation;
 
 global_variable gl_uniform1f *glUniform1f;
@@ -556,7 +560,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glUseProgram = (gl_use_program *)Win32OpenGLLoadProc("glUseProgram");
             glLinkProgram = (gl_link_program *)Win32OpenGLLoadProc("glLinkProgram");
             glGetProgramiv = (gl_get_programiv *)Win32OpenGLLoadProc("glGetProgramiv");
-            glGetShaderInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetShaderInfoLog");
+            glGetShaderInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetShaderInfoLog");glGetProgramInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetProgramInfoLog");
             glGetUniformLocation = (gl_get_uniform_location *)Win32OpenGLLoadProc("glGetUniformLocation");
             
             // NOTE(zaklaus): glUniform

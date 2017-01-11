@@ -38,7 +38,7 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
     
     while(Src < End)
     {
-         ms MaxLookback = Src - SrcInit;
+        ms MaxLookback = Src - SrcInit;
         if(MaxLookback > HENC_LZ_MAX_LOOKBACK_COUNT)
         {
             MaxLookback = HENC_LZ_MAX_LOOKBACK_COUNT;
@@ -51,7 +51,7 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
             WindowStep < Src;
             ++WindowStep)
         {
-             ms WindowSize = End - WindowStep;
+            ms WindowSize = End - WindowStep;
             if(WindowSize > HENC_LZ_MAX_RUN_COUNT)
             {
                 WindowSize = HENC_LZ_MAX_RUN_COUNT;
@@ -93,25 +93,25 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
                 *Dst++ = (u8)LiteralCount;
                 *Dst++ = 0; // NOTE(zaklaus): 0 copy count.
                 
-            for(s32 LiteralIdx = 0;
-                LiteralIdx < LiteralCount;
-                ++LiteralIdx)
-            {
-                *Dst++ = Literals[LiteralIdx];
+                for(s32 LiteralIdx = 0;
+                    LiteralIdx < LiteralCount;
+                    ++LiteralIdx)
+                {
+                    *Dst++ = Literals[LiteralIdx];
+                }
+                LiteralCount = 0;
             }
-            LiteralCount = 0;
-        }
-        
-        if(OutputRun)
-        {
-            Assert(BestRun == (u8)BestRun);
-            *Dst++ = (u8)BestRun;
             
-            Assert(BestDistance == (u8)BestDistance);
-            *Dst++ = (u8)BestDistance;
-            
-            Src += BestRun;
-        }
+            if(OutputRun)
+            {
+                Assert(BestRun == (u8)BestRun);
+                *Dst++ = (u8)BestRun;
+                
+                Assert(BestDistance == (u8)BestDistance);
+                *Dst++ = (u8)BestDistance;
+                
+                Src += BestRun;
+            }
         }
         else
         {
@@ -122,7 +122,7 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
     Assert(Src == End);
     
     ms ResultSize = Dst - DstInit;
-     u8 *ResultPtr = PlatformMemMove(DstInit, ResultSize);
+    u8 *ResultPtr = (u8 *)PlatformMemMove(DstInit, ResultSize);
     
     Result.MemorySize = ResultSize;
     Result.Memory = ResultPtr;

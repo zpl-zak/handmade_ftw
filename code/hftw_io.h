@@ -88,7 +88,7 @@ IOFileOpenRead(s8 *Path, // Path to the file.
     
     if(!FileHandles[HandleIdx])
     {
-        fprintf(stderr, "Could not open file for read!\n");
+        //fprintf(stderr, "Could not open file for read!\n");
         if(Size)
         {
             *Size = 0;
@@ -121,7 +121,7 @@ IOFileOpenWrite(s8 *Path) // Path to the file.
     
     if(!FileHandles[HandleIdx])
     {
-        fprintf(stderr, "Could not open file for write!\n");
+        //fprintf(stderr, "Could not open file for write!\n");
         return(-1);
     }
     return(HandleIdx);
