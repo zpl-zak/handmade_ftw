@@ -102,6 +102,11 @@ typedef void WINAPI gl_buffer_data(GLenum target,
                           GLsizei size,
                            const GLvoid * data,
                           GLenum usage);
+typedef void WINAPI gl_buffer_sub_data(GLenum target,
+                                       GLsizei offset,
+                                   GLsizei size,
+                                   const GLvoid * data,
+                                   GLenum usage);
 typedef void WINAPI gl_gen_buffers(GLsizei n, GLuint *buffers);
 typedef void WINAPI gl_bind_buffer(GLenum target, GLuint buffer);
 typedef void WINAPI gl_enable_vertex_attrib_array(GLuint index);
@@ -224,6 +229,7 @@ typedef void WINAPI gl_uniform_matrix4fv(GLint location,
                                        GLsizei count,
                                        b32 transpose,
                                        const GLfloat *value);
+typedef void WINAPI gl_active_texture(GLenum texture);
 
 
 //
@@ -237,6 +243,7 @@ global_variable gl_check_framebuffer_status *glCheckFramebufferStatus;
 global_variable gl_gen_vertex_arrays *glGenVertexArrays;
 global_variable gl_bind_vertex_array *glBindVertexArray;
 global_variable gl_buffer_data *glBufferData;
+global_variable gl_buffer_sub_data *glBufferSubData;
 global_variable gl_gen_buffers *glGenBuffers;
 global_variable gl_bind_buffer *glBindBuffer;
 global_variable gl_enable_vertex_attrib_array *glEnableVertexAttribArray;
@@ -276,8 +283,7 @@ global_variable gl_uniform4iv *glUniform4iv;
 global_variable gl_uniform_matrix2fv *glUniformMatrix2fv;
 global_variable gl_uniform_matrix3fv *glUniformMatrix3fv;
 global_variable gl_uniform_matrix4fv *glUniformMatrix4fv;
-
-
+global_variable gl_active_texture *glActiveTexture;
 
 // ---
 
@@ -542,6 +548,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glGenVertexArrays = (gl_gen_vertex_arrays *)Win32OpenGLLoadProc("glGenVertexArrays");
             glBindVertexArray = (gl_bind_vertex_array *)Win32OpenGLLoadProc("glBindVertexArray");
             glBufferData = (gl_buffer_data *)Win32OpenGLLoadProc("glBufferData");
+            glBufferSubData = (gl_buffer_sub_data *)Win32OpenGLLoadProc("glBufferSubData");
             glGenBuffers = (gl_gen_buffers *)Win32OpenGLLoadProc("glGenBuffers");
  glBindBuffer = (gl_bind_buffer *)Win32OpenGLLoadProc("glBindBuffer");
             
@@ -562,6 +569,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glGetProgramiv = (gl_get_programiv *)Win32OpenGLLoadProc("glGetProgramiv");
             glGetShaderInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetShaderInfoLog");glGetProgramInfoLog = (gl_get_shader_info_log *)Win32OpenGLLoadProc("glGetProgramInfoLog");
             glGetUniformLocation = (gl_get_uniform_location *)Win32OpenGLLoadProc("glGetUniformLocation");
+            glActiveTexture = (gl_active_texture *)Win32OpenGLLoadProc("glActiveTexture");
             
             // NOTE(zaklaus): glUniform
             {

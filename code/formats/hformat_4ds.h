@@ -11,23 +11,23 @@ Contributor: djbozkosz
 
 enum
 {
-    HFormat4DSMaterialFlag_TextureDiffuse = 0x0004,
-    HFormat4DSMaterialFlag_Colored = 0x08,
-    HFormat4DSMaterialFlag_MipMapping = 0x008,
-    HFormat4DSMaterialFlag_AnimatedTextureDiffuse = 0x04,
-    HFormat4DSMaterialFlag_AnimatedTextureAlpha = 0x02,
-    HFormat4DSMaterialFlag_DoubleSidedMaterial = 0x1,
-    HFormat4DSMaterialFlag_EnvironmentMap = 0x0008,
-    HFormat4DSMaterialFlag_NormalTextureBlend = 0x000001,
-    HFormat4DSMaterialFlag_MultiplyTextureBlend = 0x000002,
-    HFormat4DSMaterialFlag_AdditiveTextureBlend = 0x000004,
-    HFormat4DSMaterialFlag_CalcReflectTextureY = 0x00001,
-    HFormat4DSMaterialFlag_ProjectReflectTextureY = 0x00002,
-    HFormat4DSMaterialFlag_ProjectReflectTextureZ = 0x00004,
-    HFormat4DSMaterialFlag_AdditionalEffect = 0x00008,
-    HFormat4DSMaterialFlag_AlphaTexture = 0x4,
-    HFormat4DSMaterialFlag_ColorKey = 0x2,
-    HFormat4DSMaterialFlag_AdditiveMixing = 0x8
+    HFormat4DSMaterialFlag_TextureDiffuse = 0x00040000,
+    HFormat4DSMaterialFlag_Colored = 0x08000000,
+    HFormat4DSMaterialFlag_MipMapping = 0x00800000,
+    HFormat4DSMaterialFlag_AnimatedTextureDiffuse = 0x04000000,
+    HFormat4DSMaterialFlag_AnimatedTextureAlpha = 0x02000000,
+    HFormat4DSMaterialFlag_DoubleSidedMaterial = 0x10000000,
+    HFormat4DSMaterialFlag_EnvironmentMap = 0x00080000,
+    HFormat4DSMaterialFlag_NormalTextureBlend = 0x00000100,
+    HFormat4DSMaterialFlag_MultiplyTextureBlend = 0x00000200,
+    HFormat4DSMaterialFlag_AdditiveTextureBlend = 0x00000400,
+    HFormat4DSMaterialFlag_CalcReflectTextureY = 0x00001000,
+    HFormat4DSMaterialFlag_ProjectReflectTextureY = 0x00002000,
+    HFormat4DSMaterialFlag_ProjectReflectTextureZ = 0x00004000,
+    HFormat4DSMaterialFlag_AdditionalEffect = 0x00008000,
+    HFormat4DSMaterialFlag_AlphaTexture = 0x40000000,
+    HFormat4DSMaterialFlag_ColorKey = 0x20000000,
+    HFormat4DSMaterialFlag_AdditiveMixing = 0x80000000
 };
 
 enum
@@ -55,8 +55,8 @@ enum
     HFormat4DSMeshRenderFlag_UseDepthBias = 0x0001,
     HFormat4DSMeshRenderFlag_UseShadows = 0x0002,
     HFormat4DSMeshRenderFlag_Unknown = 0x0008,
-    HFormat4DSMeshRenderFlag_UseProjection = 0x002,
-    HFormat4DSMeshRenderFlag_ForbidFog = 0x008
+    HFormat4DSMeshRenderFlag_UseProjection = 0x0020,
+    HFormat4DSMeshRenderFlag_ForbidFog = 0x0080
 };
 
 enum
@@ -344,7 +344,7 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
         hformat_4ds_material Mat = {0};
         {
             ms msize = sizeof(r32);
-            IOFileRead(FileIdx, &Mat.Flags, msize);
+            IOFileRead(FileIdx, &Mat.Flags, sizeof(u32));
             IOFileRead(FileIdx, &Mat.Ambient, sizeof(v3));
             IOFileRead(FileIdx, &Mat.Diffuse, sizeof(v3));
             IOFileRead(FileIdx, &Mat.Emission, sizeof(v3));
@@ -360,17 +360,14 @@ HFormatLoad4DSMaterial(hformat_4ds_header *Model, s32 FileIdx)
             IOFileRead(FileIdx, &Mat.DiffuseMapNameLength, sizeof(u8));
             IOFileRead(FileIdx, Mat.DiffuseMapName, Mat.DiffuseMapNameLength);
             
-            
             if(Mat.Flags & HFormat4DSMaterialFlag_AlphaTexture)
             {
                 IOFileRead(FileIdx, &Mat.AlphaMapNameLength, sizeof(u8));
                 IOFileRead(FileIdx, Mat.AlphaMapName, Mat.AlphaMapNameLength);
             }
             
-            if(Mat.Flags & HFormat4DSMaterialFlag_AnimatedTextureDiffuse ||
-               Mat.Flags & HFormat4DSMaterialFlag_AnimatedTextureAlpha)
+            if(Mat.Flags & HFormat4DSMaterialFlag_AnimatedTextureDiffuse)
             {
-                
                 IOFileRead(FileIdx, &Mat.AnimSequenceLength, sizeof(u32));
                 IOFileRead(FileIdx, &Mat._Unk0, sizeof(u16));
                 IOFileRead(FileIdx, &Mat.FramePeriod, sizeof(u32));
