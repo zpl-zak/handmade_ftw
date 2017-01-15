@@ -35,6 +35,8 @@ typedef struct
     b32 GL_ARB_framebuffer_object;
 } opengl_info;
 
+global_variable HGLRC OpenGLRC = 0;
+
 #define GL_FRAMEBUFFER_SRGB               0x8DB9
 #define GL_SRGB8_ALPHA8                   0x8C43
 
@@ -498,7 +500,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
     
     Win32SetPixelFormat(WindowDC);
     
-    HGLRC OpenGLRC = 0;
+    
     
     if(wglCreateContextAttribsARB)
     {

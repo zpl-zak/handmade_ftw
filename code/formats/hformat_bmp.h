@@ -39,6 +39,7 @@ typedef struct
 {
     hformat_bmp_header Header;
     hformat_bmp_info Info;
+    RGBQUAD Colors[256];
      u8 *Data;
 } hformat_bmp;
 
@@ -77,6 +78,13 @@ HFormatLoadBMPImage(s32 HandleIdx, b32 SwapChannels)
             Image->Data[Idx] = Image->Data[Idx + 2];
             Image->Data[Idx + 2] = _Swap0;
         }
+    }
+    
+    if(Image->Header.BitCount == 8)
+    {
+    IOFileSeek(HandleIdx, sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER), SeekOrigin_Set);
+    
+    IOFileRead(HandleIdx, Image->Colors, sizeof(RGBQUAD)*256);
     }
     }
     return(Image);

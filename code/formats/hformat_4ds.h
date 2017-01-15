@@ -698,18 +698,14 @@ HFormatLoad4DSMesh(hformat_4ds_header *Model, s32 FileIdx)
             
             IOFileRead(FileIdx, &Mesh.Pos, sizeof(v3));
             IOFileRead(FileIdx, &Mesh.Scale, sizeof(v3));
-            IOFileRead(FileIdx, &Mesh.Rot, sizeof(v4));
             
+            r32 r[4];
+            IOFileRead(FileIdx, r, sizeof(r32)*4);
             
-            f32 _Swap0 = Mesh.Rot.W;
-            f32 _Swap1 = Mesh.Rot.X;
-            f32 _Swap2 = Mesh.Rot.Y;
-            f32 _Swap3 = Mesh.Rot.Z;
-            
-            Mesh.Rot.X = _Swap1;
-            Mesh.Rot.Y = _Swap2;
-            Mesh.Rot.Z = _Swap3;
-            Mesh.Rot.W = _Swap0;
+            Mesh.Rot.X = r[1];
+            Mesh.Rot.Y = r[2];
+            Mesh.Rot.Z = r[3];
+            Mesh.Rot.W = -r[0];
             
             IOFileRead(FileIdx, &Mesh.CullingFlags, sizeof(u8));
             
