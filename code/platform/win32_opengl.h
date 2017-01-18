@@ -110,6 +110,7 @@ typedef void WINAPI gl_buffer_sub_data(GLenum target,
                                    const GLvoid * data,
                                    GLenum usage);
 typedef void WINAPI gl_gen_buffers(GLsizei n, GLuint *buffers);
+typedef void WINAPI gl_delete_buffers(GLsizei n, GLuint *buffers);
 typedef void WINAPI gl_bind_buffer(GLenum target, GLuint buffer);
 typedef void WINAPI gl_enable_vertex_attrib_array(GLuint index);
 typedef void WINAPI gl_disable_vertex_attrib_array(GLuint index);
@@ -247,6 +248,7 @@ global_variable gl_bind_vertex_array *glBindVertexArray;
 global_variable gl_buffer_data *glBufferData;
 global_variable gl_buffer_sub_data *glBufferSubData;
 global_variable gl_gen_buffers *glGenBuffers;
+global_variable gl_delete_buffers *glDeleteBuffers;
 global_variable gl_bind_buffer *glBindBuffer;
 global_variable gl_enable_vertex_attrib_array *glEnableVertexAttribArray;
 global_variable gl_disable_vertex_attrib_array *glDisableVertexAttribArray;
@@ -552,6 +554,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glBufferData = (gl_buffer_data *)Win32OpenGLLoadProc("glBufferData");
             glBufferSubData = (gl_buffer_sub_data *)Win32OpenGLLoadProc("glBufferSubData");
             glGenBuffers = (gl_gen_buffers *)Win32OpenGLLoadProc("glGenBuffers");
+            glDeleteBuffers = (gl_delete_buffers *)Win32OpenGLLoadProc("glDeleteBuffers");
  glBindBuffer = (gl_bind_buffer *)Win32OpenGLLoadProc("glBindBuffer");
             
             glEnableVertexAttribArray = (gl_enable_vertex_attrib_array *)Win32OpenGLLoadProc("glEnableVertexAttribArray");
