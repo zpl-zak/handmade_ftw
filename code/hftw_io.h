@@ -23,7 +23,7 @@ typedef enum
     SeekOrigin_End = SEEK_END         // Seek from the end of the file backwards.
 } seek_origin;
 #endif
-#define MAX_HANDLES 128
+#define MAX_HANDLES 1024*1024
 global_variable FILE *FileHandles[MAX_HANDLES] = {0};
 
 

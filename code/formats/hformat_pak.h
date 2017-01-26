@@ -9,7 +9,7 @@ SW: Quake series
 #pragma pack(push, 1)
 typedef struct
 {
-    u8 Signature[2]; // NOTE(zaklaus): Should be "PACK"
+    u8 Signature[4]; // NOTE(zaklaus): Should be "PACK"
     s32 DirectoryOffset;
     s32 DirectoryLength;
 } hformat_pak_header;
@@ -37,7 +37,7 @@ HFormatLoadPakArchive(s32 HandleIdx)
     {
         IOFileRead(HandleIdx, &Pak->Header, sizeof(hformat_pak_header));
         
-        if(0)//!StringsAreEqualA(4, (char *)Pak->Header.Signature, "PACK"))
+        if(!StringsAreEqualA(4, (char *)Pak->Header.Signature, "PACK"))
         {
             fprintf(stderr, "Not a valid PAK format!\n");
             PlatformMemFree(Pak);
