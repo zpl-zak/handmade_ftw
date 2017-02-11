@@ -101,25 +101,25 @@ typedef GLenum WINAPI gl_check_framebuffer_status(GLenum target);
 typedef void WINAPI gl_gen_vertex_arrays(GLsizei n, GLuint *arrays);
 typedef void WINAPI gl_bind_vertex_array(GLuint array);
 typedef void WINAPI gl_buffer_data(GLenum target,
-                          GLsizei size,
-                           const GLvoid * data,
-                          GLenum usage);
-typedef void WINAPI gl_buffer_sub_data(GLenum target,
-                                       GLsizei offset,
                                    GLsizei size,
                                    const GLvoid * data,
                                    GLenum usage);
+typedef void WINAPI gl_buffer_sub_data(GLenum target,
+                                       GLsizei offset,
+                                       GLsizei size,
+                                       const GLvoid * data,
+                                       GLenum usage);
 typedef void WINAPI gl_gen_buffers(GLsizei n, GLuint *buffers);
 typedef void WINAPI gl_delete_buffers(GLsizei n, GLuint *buffers);
 typedef void WINAPI gl_bind_buffer(GLenum target, GLuint buffer);
 typedef void WINAPI gl_enable_vertex_attrib_array(GLuint index);
 typedef void WINAPI gl_disable_vertex_attrib_array(GLuint index);
 typedef void WINAPI gl_vertex_attrib_pointer(GLuint index,
-                           GLint size,
-                           GLenum type,
-                           GLboolean normalized,
-                           GLsizei stride,
-                           const GLvoid * pointer);
+                                             GLint size,
+                                             GLenum type,
+                                             GLboolean normalized,
+                                             GLsizei stride,
+                                             const GLvoid * pointer);
 typedef GLuint WINAPI gl_create_shader(GLenum shaderType);
 typedef void WINAPI gl_attach_shader(GLuint program,
                                      GLuint shader);
@@ -136,6 +136,7 @@ typedef void WINAPI gl_get_shaderiv(GLuint shader,
                                     GLint *params);
 typedef GLuint WINAPI gl_create_program(void);
 typedef void WINAPI gl_use_program(GLuint program);
+typedef void WINAPI gl_delete_program(GLuint program);
 typedef void WINAPI gl_link_program(GLuint program);
 typedef void WINAPI gl_get_programiv(GLuint program,
                                      GLenum pname,
@@ -144,94 +145,94 @@ typedef void WINAPI gl_get_shader_info_log(GLuint shader,
                                            GLsizei maxLength,
                                            GLsizei *length,
                                            char *infoLog);typedef void WINAPI gl_get_program_info_log(GLuint program,
-                                           GLsizei maxLength,
-                                           GLsizei *length,
-                                           char *infoLog);
+                                                                                                      GLsizei maxLength,
+                                                                                                      GLsizei *length,
+                                                                                                      char *infoLog);
 typedef GLint WINAPI gl_get_uniform_location(GLuint program,
                                              const char *name);
 
 typedef void WINAPI gl_uniform1f(GLint location,
-                 GLfloat v0);
+                                 GLfloat v0);
 
 typedef void WINAPI gl_uniform2f(GLint location,
-                 GLfloat v0,
-                 GLfloat v1);
+                                 GLfloat v0,
+                                 GLfloat v1);
 
 typedef void WINAPI gl_uniform3f(GLint location,
-                 GLfloat v0,
-                 GLfloat v1,
-                 GLfloat v2);
+                                 GLfloat v0,
+                                 GLfloat v1,
+                                 GLfloat v2);
 
 typedef void WINAPI gl_uniform4f(GLint location,
-                 GLfloat v0,
-                 GLfloat v1,
-                 GLfloat v2,
-                 GLfloat v3);
+                                 GLfloat v0,
+                                 GLfloat v1,
+                                 GLfloat v2,
+                                 GLfloat v3);
 
 typedef void WINAPI gl_uniform1i(GLint location,
-                 GLint v0);
+                                 GLint v0);
 
 typedef void WINAPI gl_uniform2i(GLint location,
-                 GLint v0,
-                 GLint v1);
+                                 GLint v0,
+                                 GLint v1);
 
 typedef void WINAPI gl_uniform3i(GLint location,
-                 GLint v0,
-                 GLint v1,
-                 GLint v2);
+                                 GLint v0,
+                                 GLint v1,
+                                 GLint v2);
 
 typedef void WINAPI gl_uniform4i(GLint location,
-                 GLint v0,
-                 GLint v1,
-                 GLint v2,
-                 GLint v3);
+                                 GLint v0,
+                                 GLint v1,
+                                 GLint v2,
+                                 GLint v3);
 
 typedef void WINAPI gl_uniform1fv(GLint location,
-                  GLsizei count,
-                  const GLfloat *value);
+                                  GLsizei count,
+                                  const GLfloat *value);
 
 typedef void WINAPI gl_uniform2fv(GLint location,
-                  GLsizei count,
-                  const GLfloat *value);
+                                  GLsizei count,
+                                  const GLfloat *value);
 
 typedef void WINAPI gl_uniform3fv(GLint location,
-                  GLsizei count,
-                  const GLfloat *value);
+                                  GLsizei count,
+                                  const GLfloat *value);
 
 typedef void WINAPI gl_uniform4fv(GLint location,
-                  GLsizei count,
-                  const GLfloat *value);
+                                  GLsizei count,
+                                  const GLfloat *value);
 
 typedef void WINAPI gl_uniform1iv(GLint location,
-                  GLsizei count,
-                  const GLint *value);
+                                  GLsizei count,
+                                  const GLint *value);
 
 typedef void WINAPI gl_uniform2iv(GLint location,
-                  GLsizei count,
-                  const GLint *value);
+                                  GLsizei count,
+                                  const GLint *value);
 
 typedef void WINAPI gl_uniform3iv(GLint location,
-                  GLsizei count,
-                  const GLint *value);
+                                  GLsizei count,
+                                  const GLint *value);
 
 typedef void WINAPI gl_uniform4iv(GLint location,
-                  GLsizei count,
-                  const GLint *value);
+                                  GLsizei count,
+                                  const GLint *value);
 
 typedef void WINAPI gl_uniform_matrix2fv(GLint location,
-                                       GLsizei count,
-                                       b32 transpose,
-                                       const GLfloat *value);
+                                         GLsizei count,
+                                         b32 transpose,
+                                         const GLfloat *value);
 
 typedef void WINAPI gl_uniform_matrix3fv(GLint location,
-                                       GLsizei count,
-                                       b32 transpose,
-                                       const GLfloat *value);
+                                         GLsizei count,
+                                         b32 transpose,
+                                         const GLfloat *value);
 
 typedef void WINAPI gl_uniform_matrix4fv(GLint location,
-                                       GLsizei count,
-                                       b32 transpose,
-                                       const GLfloat *value);
+                                         GLsizei count,
+                                         b32 transpose,
+                                         const GLfloat *value);
 typedef void WINAPI gl_active_texture(GLenum texture);
 
 
@@ -261,6 +262,7 @@ global_variable gl_delete_shader *glDeleteShader;
 global_variable gl_detach_shader *glDetachShader;
 global_variable gl_get_shaderiv *glGetShaderiv;
 global_variable gl_create_program *glCreateProgram;
+global_variable gl_delete_shader *glDeleteProgram;
 global_variable gl_use_program *glUseProgram;
 global_variable gl_link_program *glLinkProgram;
 global_variable gl_get_programiv *glGetProgramiv;
@@ -390,7 +392,7 @@ Win32OpenGLGetInfo(b32 ModernContext)
 internal void
 Win32SetPixelFormat(HDC WindowDC)
 {
-     s32 SuggestedPixelFormatIndex = 0;
+    s32 SuggestedPixelFormatIndex = 0;
     GLuint ExtendedPick = 0;
     if(wglChoosePixelFormatARB)
     {
@@ -420,24 +422,24 @@ Win32SetPixelFormat(HDC WindowDC)
     
     if(!ExtendedPick)
     {
-    PIXELFORMATDESCRIPTOR DesiredPixelFormat = {0};
-    DesiredPixelFormat.nSize = sizeof(DesiredPixelFormat);
-    DesiredPixelFormat.nVersion = 1;
-    DesiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
-    DesiredPixelFormat.iLayerType = PFD_MAIN_PLANE;
-    DesiredPixelFormat.dwFlags = 
-        PFD_SUPPORT_OPENGL
-        |PFD_DRAW_TO_WINDOW
-        |PFD_DOUBLEBUFFER;
-    DesiredPixelFormat.cColorBits = 32;
-    DesiredPixelFormat.cAlphaBits = 8;
+        PIXELFORMATDESCRIPTOR DesiredPixelFormat = {0};
+        DesiredPixelFormat.nSize = sizeof(DesiredPixelFormat);
+        DesiredPixelFormat.nVersion = 1;
+        DesiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
+        DesiredPixelFormat.iLayerType = PFD_MAIN_PLANE;
+        DesiredPixelFormat.dwFlags = 
+            PFD_SUPPORT_OPENGL
+            |PFD_DRAW_TO_WINDOW
+            |PFD_DOUBLEBUFFER;
+        DesiredPixelFormat.cColorBits = 32;
+        DesiredPixelFormat.cAlphaBits = 8;
+        
+        SuggestedPixelFormatIndex = ChoosePixelFormat(WindowDC, &DesiredPixelFormat);
+    }
     
-     SuggestedPixelFormatIndex = ChoosePixelFormat(WindowDC, &DesiredPixelFormat);
-}
-
-PIXELFORMATDESCRIPTOR SuggestedPixelFormat;
-DescribePixelFormat(WindowDC, SuggestedPixelFormatIndex, sizeof(SuggestedPixelFormat), &SuggestedPixelFormat);
-SetPixelFormat(WindowDC, SuggestedPixelFormatIndex, &SuggestedPixelFormat);
+    PIXELFORMATDESCRIPTOR SuggestedPixelFormat;
+    DescribePixelFormat(WindowDC, SuggestedPixelFormatIndex, sizeof(SuggestedPixelFormat), &SuggestedPixelFormat);
+    SetPixelFormat(WindowDC, SuggestedPixelFormatIndex, &SuggestedPixelFormat);
 }
 
 internal void
@@ -483,7 +485,7 @@ Win32LoadOpenGLExtensions(HDC WindowDC)
 internal PROC
 Win32OpenGLLoadProc(char *Name)
 {
-     PROC Result = wglGetProcAddress(Name);
+    PROC Result = wglGetProcAddress(Name);
     
     if(!Result)
     {
@@ -521,7 +523,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
         opengl_info Info = Win32OpenGLGetInfo(*ModernContext);
         
         // NOTE(zaklaus): OpenGL Info
-            #if PRINT_OPENGL_INFO == 1
+#if PRINT_OPENGL_INFO == 1
         {
             printf("OpenGL Context Load:\n===\n");
             printf("Vendor: %s\nRenderer: %s\nVersion: %s\n",
@@ -533,15 +535,15 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
                        Info.ShadingLanguageVersion);
             }
             
-            #if PRINT_OPENGL_EXTENSIONS == 1
+#if PRINT_OPENGL_EXTENSIONS == 1
             {
                 printf("OpenGL Extensions: %s\n", Info.Extensions);
             }
-            #endif
+#endif
             
             printf("===\n");
         }
-            #endif
+#endif
         // zLOAD
         if(Info.GL_ARB_framebuffer_object)
         {
@@ -555,7 +557,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glBufferSubData = (gl_buffer_sub_data *)Win32OpenGLLoadProc("glBufferSubData");
             glGenBuffers = (gl_gen_buffers *)Win32OpenGLLoadProc("glGenBuffers");
             glDeleteBuffers = (gl_delete_buffers *)Win32OpenGLLoadProc("glDeleteBuffers");
- glBindBuffer = (gl_bind_buffer *)Win32OpenGLLoadProc("glBindBuffer");
+            glBindBuffer = (gl_bind_buffer *)Win32OpenGLLoadProc("glBindBuffer");
             
             glEnableVertexAttribArray = (gl_enable_vertex_attrib_array *)Win32OpenGLLoadProc("glEnableVertexAttribArray");
             glDisableVertexAttribArray = (gl_disable_vertex_attrib_array *)Win32OpenGLLoadProc("glDisableVertexAttribArray");
@@ -569,6 +571,7 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
             glDetachShader = (gl_detach_shader *)Win32OpenGLLoadProc("glDetachShader");
             glGetShaderiv = (gl_get_shaderiv *)Win32OpenGLLoadProc("glGetShaderiv");
             glCreateProgram = (gl_create_program *)Win32OpenGLLoadProc("glCreateProgram");
+            glDeleteProgram = (gl_delete_program *)Win32OpenGLLoadProc("glDeleteProgram");
             glUseProgram = (gl_use_program *)Win32OpenGLLoadProc("glUseProgram");
             glLinkProgram = (gl_link_program *)Win32OpenGLLoadProc("glLinkProgram");
             glGetProgramiv = (gl_get_programiv *)Win32OpenGLLoadProc("glGetProgramiv");
