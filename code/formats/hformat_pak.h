@@ -25,9 +25,9 @@ typedef struct
 typedef struct
 {
     hformat_pak_header Header;
-     hformat_pak_file *Files;
+    hformat_pak_file *Files;
+    u64 *Checksums;
     s32 FileCount;
-    s32 PakHandle;
 } hformat_pak;
 
 internal hformat_pak *
@@ -47,18 +47,44 @@ HFormatLoadPakArchive(s32 HandleIdx)
         Pak->FileCount = Pak->Header.DirectoryLength / sizeof(hformat_pak_file);
         
         Pak->Files = (hformat_pak_file *)PlatformMemAlloc(sizeof(hformat_pak_file)*Pak->FileCount);
+        Pak->Checksums = (u64 *)PlatformMemAlloc(sizeof(u64)*Pak->FileCount);
         
         IOFileSeek(HandleIdx, Pak->Header.DirectoryOffset, SeekOrigin_Set);
         
         IOFileRead(HandleIdx, Pak->Files, Pak->Header.DirectoryLength);
+        
+        for(mi Idx = 0;
+            Idx < Pak->FileCount;
+            Idx++)
+        {
+            IOFileSeek(HandleIdx, Pak->Files[Idx].FilePosition, SeekOrigin_Set);
+            
+            s8 *FileData = (s8 *)PlatformMemAlloc(Pak->Files[Idx].FileLength);
+            IOFileRead(HandleIdx, FileData, Pak->Files[Idx].FileLength);
+            
+            Pak->Checksums[Idx] = 0;
+            
+            u64 Pos = Pak->Files[Idx].FilePosition;
+            u64 End = Pak->Files[Idx].FilePosition + Pak->Files[Idx].FileLength;
+            s8 *DataPtr = FileData;
+            while(Pos++ != End)
+            {
+                Pak->Checksums[Idx] += *DataPtr++;
+            }
+            
+            PlatformMemFree(FileData);
+        }
+        
+        IOFileSeek(HandleIdx, Pak->Header.DirectoryOffset, SeekOrigin_Set);
     }
-    Pak->PakHandle = HandleIdx;
+    IOFileClose(HandleIdx);
     return(Pak);
 }
 
 internal s8 *
 HFormatLoadPakFile(s8 *FileName, hformat_pak *Pak, ms *Size)
 {
+#if 0
     for(mi Idx = 0;
         Idx < Pak->FileCount;
         Idx++)
@@ -77,6 +103,7 @@ HFormatLoadPakFile(s8 *FileName, hformat_pak *Pak, ms *Size)
             return(FileData);
         }
     }
+#endif
     if(Size)
     {
         *Size = 0;
@@ -87,8 +114,8 @@ HFormatLoadPakFile(s8 *FileName, hformat_pak *Pak, ms *Size)
 internal hformat_pak *
 HFormatReleasePakArchive(hformat_pak *Pak)
 {
-    IOFileClose(Pak->PakHandle);
     PlatformMemFree(Pak->Files);
+    PlatformMemFree(Pak->Checksums);
     PlatformMemFree(Pak);
     Pak = 0;
     return(Pak);

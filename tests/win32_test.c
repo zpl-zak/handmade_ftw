@@ -34,7 +34,7 @@ RenderGradient(s32 XOffset, s32 YOffset)
             u8 Blue = (u8)(X + XOffset);
             u8 Green = (u8)(Y + YOffset);
             *Pixel++ = ((Green << 8) | Blue);
-            }
+        }
         Row += Pitch;
     }
 }
@@ -131,12 +131,12 @@ RenderBMPImage(s32 sX, s32 sY, hformat_bmp *Image, u32 TransparencyKey)
             
             if(Pixel > (u32 *)Memory && Pixel < (u32 *)MemoryEnd)
             {
-            if(Data != TransparencyKey 
-               ||TransparencyKey == 0)
-            {
-            *Pixel = Data;
+                if(Data != TransparencyKey 
+                   ||TransparencyKey == 0)
+                {
+                    *Pixel = Data;
+                }
             }
-        }
             ++Pixel;
         }
         Row += Pitch;
@@ -234,7 +234,7 @@ TESTLoadShader(char *ShaderOnePath, char *ShaderTwoPath)
     }
     
     PlatformMemFree(ShaderOne);
-PlatformMemFree(ShaderTwo);
+    PlatformMemFree(ShaderTwo);
     
     GLuint ProgramID = glCreateProgram();
     glAttachShader(ProgramID, VertexShaderID);
@@ -263,9 +263,9 @@ PlatformMemFree(ShaderTwo);
 
 int CALLBACK
 _WinMain(HINSTANCE Instance,
-        HINSTANCE PrevInstance,
-        LPSTR CmdLine,
-        int CmdShow)
+         HINSTANCE PrevInstance,
+         LPSTR CmdLine,
+         int CmdShow)
 {
     WindowCreateClass(Instance, "Handmade FTW", &WndProc);
     
@@ -300,11 +300,11 @@ _WinMain(HINSTANCE Instance,
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
     GLuint ProgramID = TESTLoadShader("simple.vert", "simple.frag");
-                  
+    
     u32 VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-                  
+    
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f,-1.0f,-1.0f, // triangle 1 : begin
         -1.0f,-1.0f, 1.0f,
@@ -343,7 +343,7 @@ _WinMain(HINSTANCE Instance,
         -1.0f, 1.0f, 1.0f,
         1.0f,-1.0f, 1.0f
     };            
-                  
+    
     static const GLfloat g_color_buffer_data[] = {
         0.583f,  0.771f,  0.014f,
         0.609f,  0.115f,  0.436f,
@@ -382,22 +382,22 @@ _WinMain(HINSTANCE Instance,
         0.820f,  0.883f,  0.371f,
         0.982f,  0.099f,  0.879f
     };            
-                  
+    
     GLuint vertexbuffer, colorbuffer;
-                  
+    
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-                  
+    
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-                  
-                  
+    
+    
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
     
     r64 TargetFPS = 60;
-                  
+    
     while(Running)
     {             
         r64 NewTime = TimeGet();
@@ -407,34 +407,34 @@ _WinMain(HINSTANCE Instance,
             {     
                 s32 WindowWidth = WindowArea.Width;
                 s32 WindowHeight = WindowArea.Height;
-                  
+                
                 { 
-                     Dim = WindowGetClientRect(Window);
+                    Dim = WindowGetClientRect(Window);
                     ResizeResult = WindowResize(Dim.X, Dim.Y, WindowArea, 1);
                     glViewport(0, 0, WindowArea.Width, WindowArea.Height);
                     WindowArea = ResizeResult;
                 } 
-                  
+                
                 glClearColor(1.f, 1.f, 1.f, 0.f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-                  
+                
                 glUseProgram(ProgramID);
-                  
-                  
+                
+                
                 m4 Projection = MathPerspective(45.f, WindowArea.Width / (real32)WindowArea.Height, .1f, 100.f);
-                  
+                
                 v3 Pos = {4, 3, 7};
                 v3 Target = {0};
                 v3 Up = {0, 1, 0};
-                  
+                
                 m4 View = MathLookAt(Pos, Target, Up);
                 m4 Model = MathMat4d(1.f);
-                  
+                
                 mat4 MVP = MathMultiplyMat4(Projection, View);   
                 MVP = MathMultiplyMat4(MVP, Model);
-                  
+                
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP.Elements[0][0]);
-                  
+                
                 glEnableVertexAttribArray(0);
                 glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
                 glVertexAttribPointer(
@@ -445,7 +445,7 @@ _WinMain(HINSTANCE Instance,
                     0,                  // stride
                     (void*)0            // array buffer offset
                     );
-                  
+                
                 glEnableVertexAttribArray(1);
                 glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
                 glVertexAttribPointer(
@@ -464,16 +464,16 @@ _WinMain(HINSTANCE Instance,
                 
                 {
                     local_persist b32 MainWindowVisible = 1;
-                    GUIBeginWindow("Handmade FTW", MathVec2(20, 20), MathVec2(220, 480), MathVec3(0.12, 0.12, 0.12), &MainWindowVisible);
+                    GUIBeginWindow("lala", MathVec2(20, 20), MathVec2(220, 480), MathVec3(0.12, 0.12, 0.12), &MainWindowVisible);
                     {
                         
                     }
                     GUIEndWindow();
                 }
                 GUIDrawFrame();
-                }
-                SwapBuffers(DeviceContext);
-                
+            }
+            SwapBuffers(DeviceContext);
+            
             Sleep(10);
         }
     }
@@ -488,7 +488,7 @@ _WinMain(HINSTANCE Instance,
 int
 main(void)
 {
-     LRESULT Result = _WinMain(GetModuleHandle(0), 0, GetCommandLine(), SW_SHOW);
+    LRESULT Result = _WinMain(GetModuleHandle(0), 0, GetCommandLine(), SW_SHOW);
     
     return(Result);
 }
