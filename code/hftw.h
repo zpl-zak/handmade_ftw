@@ -132,10 +132,15 @@ doc_hunt()
 #else
 #define TRAP() __builtin_trap()
 #endif
-
+/*
 #define mmalloc(Size) malloc(Size);fprintf(stderr, "malloc: %zu\t<%s@%d:%s>\n", (ms)Size, __FILE__, __LINE__, __FUNCTION__)
 #define mfree(Ptr) free(Ptr);fprintf(stderr, "free: \t\t<%s@%d:%s>\n", __FILE__, __LINE__, __FUNCTION__)
 #define mrealloc(Ptr, Size) realloc(Ptr, Size);fprintf(stderr, "realloc: %zu\t<%s@%d:%s>\n", (ms)Size, __FILE__, __LINE__, __FUNCTION__)
+*/
+
+#define mmalloc(Size) malloc(Size)
+#define mfree(Ptr) free(Ptr)
+#define mrealloc(Ptr, Size) realloc(Ptr, Size)
 
 #define Assert(Expression) if(!(Expression)) {TRAP();}
 #else

@@ -20,6 +20,8 @@ typedef struct
     b32 Strikeout;
 } font_style;
 
+font_style DefaultFontStyle = {0};
+
 internal void
 FontBuild(char *FontName, 
           u32 FontHeight, u32 FontWeight, 

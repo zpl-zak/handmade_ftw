@@ -735,14 +735,19 @@ MathTranslate(vec3 Translation)
 }
 
 internal mat4
-MathRotate(real32 Angle, vec3 Axis)
+MathRotate(real32 Angle, vec3 Axis, b32 Degrees)
 {
     mat4 Result = MathMat4d(1.0f);
     
     Axis = MathNormalize(Axis);
     
-    real32 SinTheta = sinf(MathToRadians(Angle));
-    real32 CosTheta = cosf(MathToRadians(Angle));
+    if(Degrees)
+    {
+        Angle = MathToRadians(Angle);
+    }
+    
+    real32 SinTheta = sinf(Angle);
+    real32 CosTheta = cosf(Angle);
     real32 CosValue = 1.0f - CosTheta;
     
     Result.Elements[0][0] = (Axis.X * Axis.X * CosValue) + CosTheta;
@@ -931,8 +936,10 @@ MathNormalizeQuaternion(quaternion A)
     quaternion Result = {0};
     
     real32 Length = MathSquareRoot(MathDotQuaternion(A, A));
+    if(Length)
+    {
     Result = MathDivideQuaternionf(A, Length);
-    
+    }
     return(Result);
 }
 
@@ -979,6 +986,7 @@ MathQuaternionToMat4(quaternion A)
     WY = nQuaternion.W * nQuaternion.Y;
     WZ = nQuaternion.W * nQuaternion.Z;
     
+    #if 1
     Result.Elements[0][0] = 1.0f - 2.0f * (YY + ZZ);
     Result.Elements[0][1] = 2.0f * (XY + WZ);
     Result.Elements[0][2] = 2.0f * (XZ - WY);
@@ -991,6 +999,7 @@ MathQuaternionToMat4(quaternion A)
     Result.Elements[2][1] = 2.0f * (YZ - WX);
     Result.Elements[2][2] = 1.0f - 2.0f * (XX + YY);
     
+    #endif
     return(Result);
 }
 
