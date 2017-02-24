@@ -27,7 +27,7 @@ COMPRESSION_HANDLER(HENCCompressLZMemory)
     *(u32 *)Dst = HENC_LZ_MAGIC; // NOTE(zaklaus): "HLZ0" signature
     Dst += 4;
     
-    // TODO(zaklaus): Support files bigger than 4GiB.
+    // TODO(zaklaus): Support files bigger than 2GiB.
     *(u32 *)Dst = (u32)SrcSize;
     Dst += 4;
     
@@ -150,13 +150,13 @@ DECOMPRESSION_HANDLER(HENCDecompressLZMemory)
             s32 Count = *Src++;
             u8 CopyDistance = *Src++;
             u8 *Source = (Dst - CopyDistance);
-                
+            
             if(CopyDistance == 0)
-                {
-                    Source = Src;
-                    Src += Count;
-                }
-                
+            {
+                Source = Src;
+                Src += Count;
+            }
+            
             while(Count--)
             {
                 *Dst++ = *Source++;

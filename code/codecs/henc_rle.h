@@ -25,19 +25,19 @@ COMPRESSION_HANDLER(HENCCompressRLEMemory)
     *(u32 *)Dst = HENC_RLE_MAGIC; // NOTE(zaklaus): "HRLE" signature
     Dst += 4;
     
-    // TODO(zaklaus): Support files bigger than 4GiB.
+    // TODO(zaklaus): Support files bigger than 2GiB.
     *(u32 *)Dst = (u32)SrcSize;
     Dst += 4;
     
     u8 Literals[HENC_RLE_MAX_LITERAL_COUNT];
-       s32 LiteralCount = 0;
+    s32 LiteralCount = 0;
     
     u8 *End = Src + SrcSize;
     
     while(Src < End)
     {
         u8 Value = *Src;
-          ms Run = 1;
+        ms Run = 1;
         while((Run < (ms)(End - Src)) &&
               (Run < HENC_RLE_MAX_RUN_COUNT) &&
               (Src[Run] == Value))
@@ -88,7 +88,7 @@ DECOMPRESSION_HANDLER(HENCDecompressRLEMemory)
     if(*(u32 *)Src == HENC_RLE_MAGIC) // NOTE(zaklaus): "HRLE" signature
     {
         Src += 4;
-         ms DecompressedSize = *(u32 *)Src;
+        ms DecompressedSize = *(u32 *)Src;
         Src += 4;
         
         u8 *Dst = (u8 *)PlatformMemAlloc(DecompressedSize);

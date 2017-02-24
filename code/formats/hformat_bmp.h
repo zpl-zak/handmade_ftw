@@ -6,6 +6,8 @@ SW: N/A
 */
 #if !defined(HFORMAT_BMP_H)
 
+// TODO(ZaKlaus): Re-write to use pointer manipulation.
+
 #include "hftw.h"
 #include <stdio.h>
 
@@ -40,7 +42,7 @@ typedef struct
     hformat_bmp_header Header;
     hformat_bmp_info Info;
     RGBQUAD Colors[256];
-     u8 *Data;
+    u8 *Data;
 } hformat_bmp;
 
 internal hformat_bmp *
@@ -70,22 +72,22 @@ HFormatLoadBMPImage(s32 HandleIdx, b32 SwapChannels)
         
         if(SwapChannels)
         {
-        for(mi Idx = 0;
-            Idx < Image->Header.ImageSize;
-            Idx += 3)
-        {
-            _Swap0 = Image->Data[Idx];
-            Image->Data[Idx] = Image->Data[Idx + 2];
-            Image->Data[Idx + 2] = _Swap0;
+            for(mi Idx = 0;
+                Idx < Image->Header.ImageSize;
+                Idx += 3)
+            {
+                _Swap0 = Image->Data[Idx];
+                Image->Data[Idx] = Image->Data[Idx + 2];
+                Image->Data[Idx + 2] = _Swap0;
+            }
         }
-    }
-    
-    if(Image->Header.BitCount == 8)
-    {
-    IOFileSeek(HandleIdx, sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER), SeekOrigin_Set);
-    
-    IOFileRead(HandleIdx, Image->Colors, sizeof(RGBQUAD)*256);
-    }
+        
+        if(Image->Header.BitCount == 8)
+        {
+            IOFileSeek(HandleIdx, sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER), SeekOrigin_Set);
+            
+            IOFileRead(HandleIdx, Image->Colors, sizeof(RGBQUAD)*256);
+        }
     }
     return(Image);
 }

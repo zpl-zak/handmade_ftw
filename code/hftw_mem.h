@@ -14,19 +14,19 @@ typedef struct
     b32 IsFree;  // Is this node free for use?
 } arena_header;
 
-LinkedList(arena_header)
+LinkedList(arena_header);
 
 doc(memory_arena)
 doc_string(Memory arena holding contigous block of memory and tracking of pushed objects.)
 
 typedef struct
 {
-    memory_index Size;             // Allocated memory size. 
-    uint8 *Base;                   // Memory base pointer. (Points to a contigous block of memory.)
-    memory_index Used;             // Memory already used by elements.
+    ms Size;             // Allocated memory size. 
+    u8 *Base;                   // Memory base pointer. (Points to a contigous block of memory.)
+    ms Used;             // Memory already used by elements.
     u8 Flags;                      // Arena's flags.
     b32 WasExpanded;               // If reallocation is allowed, this signals us whether memory expansion has happened.
-
+    
     s32 TempCount;                 // Counts how many times is our arena used by temp_memory.
     s32 NodeCount;                 // Counts how many nodes do we track in our arena header.
     
@@ -157,15 +157,10 @@ ArenaInitialize(memory_arena *Arena, // Arena to be initialized.
                 memory_index Size,   // Size of the allocated memory.
                 void *Base)          // Memory block to be used with Arena.
 {
+    memory_arena Arena_ = {0};
+    *Arena = Arena_;
     Arena->Size = Size;
     Arena->Base = (uint8 *)Base;
-    Arena->Used = 0;
-    Arena->WasExpanded = 0;
-    Arena->TempCount = 0;
-    Arena->Flags = 0;
-    Arena->Header = 0;
-    Arena->HeaderEnd = 0;
-    Arena->NodeCount = 0;
 }
 
 
@@ -197,7 +192,7 @@ ArenaGetAlignmentOffset(memory_arena *Arena,     // Target Arena.
     {
         AlignmentOffset = Alignment - (ResultPointer & AlignmentMask);
     }
-
+    
     return(AlignmentOffset);
 }
 
@@ -219,8 +214,7 @@ doc(ArenaAlignNoClear)
 doc_string(Returns alignment arena push params without clear flag.)
 
 internal arena_push_params
-ArenaAlignNoClear(
-u32 Alignment)      // Memory alignment we require during allocation.
+ArenaAlignNoClear(u32 Alignment)      // Memory alignment we require during allocation.
 {
     arena_push_params Params = ArenaDefaultParams();
     Params.Flags &= ~ArenaPushFlag_ClearToZero;
@@ -303,8 +297,8 @@ internal memory_index
 ArenaGetSizeRemaining(memory_arena *Arena,      // Target arena
                       arena_push_params Params) // Params to be used during the procedure.
 {
-    memory_index Result = Arena->Size - (Arena->Used + ArenaGetAlignmentOffset(Arena, Params.Alignment));
-
+    ms Result = Arena->Size - (Arena->Used + ArenaGetAlignmentOffset(Arena, Params.Alignment));
+    
     return(Result);
 }
 
@@ -316,26 +310,26 @@ ArenaGetBlockByRecord(memory_arena *Arena, // Target arena
                       size_t Index)        // Element index
 {
     Assert(Arena->Header && "Arena headers aren't enabled!");
-      u8 *Result = Arena->Base;
+    u8 *Result = Arena->Base;
     size_t Idx = 0;
     for(Node_arena_header *Record = Arena->Header->Next;
         Record;
         Record = Record->Next)
-{
-    if(Idx++ == Index)
-        break;
-    Result += Record->Value.Size;
-}
-return(Result);
+    {
+        if(Idx++ == Index)
+            break;
+        Result += Record->Value.Size;
+    }
+    return(Result);
 }
 
-doc(ArenaGetBlockByTagAndRecord)
+doc(ArenaGetBlockByTag)
 doc_string(Returns tag scan result based on specified tag.)
 
 internal tag_scan_result
-ArenaGetBlockByTagAndRecord(memory_arena *Arena,  // Target arena
-                            tag_scan_result scan, // Previous scan result. (Or DefaultTagScan if none. @see DefaultTagScan)
-                            u32 Tag)              // Tag used for lookup.
+ArenaGetBlockByTag(memory_arena *Arena,  // Target arena
+                   tag_scan_result scan, // Previous scan result. (Or DefaultTagScan if none. @see DefaultTagScan)
+                   u32 Tag)              // Tag used for lookup.
 {
     if(!scan.Node)
         scan.Node = Arena->Header;
@@ -366,10 +360,10 @@ ArenaGetEffectiveSizeFor(memory_arena *Arena,      // Target arena
                          arena_push_params Params) // Params to be used during the procedure.
 {
     memory_index Size = SizeInit;
-        
+    
     memory_index AlignmentOffset = ArenaGetAlignmentOffset(Arena, Params.Alignment);
     Size += AlignmentOffset;
-
+    
     return(Size);
 }
 
@@ -422,36 +416,36 @@ ArenaReuseMem(memory_arena *Arena,
     void *Result = 0;
     *IsReused = 0;
     if(!(Arena->Flags & ArenaFlag_DisallowReuse))
+    {
+        for (Node_arena_header *Node = Arena->Header;
+             Node;
+             Node = Node->Next)
         {
-            for (Node_arena_header *Node = Arena->Header;
-                 Node;
-                 Node = Node->Next)
+            arena_header *E = &Node->Value;
+            if(E->IsFree && E->Size >= Size)
             {
-                arena_header *E = &Node->Value;
-                if(E->IsFree && E->Size >= Size)
+                if(E->Size > Size)
                 {
-                    if(E->Size > Size)
-                    {
-                        Node_arena_header *NE = Node->Next;
-                        s32 NewSize = E->Size - (s32)Size;
-                        E->Size = (s32)Size;
-                        
-                        arena_header N = {0};
-                        N.Size = NewSize;
-                        N.Offset = E->Offset + E->Size;
-                        N.IsFree = 1;
-                        Node_arena_header *NewNode = AddNode_arena_header(Node, N);
-                        NewNode->Next = NE;
-                        ++Arena->NodeCount;
-                    }
-                    Result = Arena->Base + E->Offset;
-                    E->Tag = Params.Tag;
-                    E->IsFree = 0;
-                    *IsReused = 1;
-                    return(Result);
+                    Node_arena_header *NE = Node->Next;
+                    s32 NewSize = E->Size - (s32)Size;
+                    E->Size = (s32)Size;
+                    
+                    arena_header N = {0};
+                    N.Size = NewSize;
+                    N.Offset = E->Offset + E->Size;
+                    N.IsFree = 1;
+                    Node_arena_header *NewNode = AddNode_arena_header(Node, N);
+                    NewNode->Next = NE;
+                    ++Arena->NodeCount;
                 }
+                Result = Arena->Base + E->Offset;
+                E->Tag = Params.Tag;
+                E->IsFree = 0;
+                *IsReused = 1;
+                return(Result);
             }
         }
+    }
     return(Result);
 }
 
@@ -476,7 +470,7 @@ ArenaPushSize_(memory_arena *Arena,         // Target arena
     }
     
     Assert(Size >= SizeInit);
-
+    
     if(Params.Flags & ArenaPushFlag_ClearToZero)
     {
         ZeroSize(SizeInit, Result);
@@ -527,7 +521,7 @@ ArenaPushString(memory_arena *Arena, // Target arena
     {
         Dest[CharIndex] = Source[CharIndex];
     }
-
+    
     return(Dest);
 }
 
@@ -547,7 +541,7 @@ ArenaPushAndNullTerminate(memory_arena *Arena, // Target arena
         Dest[CharIndex] = Source[CharIndex];
     }
     Dest[Length] = 0;
-
+    
     return(Dest);
 }
 
@@ -559,12 +553,12 @@ ArenaBeginTemporaryMemory(
 memory_arena *Arena) // Target arena
 {
     temp_memory Result;
-
+    
     Result.Arena = Arena;
     Result.Used = Arena->Used;
-
+    
     ++Arena->TempCount;
-
+    
     return(Result);
 }
 
@@ -651,7 +645,7 @@ doc_ret(Returns serialized data.)
 internal u8 *
 ArenaSerialize(
 memory_arena * Arena, // Arena to be serialized.
- size_t * Size)         // Size of the serialized data.
+size_t * Size)         // Size of the serialized data.
 {
     Assert(!Arena->TempCount);
     size_t AllocSize = Arena->Used + sizeof(mi)*2 + sizeof(u8) + sizeof(s32) + sizeof(arena_header)*Arena->NodeCount;
@@ -683,8 +677,8 @@ memory_arena * Arena, // Arena to be serialized.
         }
     }
     
-*Size = AllocSize;
-return(Result);
+    *Size = AllocSize;
+    return(Result);
 }
 
 doc(ArenaDeserialize)
@@ -707,7 +701,7 @@ u8 * Data)            // Source of our serialized data.
     {
         Arena->NodeCount = *(s32 *)Data; Data += sizeof(s32);
         
-// NOTE(zaklaus): Include header as a part of the Linked-List.
+        // NOTE(zaklaus): Include header as a part of the Linked-List.
         for (s32 Idx = 0;
              Idx < Arena->NodeCount + 1;
              Idx++)
@@ -804,13 +798,13 @@ u32 Tag)
         Node;
         Node = Node->Next
         )
-{
-    if(Node->Value.Tag == Tag)
     {
-        Node->Value.IsFree = 1;
-        return;
+        if(Node->Value.Tag == Tag)
+        {
+            Node->Value.IsFree = 1;
+            return;
+        }
     }
-}
 }
 
 #define HFTW_MEM_H
