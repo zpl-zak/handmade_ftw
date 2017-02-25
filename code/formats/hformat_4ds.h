@@ -41,7 +41,7 @@ enum
 
 enum
 {
-    HFormat4DSVisualMeshType_Standard = 0x0,
+    HFormat4DSVisualMeshType_Standard = 0x00,
     HFormat4DSVisualMeshType_SingleMesh = 0x02,
     HFormat4DSVisualMeshType_SingleMorph = 0x03,
     HFormat4DSVisualMeshType_Billboard = 0x04,
