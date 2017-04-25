@@ -8,7 +8,7 @@ doc_cat(Memory Arena)
 
 typedef struct
 {
-    s32 Size;    // Size of the element.
+    u32 Size;    // Size of the element.
     u32 Tag;     // Element's tag used for identification.
     u32 Offset;  // Memory offset from the base.
     b32 IsFree;  // Is this node free for use?

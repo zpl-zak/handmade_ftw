@@ -27,7 +27,7 @@ typedef struct
     hformat_pak_header Header;
     hformat_pak_file *Files;
     u64 *Checksums;
-    s32 FileCount;
+    u32 FileCount;
 } hformat_pak;
 
 internal hformat_pak *

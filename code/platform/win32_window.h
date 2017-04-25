@@ -36,7 +36,7 @@ WindowCreateClass(HINSTANCE Instance, LPCSTR ClassName, LRESULT (*WndProc)(HWND,
 {
     WNDCLASSEX wc = {0};
     wc.cbSize = sizeof(wc);
-    wc.lpfnWndProc = WndProc;
+    wc.lpfnWndProc = (WNDPROC)WndProc;
     wc.hInstance = Instance;
     wc.hCursor = LoadCursor(0, IDC_ARROW);
     wc.lpszClassName = ClassName;

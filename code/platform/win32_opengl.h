@@ -629,5 +629,11 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
     return(OpenGLRC);
 }
 
+internal void
+Win32ReleaseOpenGL(void)
+{
+    wglDeleteContext(OpenGLRC);
+}
+
 #define WIN32_OPENGL_H
 #endif
