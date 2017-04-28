@@ -95,8 +95,23 @@ typedef BOOL WINAPI wgl_choose_pixel_format_arb(HDC hdc,
                                                 UINT *nNumFormats);
 
 typedef void WINAPI gl_bind_framebuffer(GLenum target, GLuint framebuffer);
+
+typedef void WINAPI gl_renderbuffer_storage(GLenum target,
+                                            GLenum internalformat,
+                                            GLsizei width,
+                                            GLsizei height);
+
+typedef void WINAPI gl_framebuffer_renderbuffer(GLenum target,
+                                                GLenum attachment,
+                                                GLenum renderbuffertarget,
+                                                GLuint renderbuffer);
+
+typedef void WINAPI gl_bind_renderbuffer(GLenum target, GLuint renderbuffer);
+typedef void WINAPI gl_draw_buffers(GLsizei n,
+                                    GLenum *bufs);
 typedef void WINAPI gl_gen_framebuffers(GLsizei n, GLuint *framebuffers);
 typedef void WINAPI gl_framebuffer_texture_2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef void WINAPI gl_framebuffer_texture(GLenum target, GLenum attachment, GLuint texture, GLint level);
 typedef GLenum WINAPI gl_check_framebuffer_status(GLenum target);
 typedef void WINAPI gl_gen_vertex_arrays(GLsizei n, GLuint *arrays);
 typedef void WINAPI gl_bind_vertex_array(GLuint array);
@@ -241,8 +256,13 @@ typedef void WINAPI gl_active_texture(GLenum texture);
 //
 
 global_variable gl_bind_framebuffer *glBindFramebuffer;
+global_variable gl_bind_renderbuffer *glBindRenderbuffer;
+global_variable gl_renderbuffer_storage *glRenderbufferStorage;
+global_variable gl_framebuffer_renderbuffer *glFramebufferRenderbuffer;
+global_variable gl_draw_buffers *glDrawBuffers;
 global_variable gl_gen_framebuffers *glGenFramebuffers;
 global_variable gl_framebuffer_texture_2D *glFramebufferTexture2D;
+global_variable gl_framebuffer_texture *glFramebufferTexture;
 global_variable gl_check_framebuffer_status *glCheckFramebufferStatus;
 global_variable gl_gen_vertex_arrays *glGenVertexArrays;
 global_variable gl_bind_vertex_array *glBindVertexArray;
@@ -548,8 +568,13 @@ Win32InitOpenGL(HDC WindowDC, b32 *ModernContext)
         if(Info.GL_ARB_framebuffer_object)
         {
             glBindFramebuffer = (gl_bind_framebuffer *)Win32OpenGLLoadProc("glBindFramebuffer");
+            glBindRenderbuffer = (gl_bind_renderbuffer *)Win32OpenGLLoadProc("glBindRenderbuffer");
+            glRenderbufferStorage = (gl_renderbuffer_storage *)Win32OpenGLLoadProc("glRenderbufferStorage");
+            glFramebufferRenderbuffer = (gl_framebuffer_renderbuffer *)Win32OpenGLLoadProc("glFramebufferRenderbuffer");
+            glDrawBuffers = (gl_draw_buffers *)Win32OpenGLLoadProc("glDrawBuffers");
             glGenFramebuffers = (gl_gen_framebuffers *)Win32OpenGLLoadProc("glGenFramebuffers");
             glFramebufferTexture2D = (gl_framebuffer_texture_2D *)Win32OpenGLLoadProc("glFramebufferTexture2D");
+            glFramebufferTexture = (gl_framebuffer_texture *)Win32OpenGLLoadProc("glFramebufferTexture");
             glCheckFramebufferStatus = (gl_check_framebuffer_status *)Win32OpenGLLoadProc("glCheckFramebufferStatus");
             glGenVertexArrays = (gl_gen_vertex_arrays *)Win32OpenGLLoadProc("glGenVertexArrays");
             glBindVertexArray = (gl_bind_vertex_array *)Win32OpenGLLoadProc("glBindVertexArray");
